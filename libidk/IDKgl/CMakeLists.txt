@@ -15,14 +15,13 @@ find_package(OpenGL REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${GLEW_INCLUDE_DIRS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${OPENGL_INCLUDE_DIRS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${SDL2_INCLUDE_DIRS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${SDL2_image_INCLUDE_DIRS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
+include_directories(${PROJECT_NAME} PUBLIC ${GLEW_INCLUDE_DIRS})
+include_directories(${PROJECT_NAME} PUBLIC ${OPENGL_INCLUDE_DIRS})
+include_directories(${PROJECT_NAME} PUBLIC ${SDL2_INCLUDE_DIRS})
+include_directories(${PROJECT_NAME} PUBLIC ${SDL2_image_INCLUDE_DIRS})
+include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
 
-target_link_libraries(
-    ${PROJECT_NAME} PUBLIC
+link_libraries(
     GLEW
     SDL2
     SDL2_image
