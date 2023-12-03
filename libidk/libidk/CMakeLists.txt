@@ -10,9 +10,9 @@ file(GLOB SOURCES
 add_library(${PROJECT_NAME} OBJECT ${SOURCES})
 
 find_package(SDL2_mixer REQUIRED)
-include_directories(${PROJECT_NAME} PUBLIC ${SDL2_mixer_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PUBLIC ${SDL2_mixer_INCLUDE_DIRS})
 
-link_libraries(
+target_link_libraries(
     ${PROJECT_NAME} PUBLIC
     SDL2_mixer
 )
