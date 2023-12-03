@@ -1,23 +1,20 @@
 #!/bin/bash
 
-mkdir -p build
+mkdir -p build/CMake
 
-cd build
-cmake -G Ninja ..
+cd build/CMake
+cmake -G Ninja ../../
 ninja -j 6
+
+
 cd ..
 
+mkdir -p {include,lib}/
+mkdir -p include/libidk
 
-# Create output directory structure
-mkdir -p output/{include,lib}/libidk/
-
-# Copy source code to output directory
-cp -R libidk/. output/include/libidk/.
+cp ./CMake/libidk.so ./lib/.
+cp -R ../src/libidk ./include/.
 
 # Delete everything but header files
-find ./output/include/libidk/ -name "*.cpp" -type f -delete
-find ./output/include/libidk/ -name "*.txt" -type f -delete
-
-# Copy library file to output directory
-cp build/libidk.so  output/lib/libidk/.
-
+find ./include/libidk/ -name "*.cpp" -type f -delete
+find ./include/libidk/ -name "*.txt" -type f -delete
