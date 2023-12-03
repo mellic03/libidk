@@ -19,5 +19,5 @@ find ./output/include/libidk/ -name "*.cpp" -type f -delete
 find ./output/include/libidk/ -name "*.txt" -type f -delete
 
 # Copy library file to output directory
-cp build/libidk.a  output/lib/libidk/libidk.a
+cp build/libidk.so  output/lib/libidk/.
 
