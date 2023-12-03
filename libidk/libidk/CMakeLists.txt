@@ -7,7 +7,7 @@ file(GLOB SOURCES
     "idk_datastructures/*.cpp"
 )
 
-add_library(${PROJECT_NAME} OBJECT ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 find_package(SDL2_mixer REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${SDL2_mixer_INCLUDE_DIRS})
