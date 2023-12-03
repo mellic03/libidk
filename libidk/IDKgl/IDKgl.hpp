@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common.hpp"
 #include "idk_gltools.hpp"
 #include "idk_glBindings.hpp"
 #include "idk_glUBO.hpp"
