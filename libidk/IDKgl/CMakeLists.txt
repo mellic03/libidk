@@ -6,7 +6,7 @@ file(GLOB SOURCES
     "./*.cpp"
 )
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
+add_library(${PROJECT_NAME} OBJECT ${SOURCES})
 
 set(OpenGL_GL_PREFERENCE GLVND)
 
