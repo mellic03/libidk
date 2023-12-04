@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../idk_utility.h"
+#include "../idk_utility.hpp"
 
 #include <vector>
 

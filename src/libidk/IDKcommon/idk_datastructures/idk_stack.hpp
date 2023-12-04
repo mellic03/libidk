@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstring>
-#include "datastructures_decl.h"
+#include "datastructures_decl.hpp"
 
 
 template <typename T>

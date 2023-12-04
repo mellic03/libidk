@@ -1,6 +1,6 @@
 #pragma once
 
-#include "datastructures_decl.h"
+#include "datastructures_decl.hpp"
 
 template <typename T, typename U>
 struct idk::pair

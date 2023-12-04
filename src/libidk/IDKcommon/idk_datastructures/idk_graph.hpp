@@ -1,7 +1,7 @@
 #pragma once
 
-#include "datastructures_decl.h"
-#include "idk_vector.h"
+#include "datastructures_decl.hpp"
+#include "idk_vector.hpp"
 
 #include <set>
 #include <map>

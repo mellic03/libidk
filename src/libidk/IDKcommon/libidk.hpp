@@ -1,9 +1,9 @@
 #pragma once
 
-#include "IDK_SDL2/IDK_SDL2.h"
+#include "idk_SDL2/IDKSDL2.hpp"
 
-#include "idk_enums.h"
-#include "idk_utility.h"
+#include "idk_enums.hpp"
+#include "idk_utility.hpp"
 
-#include "idk_datastructures/datastructures.h"
+#include "idk_datastructures/datastructures.hpp"
 
