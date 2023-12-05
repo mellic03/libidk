@@ -16,7 +16,7 @@ idk::glUBO::glUBO( GLuint location, GLsizeiptr size )
 
     gl::genBuffers(1, &m_UBO);
     gl::bindBuffer(GL_UNIFORM_BUFFER, m_UBO);
-    gl::bufferData(GL_UNIFORM_BUFFER, size, NULL, GL_STATIC_DRAW);
+    gl::bufferData(GL_UNIFORM_BUFFER, size, NULL, GL_DYNAMIC_DRAW);
     gl::bindBuffer(GL_UNIFORM_BUFFER, 0);
     gl::bindBufferBase(GL_UNIFORM_BUFFER, location, m_UBO);
 }
