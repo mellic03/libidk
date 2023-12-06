@@ -46,6 +46,13 @@ idk::Transform::front()
 }
 
 
+glm::vec3
+idk::Transform::right()
+{
+    return m_model_mat * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+}
+
+
 void
 idk::Transform::translate(glm::vec3 t)
 {

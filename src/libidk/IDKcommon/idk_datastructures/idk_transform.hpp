@@ -21,6 +21,7 @@ public:
 
     glm::vec3           scale();
     glm::vec3           front();
+    glm::vec3           right();
 
 
     void                translate( glm::vec3 );
