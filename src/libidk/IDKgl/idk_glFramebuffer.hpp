@@ -32,6 +32,7 @@ struct idk::glColorConfig
 struct idk::DepthAttachmentConfig
 {
     GLint  internalformat = GL_DEPTH_COMPONENT16;
+    GLenum format         = GL_DEPTH_COMPONENT;
     GLenum datatype       = GL_FLOAT;
 };
 

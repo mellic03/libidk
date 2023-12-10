@@ -17,10 +17,10 @@ idk::gltools::loadTexture( size_t w, size_t h, void *data, bool srgb, GLint minf
     gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_S, GL_REPEAT);
     gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    GLint internalformat = (srgb) ? GL_SRGB8 : GL_RGB8;
+    GLint internalformat = (srgb) ? GL_SRGB8_ALPHA8 : GL_RGBA16;
 
     gl::textureStorage2D(texture_id, 1, internalformat, w, h);
-    gl::textureSubImage2D(texture_id, 0, 0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, data);
+    gl::textureSubImage2D(texture_id, 0, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
     // gl::texImage2D(GL_TEXTURE_2D, 0, internalformat, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     // gl::generateMipmap(GL_TEXTURE_2D);
@@ -36,7 +36,7 @@ GLuint
 idk::gltools::loadTexture( std::string filepath, bool srgb, GLint minfilter, GLint magfilter )
 {
     SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
-    SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGB24);
+    SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
     SDL_Surface      *img    = SDL_ConvertSurface(tmp, target, 0);
 
     GLuint texture_id = gltools::loadTexture(img->w, img->h, (uint32_t *)(img->pixels), srgb, minfilter, magfilter);

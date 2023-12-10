@@ -11,6 +11,8 @@ private:
     glm::vec3           m_up         = glm::vec3( 0.0f,  1.0f,  0.0f );
     glm::vec3           m_scale      = glm::vec3( 1.0f );
     glm::mat4           m_model_mat  = glm::mat4( 1.0f );
+    glm::mat4           m_rotation   = glm::mat4( 1.0f );
+    glm::mat4           m_point_to   = glm::mat4( 1.0f );
 
 public:
                         Transform();
@@ -22,6 +24,7 @@ public:
     glm::vec3           scale();
     glm::vec3           front();
     glm::vec3           right();
+    void                pointTowards( const glm::vec3 & );
 
 
     void                translate( glm::vec3 );

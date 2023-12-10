@@ -15,7 +15,9 @@ class idk::iBuffer
 {
 public:
     virtual        ~iBuffer() = default;
+
     virtual void *  data   (        ) = 0;
+    virtual size_t  size   (        ) = 0;
     virtual size_t  nbytes (        ) = 0;
     virtual void    resize ( size_t ) = 0;   
 };
@@ -28,8 +30,14 @@ public:
     std::vector<T> m_data;
 
     virtual void   *data   (          ) final;
+    virtual size_t  size   (          ) final { return m_data.size(); };
     virtual size_t  nbytes (          ) final;
-    virtual void    resize ( size_t s ) final;   
+    virtual void    resize ( size_t s ) final;
+
+    void    push_back( const T &data ) { m_data.push_back(data); };
+
+    typename std::vector<T>::iterator begin() { return m_data.begin(); };
+    typename std::vector<T>::iterator end()   { return m_data.end();   };
 };
 
 

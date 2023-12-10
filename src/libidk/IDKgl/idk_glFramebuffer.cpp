@@ -17,17 +17,18 @@ idk::glFramebuffer::reset( int w, int h, size_t num_attachments )
 
     gl::genFramebuffers(1, &m_FBO);
     gl::genRenderbuffers(1, &m_RBO);
-    // gl::genRenderbuffers(1, &m_cubemap_RBO);
 
-    gl::bindRenderbuffer(GL_RENDERBUFFER, m_FBO);
-    gl::bindFramebuffer(GL_FRAMEBUFFER, m_RBO);
+    if (num_attachments > 0)
+    {
+        gl::bindFramebuffer(GL_FRAMEBUFFER, m_RBO);
+        gl::bindRenderbuffer(GL_RENDERBUFFER, m_FBO);
 
-    GLCALL( glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, w, h); )
-    GLCALL( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBO); )
+        GLCALL( glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, w, h); )
+        GLCALL( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBO); )
 
-    gl::bindRenderbuffer(GL_RENDERBUFFER, 0);
-    gl::bindFramebuffer(GL_FRAMEBUFFER, 0);
-
+        gl::bindRenderbuffer(GL_RENDERBUFFER, 0);
+        gl::bindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 
     m_first = false;
 }
@@ -54,13 +55,13 @@ idk::glFramebuffer::cubemapColorAttachment( const idk::glColorConfig &config )
     gl::texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     gl::texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-    gl::bindRenderbuffer(GL_RENDERBUFFER, m_RBO);
-    GLCALL( glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_size.x, m_size.y); )
-    GLCALL( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBO); )
+    // gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+    // gl::bindRenderbuffer(GL_RENDERBUFFER, m_RBO);
+    // GLCALL( glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_size.x, m_size.y); )
+    // GLCALL( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBO); )
 
     gl::bindFramebuffer(GL_FRAMEBUFFER, 0);
-    gl::bindRenderbuffer(GL_RENDERBUFFER, 0);
+    // gl::bindRenderbuffer(GL_RENDERBUFFER, 0);
     gl::bindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
@@ -104,7 +105,7 @@ idk::glFramebuffer::colorAttachment( int idx, const idk::glColorConfig &config )
     );
 
     m_gl_attachments.push_back(GL_COLOR_ATTACHMENT0 + idx);
-    glDrawBuffers(m_gl_attachments.size(), &(m_gl_attachments[0]));
+    GLCALL( glDrawBuffers(m_gl_attachments.size(), &(m_gl_attachments[0])); )
 
     gl::bindFramebuffer(GL_FRAMEBUFFER, 0);
     gl::bindTexture(GL_TEXTURE_2D, 0);
@@ -114,19 +115,25 @@ idk::glFramebuffer::colorAttachment( int idx, const idk::glColorConfig &config )
 void
 idk::glFramebuffer::depthAttachment( const idk::DepthAttachmentConfig &config )
 {
-    gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-
     gl::deleteTextures(1, &depth_attachment);
     gl::genTextures(1, &depth_attachment);
     gl::bindTexture(GL_TEXTURE_2D, depth_attachment);
 
     gl::texImage2D(
         GL_TEXTURE_2D, 0, config.internalformat,
-        m_size.x, m_size.y, 0, GL_DEPTH_COMPONENT, config.datatype, NULL
+        m_size.x, m_size.y, 0, config.format, config.datatype, NULL
     );
 
-    m_gl_attachments.push_back(GL_DEPTH_ATTACHMENT);
-    glDrawBuffers(m_gl_attachments.size(), &(m_gl_attachments[0]));
+    gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+    gl::framebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_attachment, 0);
+
+    GLCALL( glDrawBuffer(GL_NONE); )
+    GLCALL( glReadBuffer(GL_NONE); )
+
+    gl::texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    gl::texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    gl::texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    gl::texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
     gl::bindFramebuffer(GL_FRAMEBUFFER, 0);
     gl::bindTexture(GL_TEXTURE_2D, 0);

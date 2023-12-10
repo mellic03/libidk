@@ -54,6 +54,26 @@ idk::Transform::right()
 
 
 void
+idk::Transform::pointTowards( const glm::vec3 &p )
+{
+    glm::vec3 up(0.0f, 1.0f, 0.0f);
+
+    glm::vec3 z_axis = glm::normalize(p - position());
+    glm::vec3 x_axis = glm::normalize(glm::cross(up, z_axis));
+    glm::vec3 y_axis = glm::normalize(glm::cross(z_axis, x_axis));
+
+    glm::mat4 rotationMatrix(
+        glm::vec4(x_axis, 0.0f),
+        glm::vec4(y_axis, 0.0f),
+        glm::vec4(z_axis, 0.0f),
+        glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+    m_point_to = rotationMatrix;
+}
+
+
+
+void
 idk::Transform::translate(glm::vec3 t)
 {
     glm::mat4 translation = glm::translate(glm::mat4(1.0f), t);
@@ -131,24 +151,27 @@ void
 idk::Transform::rotateX(float x)
 {
     glm::quat rotX = glm::quat(glm::vec3(x, 0.0f, 0.0f));
-    m_model_mat = m_model_mat * glm::mat4_cast(rotX);
+    m_rotation = glm::mat4_cast(rotX) * m_rotation;
 }
 
 void
 idk::Transform::rotateY(float y)
 {
     glm::quat rotY = glm::quat(glm::vec3(0.0f, y, 0.0f));
-    m_model_mat = m_model_mat * glm::mat4_cast(rotY);
+    m_rotation = glm::mat4_cast(rotY) * m_rotation;
  
-    m_front = glm::mat3(m_model_mat) * m_front;
+    // m_front = glm::mat3(m_model_mat) * m_front;
 }
 
 void
 idk::Transform::rotateZ(float z)
 {
-    m_model_mat = glm::rotate(m_model_mat, z, glm::vec3(0.0f, 0.0f, 1.0f));
-//     glm::quat rotZ = glm::quat(glm::vec3(0.0f, 0.0f, z));
-//     _model_mat = _model_mat * glm::mat4_cast(rotZ);
+    glm::quat rotZ = glm::quat(glm::vec3(0.0f, 0.0f, z));
+    m_rotation = glm::mat4_cast(rotZ) * m_rotation;
+ 
+    // m_rotation = glm::rotate(m_rotation, z, glm::vec3(0.0f, 0.0f, 1.0f));
+    // glm::quat rotZ = glm::quat(glm::vec3(0.0f, 0.0f, z));
+    // _model_mat = _model_mat * glm::mat4_cast(rotZ);
 }
 
 
@@ -156,7 +179,7 @@ void
 idk::Transform::rotate(glm::vec3 v)
 {
     glm::quat rot = glm::quat(v);
-    m_model_mat = m_model_mat * glm::mat4_cast(rot);
+    m_rotation = m_rotation * glm::mat4_cast(rot);
 }
 
 
@@ -166,6 +189,7 @@ idk::Transform::modelMatrix()
     // glm::mat4 model_mat = glm::translate(glm::mat4(1.0f), _position) * glm::mat4_cast(_orientation);
     // model_mat = glm::scale(model_mat, _scale);
 
-    return glm::scale(m_model_mat, m_scale);
+    // return glm::scale(m_rotation * m_model_mat, m_scale);
+    return m_model_mat * m_point_to * m_rotation;
 }
 
