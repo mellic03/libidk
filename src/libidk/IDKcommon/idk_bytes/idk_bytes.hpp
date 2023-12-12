@@ -27,10 +27,6 @@ struct idk::ProcessorInfo
 };
 
 
-const bool idk::ProcessorInfo::ENDIANNESS = idk::ProcessorInfo::get_endiannes();
-
-
-
 namespace idk
 {
     void readbytes( std::ifstream &, uint32_t *, uint32_t n );

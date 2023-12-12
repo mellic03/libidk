@@ -1,6 +1,9 @@
 #include "idk_bytes.hpp"
 
 
+const bool idk::ProcessorInfo::ENDIANNESS = idk::ProcessorInfo::get_endiannes();
+
+
 void
 idk::readbytes( std::ifstream &stream, uint32_t *data, uint32_t n )
 {
