@@ -4,7 +4,6 @@
 #include <cstdint>
 
 
-
 namespace idk { struct ProcessorInfo; };
 
 

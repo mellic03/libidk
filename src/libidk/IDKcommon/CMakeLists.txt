@@ -4,6 +4,7 @@ project(IDKcommon)
 
 file(GLOB SOURCES
     "./*.cpp"
+    "idk_bytes/*.cpp"
     "idk_datastructures/*.cpp"
 )
 
