@@ -17,9 +17,6 @@
 #include <string>
 
 
-#define assertm(exp, msg) assert(((void)msg, exp))
-
-
 #define GLClearError() \
 { \
   while (glGetError() != GL_NO_ERROR); \

@@ -53,6 +53,11 @@ namespace idk::gl
 
     void bufferData( GLenum target, GLsizeiptr size, const void *data, GLenum usage );
     void bufferSubData( GLenum target, GLintptr offset, GLsizeiptr size, const void *data);
+
+    void createBuffers( GLsizei n, GLuint *buffers );
+    void namedBufferData( GLuint buffer, GLsizeiptr size, const void *data, GLenum usage );
+    void namedBufferSubData( GLuint buffer, GLintptr offset, GLsizeiptr size, const void *data );
+
     void *mapBuffer( GLenum target, GLenum access );
     void unmapBuffer( GLenum target );
 
@@ -88,17 +93,13 @@ namespace idk::gl
 
     // -----------------------------------------------------------------------------------------
 
-
     void generateMipmap( GLenum target );
-
     void pixelStorei( GLenum pname, GLint param );
-
 
     // Framebuffer stuff  --------------------------------------------------------------------
     void framebufferTexture2D( GLenum target, GLenum attachment, GLenum textarget,
                                GLuint texture, GLint level );
     // ---------------------------------------------------------------------------------------
-
 
     // Uniforms ------------------------------------------------------------------------------
     /**/
@@ -121,6 +122,7 @@ namespace idk::gl
     void clearColor( float r, float g, float b, float a );
     void clear( GLbitfield mask );
     void viewport( GLint x, GLint y, GLsizei w, GLsizei h );
+    void cullFace( GLenum mode );
 };
 
 

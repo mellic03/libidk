@@ -29,7 +29,7 @@ template <typename T>
 void
 idk::glUBO::add(const void *data)
 {
-    gl::bufferSubData(GL_UNIFORM_BUFFER, m_offset, sizeof(T), data);
+    gl::namedBufferSubData(m_UBO, m_offset, sizeof(T), data);
     m_offset += round_up(sizeof(T), 16);
 }
 

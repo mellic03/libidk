@@ -148,6 +148,25 @@ idk::gl::bufferSubData( GLenum target, GLintptr offset, GLsizeiptr size, const v
     GLCALL( glBufferSubData(target, offset, size, data); )
 }
 
+void
+idk::gl::createBuffers( GLsizei n, GLuint *buffers )
+{
+    GLCALL( glCreateBuffers(n, buffers); )
+}
+
+void
+idk::gl::namedBufferData( GLuint buffer, GLsizeiptr size, const void *data, GLenum usage )
+{
+    GLCALL( glNamedBufferData(buffer, size, data, usage); )
+}
+
+void
+idk::gl::namedBufferSubData( GLuint buffer, GLintptr offset, GLsizeiptr size, const void *data )
+{
+    GLCALL( glNamedBufferSubData(buffer, offset, size, data); )
+}
+
+
 void *
 idk::gl::mapBuffer( GLenum target, GLenum access )
 {
@@ -347,7 +366,8 @@ idk::gl::clearColor( float r, float g, float b, float a )
 }
 
 
-void idk::gl::clear( GLbitfield mask )
+void
+idk::gl::clear( GLbitfield mask )
 {
     GLCALL( glClear(mask); )
 }
@@ -360,3 +380,8 @@ idk::gl::viewport( GLint x, GLint y, GLsizei w, GLsizei h )
 }
 
 
+void
+idk::gl::cullFace( GLenum mode )
+{
+    GLCALL( glCullFace(mode); )
+}
