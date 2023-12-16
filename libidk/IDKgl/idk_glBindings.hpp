@@ -30,6 +30,7 @@ namespace idk::gl
     void genFramebuffers  ( GLsizei n, GLuint *framebuffers     );
     void genRenderbuffers ( GLsizei n, GLuint *renderbuffers    );
 
+    void createBuffers( GLsizei n, GLuint *buffers );
     void createTextures ( GLenum target, GLsizei n, GLuint *textures );
 
     void deleteVertexArrays  ( GLsizei n, GLuint *arrays         );
@@ -54,7 +55,6 @@ namespace idk::gl
     void bufferData( GLenum target, GLsizeiptr size, const void *data, GLenum usage );
     void bufferSubData( GLenum target, GLintptr offset, GLsizeiptr size, const void *data);
 
-    void createBuffers( GLsizei n, GLuint *buffers );
     void namedBufferData( GLuint buffer, GLsizeiptr size, const void *data, GLenum usage );
     void namedBufferSubData( GLuint buffer, GLintptr offset, GLsizeiptr size, const void *data );
 
@@ -97,8 +97,16 @@ namespace idk::gl
     void pixelStorei( GLenum pname, GLint param );
 
     // Framebuffer stuff  --------------------------------------------------------------------
+    void framebufferTexture( GLenum target, GLenum attachment, GLuint texture, GLint level );
+
     void framebufferTexture2D( GLenum target, GLenum attachment, GLenum textarget,
-                               GLuint texture, GLint level );
+                                GLuint texture, GLint level );
+
+    void framebufferTextureLayer( GLenum target, GLenum attachment, GLuint texture,
+                                  GLint level, GLint layer );
+
+    void namedFramebufferTextureLayer( GLuint framebuffer, GLenum attachment, GLuint texture,
+                                       GLint level, GLint layer );
     // ---------------------------------------------------------------------------------------
 
     // Uniforms ------------------------------------------------------------------------------

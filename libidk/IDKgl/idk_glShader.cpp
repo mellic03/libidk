@@ -396,7 +396,7 @@ idk::glShader::unbind()
 
 
 void
-idk::glShader::set_int( std::string name, int i )
+idk::glShader::set_int( const std::string &name, int i )
 {
     GLint loc = uniformLoc(name);
     gl::uniform1i(loc, i);
@@ -404,7 +404,7 @@ idk::glShader::set_int( std::string name, int i )
 
 
 void
-idk::glShader::set_float( std::string name, float f )
+idk::glShader::set_float( const std::string &name, float f )
 {
     GLint loc = uniformLoc(name);
     gl::uniform1f(loc, f);
@@ -412,7 +412,7 @@ idk::glShader::set_float( std::string name, float f )
 
 
 void
-idk::glShader::set_vec2( std::string name, glm::vec2 v )
+idk::glShader::set_vec2( const std::string &name, glm::vec2 v )
 {
     GLint loc = uniformLoc(name);
     gl::uniform2fv(loc, 1, glm::value_ptr(v));
@@ -420,7 +420,7 @@ idk::glShader::set_vec2( std::string name, glm::vec2 v )
 
 
 void
-idk::glShader::set_vec3( std::string name, glm::vec3 v )
+idk::glShader::set_vec3( const std::string &name, glm::vec3 v )
 {
     GLint loc = uniformLoc(name);
     gl::uniform3fv(loc, 1, glm::value_ptr(v));
@@ -428,7 +428,7 @@ idk::glShader::set_vec3( std::string name, glm::vec3 v )
 
 
 void
-idk::glShader::set_vec4( std::string name, glm::vec4 v )
+idk::glShader::set_vec4( const std::string &name, glm::vec4 v )
 {
     GLint loc = uniformLoc(name);
     gl::uniform4fv(loc, 1, glm::value_ptr(v));
@@ -436,7 +436,7 @@ idk::glShader::set_vec4( std::string name, glm::vec4 v )
 
 
 void
-idk::glShader::set_mat3( std::string name, glm::mat3 m )
+idk::glShader::set_mat3( const std::string &name, glm::mat3 m )
 {
     GLint loc = uniformLoc(name);
     gl::uniformMatrix3fv(loc, 1, GL_FALSE, glm::value_ptr(m));
@@ -444,7 +444,7 @@ idk::glShader::set_mat3( std::string name, glm::mat3 m )
 
 
 void
-idk::glShader::set_mat4( std::string name, glm::mat4 m )
+idk::glShader::set_mat4( const std::string &name, glm::mat4 m )
 {
     GLint loc = uniformLoc(name);
     gl::uniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
@@ -452,7 +452,7 @@ idk::glShader::set_mat4( std::string name, glm::mat4 m )
 
 
 void
-idk::glShader::set_sampler2D( std::string name, GLuint texture_id )
+idk::glShader::set_sampler2D( const std::string &name, GLuint texture_id )
 {
     if (m_program_id == 0)
     {
@@ -478,7 +478,33 @@ idk::glShader::set_sampler2D( std::string name, GLuint texture_id )
 
 
 void
-idk::glShader::set_sampler3D( std::string name, GLuint texture_id )
+idk::glShader::set_sampler2DArray( const std::string &name, GLuint texture_id )
+{
+    if (m_program_id == 0)
+    {
+        std::cout << "RUH ROH" << std::endl;
+        exit(1);
+    }
+
+    #ifdef IDK_DEBUG
+        if (m_texture_unit - GL_TEXTURE0 > 32)
+        {
+            std::cout << "[idk::glShader::set_sampler2D] m_texture_unit > GL_TEXTURE0 + 32\n";
+            exit(1);
+        }
+    #endif
+
+    GLint loc = uniformLoc(name);
+
+    gl::bindTextureUnit(m_texture_unit - GL_TEXTURE0, texture_id);
+    gl::uniform1i(loc, m_texture_unit - GL_TEXTURE0);
+
+    m_texture_unit += 1;
+}
+
+
+void
+idk::glShader::set_sampler3D( const std::string &name, GLuint texture_id )
 {
     #ifdef IDK_DEBUG
         if (m_texture_unit - GL_TEXTURE0 > GL_TEXTURE0 + 32)
@@ -500,7 +526,7 @@ idk::glShader::set_sampler3D( std::string name, GLuint texture_id )
 
 
 void
-idk::glShader::set_samplerCube( std::string name, GLuint texture_id )
+idk::glShader::set_samplerCube( const std::string &name, GLuint texture_id )
 {
     if (m_program_id == 0)
     {

@@ -57,15 +57,16 @@ public:
 
     GLint       uniformLoc    ( const std::string &name );
 
-    void        set_int       ( std::string, int       );
-    void        set_float     ( std::string, float     );
-    void        set_vec2      ( std::string, glm::vec2 );
-    void        set_vec3      ( std::string, glm::vec3 );
-    void        set_vec4      ( std::string, glm::vec4 );
-    void        set_mat3      ( std::string, glm::mat3 );
-    void        set_mat4      ( std::string, glm::mat4 );
-    void        set_sampler2D ( std::string, GLuint    );
-    void        set_sampler3D ( std::string, GLuint    );
-    void        set_samplerCube ( std::string, GLuint  );
+    void        set_int             ( const std::string &, int       );
+    void        set_float           ( const std::string &, float     );
+    void        set_vec2            ( const std::string &, glm::vec2 );
+    void        set_vec3            ( const std::string &, glm::vec3 );
+    void        set_vec4            ( const std::string &, glm::vec4 );
+    void        set_mat3            ( const std::string &, glm::mat3 );
+    void        set_mat4            ( const std::string &, glm::mat4 );
+    void        set_sampler2D       ( const std::string &, GLuint    );
+    void        set_sampler2DArray  ( const std::string &, GLuint    );
+    void        set_sampler3D       ( const std::string &, GLuint    );
+    void        set_samplerCube     ( const std::string &, GLuint    );
 };
 

@@ -3,7 +3,7 @@
 
 
 void
-idk::glFramebuffer::reset( int w, int h, size_t num_attachments )
+idk::glFramebuffer::f_reset( int w, int h, size_t num_attachments )
 {
     m_size.x = w;  m_size.y = h;
     m_gl_attachments.resize(0);
@@ -31,6 +31,14 @@ idk::glFramebuffer::reset( int w, int h, size_t num_attachments )
     }
 
     m_first = false;
+}
+
+
+
+void
+idk::glFramebuffer::reset( int w, int h, size_t num_attachments )
+{
+    f_reset(w, h, num_attachments);
 }
 
 
@@ -113,11 +121,11 @@ idk::glFramebuffer::colorAttachment( int idx, const idk::glColorConfig &config )
 
 
 void
-idk::glFramebuffer::depthAttachment( const idk::DepthAttachmentConfig &config )
+idk::glFramebuffer::depthAttachment( int idx, const idk::DepthAttachmentConfig &config )
 {
-    gl::deleteTextures(1, &depth_attachment);
-    gl::genTextures(1, &depth_attachment);
-    gl::bindTexture(GL_TEXTURE_2D, depth_attachment);
+    gl::deleteTextures(1, &attachments[idx]);
+    gl::genTextures(1, &attachments[idx]);
+    gl::bindTexture(GL_TEXTURE_2D, attachments[idx]);
 
     gl::texImage2D(
         GL_TEXTURE_2D, 0, config.internalformat,
@@ -125,7 +133,7 @@ idk::glFramebuffer::depthAttachment( const idk::DepthAttachmentConfig &config )
     );
 
     gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-    gl::framebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_attachment, 0);
+    gl::framebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, attachments[idx], 0);
 
     GLCALL( glDrawBuffer(GL_NONE); )
     GLCALL( glReadBuffer(GL_NONE); )
@@ -138,6 +146,48 @@ idk::glFramebuffer::depthAttachment( const idk::DepthAttachmentConfig &config )
     gl::bindFramebuffer(GL_FRAMEBUFFER, 0);
     gl::bindTexture(GL_TEXTURE_2D, 0);
 }
+
+
+void
+idk::glFramebuffer::depthArrayAttachment( GLsizei depth, const idk::DepthAttachmentConfig &config )
+{
+    gl::deleteTextures(1, &depth_attachment);
+    gl::genTextures(1, &depth_attachment);
+    gl::bindTexture(GL_TEXTURE_2D_ARRAY, depth_attachment);
+
+    gl::texImage3D(
+        GL_TEXTURE_2D_ARRAY,
+        0,
+        config.internalformat,
+        m_size.x, m_size.y,
+        depth,
+        0,
+        GL_DEPTH_COMPONENT,
+        config.datatype,
+        nullptr
+    );
+
+    gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE,  GL_COMPARE_REF_TO_TEXTURE);
+
+
+    gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+    gl::framebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth_attachment, 0);
+
+    GLCALL( glDrawBuffer(GL_NONE); )
+    GLCALL( glReadBuffer(GL_NONE); )
+
+    // constexpr float bordercolor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    // GLCALL( glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, bordercolor); )
+
+    gl::bindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 
 
 void
@@ -170,6 +220,7 @@ idk::glFramebuffer::bind()
 {
     gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
     gl::viewport(0, 0, m_size.x, m_size.y);
+    m_bound = true;
 }
 
 
@@ -177,6 +228,7 @@ void
 idk::glFramebuffer::unbind()
 {
     gl::bindFramebuffer(GL_FRAMEBUFFER, 0);
+    m_bound = false;
 }
 
 

@@ -16,6 +16,7 @@ public:
                 glUBO() {  };
                 glUBO( GLuint location, GLsizeiptr size );
     void        bind();
+    void        bind( GLint location );
     void        unbind();
 
     template <typename data_t>

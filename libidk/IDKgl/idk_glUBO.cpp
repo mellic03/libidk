@@ -28,6 +28,14 @@ idk::glUBO::bind()
 
 
 void
+idk::glUBO::bind( GLint location )
+{
+    gl::bindBufferBase(GL_UNIFORM_BUFFER, location, m_UBO);
+    m_offset = 0;
+};
+
+
+void
 idk::glUBO::unbind()
 {
     m_offset = 0;

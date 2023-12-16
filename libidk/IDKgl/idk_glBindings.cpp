@@ -243,7 +243,6 @@ void idk::gl::textureStorage2D( GLuint texture, GLsizei levels, GLenum internalf
     GLCALL( glTextureStorage2D(texture, levels, internalformat, width, height); )
 }
 
-
 void idk::gl::textureSubImage2D( GLenum texture, GLint level, GLint xoffset, GLint yoffset,
                                  GLsizei width, GLsizei height, GLenum format, GLenum type,
                                  const void *pixels )
@@ -253,21 +252,40 @@ void idk::gl::textureSubImage2D( GLenum texture, GLint level, GLint xoffset, GLi
     )
 }
 
-
 void idk::gl::textureParameteri( GLuint texture, GLenum pname, GLint param )
 {
     GLCALL( glTextureParameteri(texture, pname, param); )
 }
-
 // ---------------------------------------------------------------------------------------------
 
 
 
-// Framebuffer stuff ---------------------------------------------------------------------
-void idk::gl::framebufferTexture2D( GLenum target, GLenum attachment, GLenum textarget,
-                                    GLuint texture, GLint level )
+// glFramebufferXXX ---------------------------------------------------------------------
+void
+idk::gl::framebufferTexture( GLenum target, GLenum attachment, GLuint texture, GLint level )
+{
+    GLCALL( glFramebufferTexture(target, attachment, texture, level); )
+}
+
+void
+idk::gl::framebufferTexture2D( GLenum target, GLenum attachment, GLenum textarget,
+                               GLuint texture, GLint level )
 {
     GLCALL( glFramebufferTexture2D(target, attachment, textarget, texture, level); )
+}
+
+void
+idk::gl::framebufferTextureLayer( GLenum target, GLenum attachment, GLuint texture,
+                                  GLint level, GLint layer )
+{
+    GLCALL( glFramebufferTextureLayer(target, attachment, texture, level, layer); )
+}
+
+void
+idk::gl::namedFramebufferTextureLayer( GLuint framebuffer, GLenum attachment, GLuint texture,
+                                       GLint level, GLint layer )
+{
+    GLCALL( glNamedFramebufferTextureLayer(framebuffer, attachment, texture, level, layer); )
 }
 // ---------------------------------------------------------------------------------------
 
@@ -281,44 +299,43 @@ idk::gl::getUniformLocation( GLuint program, std::string name )
     return glGetUniformLocation(program, name.c_str());
 }
 
-
-void idk::gl::uniform1i( GLint loc, int i )
+void
+idk::gl::uniform1i( GLint loc, int i )
 {
     GLCALL( glUniform1i(loc, i); )
 }
-
 
 void idk::gl::uniform1f( GLint loc, float f )
 {
     GLCALL( glUniform1f(loc, f); )
 }
 
-
-void idk::gl::uniform2fv( GLint loc, GLsizei count, float *value )
+void
+idk::gl::uniform2fv( GLint loc, GLsizei count, float *value )
 {
     GLCALL( glUniform2fv(loc, count, value); )
 }
 
-
-void idk::gl::uniform3fv( GLint loc, GLsizei count, float *value )
+void
+idk::gl::uniform3fv( GLint loc, GLsizei count, float *value )
 {
     GLCALL( glUniform3fv(loc, count, value); )
 }
 
-
-void idk::gl::uniform4fv( GLint loc, GLsizei count, float *value )
+void
+idk::gl::uniform4fv( GLint loc, GLsizei count, float *value )
 {
     GLCALL( glUniform4fv(loc, count, value); )
 }
 
-
-void idk::gl::uniformMatrix3fv( GLint loc, GLsizei count, GLboolean transpose, float *value )
+void
+idk::gl::uniformMatrix3fv( GLint loc, GLsizei count, GLboolean transpose, float *value )
 {
     GLCALL( glUniformMatrix3fv(loc, 1, transpose, value); )
 }
 
-
-void idk::gl::uniformMatrix4fv( GLint loc, GLsizei count, GLboolean transpose, float *value )
+void
+idk::gl::uniformMatrix4fv( GLint loc, GLsizei count, GLboolean transpose, float *value )
 {
     GLCALL( glUniformMatrix4fv(loc, 1, transpose, value); )
 }

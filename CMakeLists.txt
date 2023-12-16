@@ -8,13 +8,15 @@ add_definitions(-DIDK_DEBUG)
 
 project(idk)
 
-add_subdirectory(src/libidk/IDKgl)
-add_subdirectory(src/libidk/IDKcommon)
+add_subdirectory(libidk/IDKgl)
+add_subdirectory(libidk/IDKcore)
+add_subdirectory(libidk/IDKcommon)
 
-add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/dummy.cpp)
+add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/dummy.cpp)
 
 target_link_libraries(
     ${PROJECT_NAME} PUBLIC
+    IDKcore
     IDKgl
     IDKcommon
 )
