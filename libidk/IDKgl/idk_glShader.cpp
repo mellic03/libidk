@@ -383,6 +383,8 @@ idk::glShader::bind()
 
     gl::useProgram(m_program_id);
     m_texture_unit = GL_TEXTURE0;
+
+    // glShader::bound_program_id = m_program_id;
 }
 
 
@@ -392,6 +394,8 @@ idk::glShader::unbind()
     #ifdef IDK_DEBUG
         idk::gl::useProgram(0);
     #endif
+
+    // glShader::bound_program_id = 0;
 };
 
 
@@ -448,6 +452,14 @@ idk::glShader::set_mat4( const std::string &name, glm::mat4 m )
 {
     GLint loc = uniformLoc(name);
     gl::uniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
+}
+
+
+void
+idk::glShader::set_mat4Array( const std::string &name, glm::mat4 *m, size_t n )
+{
+    GLint loc = uniformLoc(name);
+    gl::uniformMatrix4fv(loc, n, GL_FALSE, glm::value_ptr(*m));
 }
 
 

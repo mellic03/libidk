@@ -43,7 +43,7 @@ idk::glFramebuffer::reset( int w, int h, size_t num_attachments )
 
 
 void
-idk::glFramebuffer::cubemapColorAttachment( const idk::glColorConfig &config )
+idk::glFramebuffer::cubemapColorAttachment( const idk::glTextureConfig &config )
 {
     gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
 
@@ -75,7 +75,7 @@ idk::glFramebuffer::cubemapColorAttachment( const idk::glColorConfig &config )
 
 
 void
-idk::glFramebuffer::colorAttachment( int idx, const idk::glColorConfig &config )
+idk::glFramebuffer::colorAttachment( int idx, const idk::glTextureConfig &config )
 {
     gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
 

@@ -5,14 +5,14 @@
 
 namespace idk
 {
-    struct glColorConfig;
+    struct glTextureConfig;
     struct DepthAttachmentConfig;
     class  glFramebuffer;
 };
 
 
 
-struct idk::glColorConfig
+struct idk::glTextureConfig
 {
     GLint  internalformat = GL_RGBA16F;
     GLenum format         = GL_RGBA;
@@ -22,8 +22,9 @@ struct idk::glColorConfig
     GLenum wrap_t         = GL_CLAMP_TO_EDGE;
     GLenum wrap_r         = GL_CLAMP_TO_EDGE;
     GLenum datatype       = GL_FLOAT;
-    bool   genmipmap      = true;
-    bool   setmipmap      = false;
+    bool   anisotropic    = GL_FALSE;
+    bool   genmipmap      = GL_TRUE;
+    bool   setmipmap      = GL_FALSE;
     GLint  texbaselevel   = 0;
     GLint  texmaxlevel    = 0;
 };
@@ -56,8 +57,8 @@ public:
     GLuint              depth_attachment;
 
     void    reset( int w, int h, size_t num_attachments );
-    void    cubemapColorAttachment( const idk::glColorConfig &config );
-    void    colorAttachment( int idx, const idk::glColorConfig &config );
+    void    cubemapColorAttachment( const idk::glTextureConfig &config );
+    void    colorAttachment( int idx, const idk::glTextureConfig &config );
     void    depthAttachment( int idx, const idk::DepthAttachmentConfig &config );
     void    depthArrayAttachment( GLsizei depth, const idk::DepthAttachmentConfig &config );
     void    generateMipmap( int idx );

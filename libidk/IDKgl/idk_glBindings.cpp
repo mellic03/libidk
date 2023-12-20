@@ -2,6 +2,14 @@
 
 
 
+void
+idk::gl::getFloatv( GLenum pname, GLfloat *params )
+{
+    GLCALL( glGetFloatv(pname, params); )
+}
+
+
+
 // glGenXXX ------------------------------------------------------------------------------
 /**/
 void idk::gl::genVertexArrays( GLsizei n, GLuint *arrays )
@@ -217,17 +225,28 @@ idk::gl::texImage3D( GLenum target, GLint level, GLint internalformat, GLsizei w
     GLCALL( glTexImage3D(target, level, internalformat, w, h, d, border, format, type, data); )
 }
 
-void idk::gl::texParameteri( GLenum target, GLenum pname, GLint param )
+void
+idk::gl::texParameteri( GLenum target, GLenum pname, GLint param )
 {
     GLCALL( glTexParameteri(target, pname, param); )
 }
 
-void idk::gl::generateMipmap( GLenum target )
+
+void
+idk::gl::generateTextureMipmap( GLuint texture )
+{
+    GLCALL( glGenerateTextureMipmap(texture); )
+}
+
+
+void
+idk::gl::generateMipmap( GLenum target )
 {
     GLCALL( glGenerateMipmap(target); )
 }
 
-void idk::gl::pixelStorei( GLenum pname, GLint param )
+void
+idk::gl::pixelStorei( GLenum pname, GLint param )
 {
     GLCALL( glPixelStorei(pname, param); )
 }
@@ -237,13 +256,15 @@ void idk::gl::pixelStorei( GLenum pname, GLint param )
 
 // glTextureXXX
 // ---------------------------------------------------------------------------------------------
-void idk::gl::textureStorage2D( GLuint texture, GLsizei levels, GLenum internalformat,
+void
+idk::gl::textureStorage2D( GLuint texture, GLsizei levels, GLenum internalformat,
                                 GLsizei width, GLsizei height )
 {
     GLCALL( glTextureStorage2D(texture, levels, internalformat, width, height); )
 }
 
-void idk::gl::textureSubImage2D( GLenum texture, GLint level, GLint xoffset, GLint yoffset,
+void
+idk::gl::textureSubImage2D( GLenum texture, GLint level, GLint xoffset, GLint yoffset,
                                  GLsizei width, GLsizei height, GLenum format, GLenum type,
                                  const void *pixels )
 {
@@ -252,9 +273,16 @@ void idk::gl::textureSubImage2D( GLenum texture, GLint level, GLint xoffset, GLi
     )
 }
 
-void idk::gl::textureParameteri( GLuint texture, GLenum pname, GLint param )
+void
+idk::gl::textureParameteri( GLuint texture, GLenum pname, GLint param )
 {
     GLCALL( glTextureParameteri(texture, pname, param); )
+}
+
+void
+idk::gl::textureParameterf( GLuint texture, GLenum pname, GLfloat param )
+{
+    GLCALL( glTextureParameterf(texture, pname, param); )
 }
 // ---------------------------------------------------------------------------------------------
 

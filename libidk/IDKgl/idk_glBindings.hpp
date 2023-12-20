@@ -24,6 +24,10 @@ namespace idk::gl
     template <typename... GLenums> inline void     enable( GLenum, GLenums... );
     template <typename... GLenums> inline void     disable( GLenum, GLenums... );
 
+
+    void getFloatv( GLenum pname, GLfloat *params );
+
+
     void genVertexArrays  ( GLsizei n, GLuint *arrays           );
     void genBuffers       ( GLsizei n, GLuint *buffers          );
     void genTextures      ( GLsizei n, GLuint *textures         );
@@ -61,12 +65,13 @@ namespace idk::gl
     void *mapBuffer( GLenum target, GLenum access );
     void unmapBuffer( GLenum target );
 
-    // glActiveXXX ---------------------------------------------------------------------------
+    // glActiveXXX -----------------------------------------------------------------------------
     /**/
     void activeTexture( GLenum texture );
-    // ---------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------
 
-    // glTexXXX ------------------------------------------------------------------------------
+
+    // glTexXXX --------------------------------------------------------------------------------
     /**/
     void texImage2D( GLenum target, GLint level, GLint internalformat, GLsizei w, GLsizei h,
                      GLint border, GLenum format, GLenum type, const void *data );
@@ -78,10 +83,12 @@ namespace idk::gl
                      GLsizei d, GLint border, GLenum format, GLenum type, const void *data );
 
     void texParameteri( GLenum target, GLenum pname, GLint param );
+
     // -----------------------------------------------------------------------------------------
 
 
     // glTextureXXX ----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------
     void textureStorage2D( GLuint texture, GLsizei levels, GLenum internalformat,
                            GLsizei width, GLsizei height );
 
@@ -90,13 +97,17 @@ namespace idk::gl
                             const void *pixels );
 
     void textureParameteri( GLuint texture, GLenum pname, GLint param );
-
+    void textureParameterf( GLuint texture, GLenum pname, GLfloat param );
     // -----------------------------------------------------------------------------------------
 
+
+    void generateTextureMipmap( GLuint texture );
     void generateMipmap( GLenum target );
     void pixelStorei( GLenum pname, GLint param );
 
+
     // Framebuffer stuff  --------------------------------------------------------------------
+    /**/
     void framebufferTexture( GLenum target, GLenum attachment, GLuint texture, GLint level );
 
     void framebufferTexture2D( GLenum target, GLenum attachment, GLenum textarget,

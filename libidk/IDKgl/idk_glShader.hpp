@@ -14,6 +14,8 @@ public:
     struct Def { std::string value = "NONE"; };
 
 private:
+    // static GLuint bound_program_id;
+
     std::string                 m_version;
     std::string                 m_vert_src;
     std::string                 m_geom_src;
@@ -64,6 +66,7 @@ public:
     void        set_vec4            ( const std::string &, glm::vec4 );
     void        set_mat3            ( const std::string &, glm::mat3 );
     void        set_mat4            ( const std::string &, glm::mat4 );
+    void        set_mat4Array       ( const std::string &, glm::mat4 *, size_t );
     void        set_sampler2D       ( const std::string &, GLuint    );
     void        set_sampler2DArray  ( const std::string &, GLuint    );
     void        set_sampler3D       ( const std::string &, GLuint    );
