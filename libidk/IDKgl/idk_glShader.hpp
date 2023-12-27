@@ -14,7 +14,7 @@ public:
     struct Def { std::string value = "NONE"; };
 
 private:
-    // static GLuint bound_program_id;
+    static GLuint current_bound_id;
 
     std::string                 m_version;
     std::string                 m_vert_src;

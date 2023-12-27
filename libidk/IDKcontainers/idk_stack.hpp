@@ -1,7 +1,11 @@
 #pragma once
 
 #include <cstring>
-#include "datastructures_decl.hpp"
+#include <memory>
+
+
+namespace idk { template <typename T> class stack; };
+
 
 
 template <typename T>

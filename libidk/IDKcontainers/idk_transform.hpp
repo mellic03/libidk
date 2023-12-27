@@ -1,7 +1,9 @@
 #pragma once
 
-#include "datastructures_decl.hpp"
+#include <libidk/IDKglm.hpp>
 
+
+namespace idk { class Transform; };
 
 class idk::Transform
 {
@@ -18,6 +20,7 @@ public:
                         Transform();
                         Transform( glm::mat4 m );
     
+    float *             position_ptr();
     glm::vec3           position();
     void                position( glm::vec3 );
 

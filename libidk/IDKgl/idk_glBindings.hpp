@@ -16,8 +16,8 @@ enum class UBOloc: GLuint
 
 namespace idk::gl
 {
-    inline void enable(GLenum cap)      { GLCALL( glEnable(cap);  ) };
-    inline void disable(GLenum cap)     { GLCALL( glDisable(cap); ) };
+    inline void enable(GLenum cap)      { IDK_GLCALL( glEnable(cap);  ) };
+    inline void disable(GLenum cap)     { IDK_GLCALL( glDisable(cap); ) };
     inline void enable()  {  };
     inline void disable() {  };
 
@@ -55,6 +55,8 @@ namespace idk::gl
     void drawArrays( GLenum mode, GLint first, GLsizei count );
     void drawElements( GLenum mode, GLsizei count, GLenum type, const void *indices );
     void drawElementsInstanced( GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei instancecount );
+    void multiDrawElements( GLenum mode, const GLsizei *count, GLenum type, const void *const *indices, GLsizei drawcount );
+    void multiDrawElementsIndirect( GLenum mode, GLenum type, const void *indirect, GLsizei primcount, GLsizei stride );
 
     void bufferData( GLenum target, GLsizeiptr size, const void *data, GLenum usage );
     void bufferSubData( GLenum target, GLintptr offset, GLsizeiptr size, const void *data);
@@ -95,6 +97,13 @@ namespace idk::gl
     void textureSubImage2D( GLenum texture, GLint level, GLint xoffset, GLint yoffset,
                             GLsizei width, GLsizei height, GLenum format, GLenum type,
                             const void *pixels );
+
+    void textureStorage3D( GLuint texture, GLsizei levels, GLenum internalformat,
+                           GLsizei width, GLsizei height, GLsizei depth );
+
+    void textureSubImage3D( GLuint texture, GLint level, GLint xoffset, GLint yoffset,
+                            GLint zoffset, GLsizei width, GLsizei height, GLsizei depth,
+                            GLenum format, GLenum type, const void *pixels );
 
     void textureParameteri( GLuint texture, GLenum pname, GLint param );
     void textureParameterf( GLuint texture, GLenum pname, GLfloat param );

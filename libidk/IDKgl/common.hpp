@@ -7,9 +7,7 @@
 #include <GL/glu.h>
 #include <assert.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "idk_glm.hpp"
 
 #include <set>
 #include <map>
@@ -23,7 +21,7 @@
 }
 
 #ifdef IDK_DEBUG
-  #define GLCALL(glFunc) \
+  #define IDK_GLCALL(glFunc) \
   { \
     GLClearError(); \
     glFunc \
@@ -36,7 +34,7 @@
     } \
   }
 #else
-  #define GLCALL(glFunc) \
+  #define IDK_GLCALL(glFunc) \
   { \
     glFunc \
   }

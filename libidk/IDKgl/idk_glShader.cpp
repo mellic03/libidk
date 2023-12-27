@@ -5,6 +5,12 @@
 #include <sstream>
 #include <iostream>
 
+// Static member initialization
+// ---------------------------------------------------------------------------------------------
+GLuint idk::glShader::current_bound_id = 0;
+// ---------------------------------------------------------------------------------------------
+
+
 
 std::vector<std::string> tokenize( std::string str, size_t num_tokens=~0 )
 {
@@ -132,20 +138,20 @@ idk::glShader::compileShader( std::string name, std::string &src, GLenum type )
     const char *str = src.c_str();
     GLuint shader_id = glCreateShader(type);
 
-    GLCALL( glShaderSource(shader_id, 1, &str, nullptr); )
-    GLCALL( glCompileShader(shader_id); )
+    IDK_GLCALL( glShaderSource(shader_id, 1, &str, nullptr); )
+    IDK_GLCALL( glCompileShader(shader_id); )
 
     int result;
-    GLCALL( glGetShaderiv(shader_id, GL_COMPILE_STATUS, &result); )
+    IDK_GLCALL( glGetShaderiv(shader_id, GL_COMPILE_STATUS, &result); )
 
     if (result == GL_FALSE)
     {
         std::cout << src << "\n";
 
         int length;
-        GLCALL( glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &length); )
+        IDK_GLCALL( glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &length); )
         char *message = new char[length * sizeof(char)];
-        GLCALL( glGetShaderInfoLog(shader_id, length, &length, message); )
+        IDK_GLCALL( glGetShaderInfoLog(shader_id, length, &length, message); )
 
         std::cout << "Name: " << name << std::endl;
 
@@ -176,19 +182,19 @@ idk::glShader::compile_vf( const std::string &defines )
     GLuint frag_id = compileShader("Ree", f, GL_FRAGMENT_SHADER);
 
     GLuint program = glCreateProgram();
-    GLCALL( glAttachShader(program, vert_id); )
-    GLCALL( glAttachShader(program, frag_id); )
-    GLCALL( glLinkProgram(program); )
+    IDK_GLCALL( glAttachShader(program, vert_id); )
+    IDK_GLCALL( glAttachShader(program, frag_id); )
+    IDK_GLCALL( glLinkProgram(program); )
 
     // GLchar *str = new GLchar[1024];
     // glGetProgramInfoLog(program, 1024, nullptr, str);
     // std::cout << str << "";
     // delete[] str;
 
-    GLCALL( glValidateProgram(program); )
+    IDK_GLCALL( glValidateProgram(program); )
 
-    GLCALL( glDeleteShader(vert_id); )
-    GLCALL( glDeleteShader(frag_id); )
+    IDK_GLCALL( glDeleteShader(vert_id); )
+    IDK_GLCALL( glDeleteShader(frag_id); )
 
     return program;
 }
@@ -209,16 +215,16 @@ idk::glShader::compile_vgf( const std::string &defines )
     GLuint frag_id = compileShader("Ree", f, GL_FRAGMENT_SHADER);
 
     GLuint program = glCreateProgram();
-    GLCALL( glAttachShader(program, vert_id); )
-    GLCALL( glAttachShader(program, geom_id); )
-    GLCALL( glAttachShader(program, frag_id); )
-    GLCALL( glLinkProgram(program); )
+    IDK_GLCALL( glAttachShader(program, vert_id); )
+    IDK_GLCALL( glAttachShader(program, geom_id); )
+    IDK_GLCALL( glAttachShader(program, frag_id); )
+    IDK_GLCALL( glLinkProgram(program); )
 
-    GLCALL( glValidateProgram(program); )
+    IDK_GLCALL( glValidateProgram(program); )
 
-    GLCALL( glDeleteShader(vert_id); )
-    GLCALL( glDeleteShader(geom_id); )
-    GLCALL( glDeleteShader(frag_id); )
+    IDK_GLCALL( glDeleteShader(vert_id); )
+    IDK_GLCALL( glDeleteShader(geom_id); )
+    IDK_GLCALL( glDeleteShader(frag_id); )
 
     return program;
 }
@@ -373,6 +379,11 @@ idk::glShader::uniformLoc( const std::string &name )
 void
 idk::glShader::bind()
 {
+    if (glShader::current_bound_id == m_program_id)
+    {
+        return;
+    }
+
     #ifdef IDK_DEBUG
     if (m_program_id == 0)
     {
@@ -384,18 +395,23 @@ idk::glShader::bind()
     gl::useProgram(m_program_id);
     m_texture_unit = GL_TEXTURE0;
 
-    // glShader::bound_program_id = m_program_id;
+    glShader::current_bound_id = m_program_id;
 }
 
 
 void
 idk::glShader::unbind()
 {
+    if (glShader::current_bound_id == 0)
+    {
+        return;
+    }
+
     #ifdef IDK_DEBUG
         idk::gl::useProgram(0);
     #endif
 
-    // glShader::bound_program_id = 0;
+    glShader::current_bound_id = 0;
 };
 
 
@@ -528,8 +544,7 @@ idk::glShader::set_sampler3D( const std::string &name, GLuint texture_id )
 
     GLint loc = uniformLoc(name);
 
-    gl::activeTexture(m_texture_unit);
-    gl::bindTexture(GL_TEXTURE_3D, texture_id);
+    gl::bindTextureUnit(m_texture_unit - GL_TEXTURE0, texture_id);
     gl::uniform1i(loc, m_texture_unit - GL_TEXTURE0);
 
     m_texture_unit += 1;
@@ -556,8 +571,7 @@ idk::glShader::set_samplerCube( const std::string &name, GLuint texture_id )
 
     GLint loc = uniformLoc(name);
 
-    gl::activeTexture(m_texture_unit);
-    gl::bindTexture(GL_TEXTURE_CUBE_MAP, texture_id);
+    gl::bindTextureUnit(m_texture_unit - GL_TEXTURE0, texture_id);
     gl::uniform1i(loc, m_texture_unit - GL_TEXTURE0);
 
     m_texture_unit += 1;

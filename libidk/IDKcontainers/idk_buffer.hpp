@@ -16,10 +16,11 @@ class idk::iBuffer
 public:
     virtual        ~iBuffer() = default;
 
-    virtual void *  data   (        ) = 0;
-    virtual size_t  size   (        ) = 0;
-    virtual size_t  nbytes (        ) = 0;
-    virtual void    resize ( size_t ) = 0;   
+    virtual void *  data     (        ) = 0;
+    virtual size_t  size     (        ) = 0;
+    virtual size_t  typesize (        ) = 0;
+    virtual size_t  nbytes   (        ) = 0;
+    virtual void    resize   ( size_t ) = 0;   
 };
 
 
@@ -29,10 +30,11 @@ class idk::Buffer: public idk::iBuffer
 public:
     std::vector<T> m_data;
 
-    virtual void   *data   (          ) final;
-    virtual size_t  size   (          ) final { return m_data.size(); };
-    virtual size_t  nbytes (          ) final;
-    virtual void    resize ( size_t s ) final;
+    virtual void   *data     (          ) final;
+    virtual size_t  size     (          ) final { return m_data.size(); };
+    virtual size_t  typesize (          ) final { return sizeof(T);     };
+    virtual size_t  nbytes   (          ) final;
+    virtual void    resize   ( size_t s ) final;
 
     void    push_back( const T &data ) { m_data.push_back(data); };
 

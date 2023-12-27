@@ -11,6 +11,7 @@ namespace idk::gltools
     GLuint  loadTexture( size_t w, size_t h, void *data, const glTextureConfig &config );
     GLuint  loadTexture( std::string filepath, const glTextureConfig &config );
 
+    GLuint loadTextureArray( size_t w, size_t h, size_t d, void **data, const glTextureConfig &config );
 
 
     // GLuint  loadTexture( size_t w, size_t h, void *data, bool srgb, GLint minfilter, GLint magfilter );

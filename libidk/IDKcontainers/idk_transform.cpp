@@ -14,11 +14,18 @@ idk::Transform::Transform( glm::mat4 m ): m_model_mat(m)
 }
 
 
+float *
+idk::Transform::position_ptr()
+{
+    return reinterpret_cast<float *>(&m_model_mat[3]);
+}
+
 glm::vec3
 idk::Transform::position()
 {
     return glm::vec3(m_model_mat[3]);
 }
+
 
 void
 idk::Transform::position( glm::vec3 v )

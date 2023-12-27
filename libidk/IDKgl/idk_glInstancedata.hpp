@@ -13,12 +13,10 @@ private:
     GLuint m_VBO;
 
 public:
-    std::vector<glm::mat4> data;
+    size_t instancecount = 0;
 
-    void         init( size_t num_elements );
-    void         resize( size_t num_elements );
-    glm::mat4 &  get( int idx );
-    void         update();
+    void         init( GLuint index, const std::vector<glm::mat4> &data );
+    void         update( const std::vector<glm::mat4> &data );
     void         bind();
     void         unbind();
 

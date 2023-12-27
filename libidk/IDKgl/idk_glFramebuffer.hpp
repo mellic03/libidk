@@ -26,7 +26,7 @@ struct idk::glTextureConfig
     bool   genmipmap      = GL_TRUE;
     bool   setmipmap      = GL_FALSE;
     GLint  texbaselevel   = 0;
-    GLint  texmaxlevel    = 0;
+    GLint  texmaxlevel    = 4;
 };
 
 

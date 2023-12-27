@@ -20,6 +20,7 @@ namespace idk
     void    print( std::string sep, T head, Args... );
     void    print( std::string sep );
 
+    glm::vec3 calculate_barycentric( float x, float y, glm::vec2 v1, glm::vec2 v2, glm::vec2 v3 );
 };
 
 
@@ -63,4 +64,6 @@ idk::print( std::string sep, T head, Args... rest )
     std::cout << head << sep;
     idk::print(sep, rest...);
 }
+
+
 

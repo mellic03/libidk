@@ -2,6 +2,86 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <libidk/IDKcore/libidk.hpp>
+
+// void
+// idk::glFramebuffer::depthArrayAttachment( GLsizei depth, const idk::DepthAttachmentConfig &config )
+// {
+//     gl::deleteTextures(1, &depth_attachment);
+//     gl::genTextures(1, &depth_attachment);
+//     gl::bindTexture(GL_TEXTURE_2D_ARRAY, depth_attachment);
+
+//     gl::texImage3D(
+//         GL_TEXTURE_2D_ARRAY,
+//         0,
+//         config.internalformat,
+//         m_size.x, m_size.y,
+//         depth,
+//         0,
+//         GL_DEPTH_COMPONENT,
+//         config.datatype,
+//         nullptr
+//     );
+
+//     gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//     gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//     gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+//     gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+//     gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+//     gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+
+//     gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+//     gl::framebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth_attachment, 0);
+
+//     IDK_GLCALL( glDrawBuffer(GL_NONE); )
+//     IDK_GLCALL( glReadBuffer(GL_NONE); )
+
+//     gl::bindFramebuffer(GL_FRAMEBUFFER, 0);
+// }
+
+
+
+// GLuint
+// idk::gltools::loadTextureArray( size_t w, size_t h, size_t d, void **data, const glTextureConfig &config )
+// {
+//     GLuint texture_id;
+
+//     gl::createTextures(GL_TEXTURE_2D_ARRAY, 1, &texture_id);
+
+//     gl::textureStorage3D(texture_id, 0, config.internalformat, w, h, d);
+//     gl::textureSubImage3D(texture_id, 0, 0, 0, 0, w, h, d, config.format, config.datatype, data[1]);
+
+//     gl::textureStorage2D(texture_id, 1, config.internalformat, w, h);
+//     gl::textureSubImage2D(texture_id, 0, 0, 0, w, h, config.format, config.datatype, data);
+
+//     gl::textureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, config.minfilter);
+//     gl::textureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, config.magfilter);
+//     gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_S, config.wrap_s);
+//     gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_T, config.wrap_t);
+
+
+//     if (config.anisotropic)
+//     {
+//         float anisotropy;
+//         gl::getFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisotropy);
+//         gl::textureParameterf(texture_id, GL_TEXTURE_MAX_ANISOTROPY, anisotropy);
+//     }
+
+//     if (config.genmipmap)
+//     {
+//         gl::generateTextureMipmap(texture_id);
+//     }
+
+//     else if (config.setmipmap)
+//     {
+//         gl::textureParameteri(texture_id, GL_TEXTURE_BASE_LEVEL, config.texbaselevel);
+//         gl::textureParameteri(texture_id, GL_TEXTURE_MAX_LEVEL,  config.texmaxlevel);
+//     }
+
+//     return texture_id;
+// }
+
 
 
 GLuint
@@ -11,7 +91,11 @@ idk::gltools::loadTexture( size_t w, size_t h, void *data, const glTextureConfig
 
     gl::createTextures(GL_TEXTURE_2D, 1, &texture_id);
 
-    gl::textureStorage2D(texture_id, 1, config.internalformat, w, h);
+
+    GLsizei levels = 1 + floor(log2(idk::max(w, h)));
+            levels = config.genmipmap ? levels : 1;
+
+    gl::textureStorage2D(texture_id, levels, config.internalformat, w, h);
     gl::textureSubImage2D(texture_id, 0, 0, 0, w, h, config.format, config.datatype, data);
 
     gl::textureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, config.minfilter);
@@ -32,11 +116,11 @@ idk::gltools::loadTexture( size_t w, size_t h, void *data, const glTextureConfig
         gl::generateTextureMipmap(texture_id);
     }
 
-    else if (config.setmipmap)
-    {
-        gl::textureParameteri(texture_id, GL_TEXTURE_BASE_LEVEL, config.texbaselevel);
-        gl::textureParameteri(texture_id, GL_TEXTURE_MAX_LEVEL,  config.texmaxlevel);
-    }
+    // else if (config.setmipmap)
+    // {
+    //     gl::textureParameteri(texture_id, GL_TEXTURE_BASE_LEVEL, config.texbaselevel);
+    //     gl::textureParameteri(texture_id, GL_TEXTURE_MAX_LEVEL,  config.texmaxlevel);
+    // }
 
     return texture_id;
 }
@@ -79,16 +163,16 @@ idk::gltools::loadTexture( std::string filepath, const glTextureConfig &config )
 //     gl::textureStorage2D(texture_id, 1, internalformat, w, h);
 //     gl::textureSubImage2D(texture_id, 0, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-//     GLCALL( glGenerateTextureMipmap(texture_id); )
+//     IDK_GLCALL( glGenerateTextureMipmap(texture_id); )
 
     
 //     float value;
 //     float max_anisotropy = 8.0f;
 
-//     GLCALL( glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &value); )
+//     IDK_GLCALL( glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &value); )
 //     // value = (value > max_anisotropy) ? max_anisotropy : value;
 //     // std::cout << "Max Anisotropy: " << value << "\n";
-//     GLCALL( glTextureParameterf(texture_id, GL_TEXTURE_MAX_ANISOTROPY_EXT, value); )
+//     IDK_GLCALL( glTextureParameterf(texture_id, GL_TEXTURE_MAX_ANISOTROPY_EXT, value); )
 
 
 //     return texture_id;
