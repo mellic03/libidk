@@ -4,41 +4,7 @@
 #include <iostream>
 #include <libidk/IDKcore/libidk.hpp>
 
-// void
-// idk::glFramebuffer::depthArrayAttachment( GLsizei depth, const idk::DepthAttachmentConfig &config )
-// {
-//     gl::deleteTextures(1, &depth_attachment);
-//     gl::genTextures(1, &depth_attachment);
-//     gl::bindTexture(GL_TEXTURE_2D_ARRAY, depth_attachment);
-
-//     gl::texImage3D(
-//         GL_TEXTURE_2D_ARRAY,
-//         0,
-//         config.internalformat,
-//         m_size.x, m_size.y,
-//         depth,
-//         0,
-//         GL_DEPTH_COMPONENT,
-//         config.datatype,
-//         nullptr
-//     );
-
-//     gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//     gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//     gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-//     gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-//     gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-//     gl::texParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-
-//     gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-//     gl::framebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth_attachment, 0);
-
-//     IDK_GLCALL( glDrawBuffer(GL_NONE); )
-//     IDK_GLCALL( glReadBuffer(GL_NONE); )
-
-//     gl::bindFramebuffer(GL_FRAMEBUFFER, 0);
-// }
+#include "../IDKcore/idk_utility.hpp"
 
 
 
@@ -88,9 +54,7 @@ GLuint
 idk::gltools::loadTexture( size_t w, size_t h, void *data, const glTextureConfig &config )
 {
     GLuint texture_id;
-
-    gl::createTextures(GL_TEXTURE_2D, 1, &texture_id);
-
+    gl::createTextures(config.target, 1, &texture_id);
 
     GLsizei levels = 1 + floor(log2(idk::max(w, h)));
             levels = config.genmipmap ? levels : 1;
@@ -102,7 +66,6 @@ idk::gltools::loadTexture( size_t w, size_t h, void *data, const glTextureConfig
     gl::textureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, config.magfilter);
     gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_S, config.wrap_s);
     gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_T, config.wrap_t);
-
 
     if (config.anisotropic)
     {
@@ -127,67 +90,14 @@ idk::gltools::loadTexture( size_t w, size_t h, void *data, const glTextureConfig
 
 
 
-GLuint
-idk::gltools::loadTexture( std::string filepath, const glTextureConfig &config )
-{
-    SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
-    SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
-    SDL_Surface      *img    = SDL_ConvertSurface(tmp, target, 0);
-
-    GLuint texture_id = gltools::loadTexture(img->w, img->h, (uint32_t *)(img->pixels), config);
-
-    SDL_FreeFormat(target);
-    SDL_FreeSurface(tmp);
-    SDL_FreeSurface(img);
-
-    return texture_id;
-}
-
-
-
-
 // GLuint
-// idk::gltools::loadTexture( size_t w, size_t h, void *data, bool srgb, GLint minfilter, GLint magfilter )
-// {
-//     GLuint texture_id;
-
-//     gl::createTextures(GL_TEXTURE_2D, 1, &texture_id);
-
-//     gl::textureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, minfilter);
-//     gl::textureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, magfilter);
-//     gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//     gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-//     GLint internalformat = (srgb) ? GL_SRGB8_ALPHA8 : GL_RGBA16;
-
-//     gl::textureStorage2D(texture_id, 1, internalformat, w, h);
-//     gl::textureSubImage2D(texture_id, 0, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-//     IDK_GLCALL( glGenerateTextureMipmap(texture_id); )
-
-    
-//     float value;
-//     float max_anisotropy = 8.0f;
-
-//     IDK_GLCALL( glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &value); )
-//     // value = (value > max_anisotropy) ? max_anisotropy : value;
-//     // std::cout << "Max Anisotropy: " << value << "\n";
-//     IDK_GLCALL( glTextureParameterf(texture_id, GL_TEXTURE_MAX_ANISOTROPY_EXT, value); )
-
-
-//     return texture_id;
-// }
-
-
-
-// GLuint
-// idk::gltools::loadTexture( std::string filepath, bool srgb, GLint minfilter, GLint magfilter )
+// idk::gltools::loadTexture( std::string filepath, const glTextureConfig &config )
 // {
 //     SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
 //     SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
 //     SDL_Surface      *img    = SDL_ConvertSurface(tmp, target, 0);
 
-//     GLuint texture_id = gltools::loadTexture(img->w, img->h, (uint32_t *)(img->pixels), srgb, minfilter, magfilter);
+//     GLuint texture_id = gltools::loadTexture(img->w, img->h, (uint32_t *)(img->pixels), config);
 
 //     SDL_FreeFormat(target);
 //     SDL_FreeSurface(tmp);
@@ -195,6 +105,77 @@ idk::gltools::loadTexture( std::string filepath, const glTextureConfig &config )
 
 //     return texture_id;
 // }
+
+
+
+static glm::vec4
+interpolate(glm::vec4 p00, glm::vec4 p10, glm::vec4 p01, glm::vec4 p11, float u, float v)
+{
+    float factor_u = u - floor(u);
+    float factor_v = v - floor(v);
+
+    glm::vec4 bottom = (p10 - p00) * factor_u + p00;
+    glm::vec4 top    = (p11 - p01) * factor_u + p01;
+
+    return (top - bottom) * factor_v + bottom;
+}
+
+
+static glm::vec4
+t_query( int u, int v, size_t w, size_t h, std::unique_ptr<uint8_t[]> &data )
+{
+    glm::vec4 result = glm::vec4(
+        float(data[4*w*v + 4*u + 0]),
+        float(data[4*w*v + 4*u + 1]),
+        float(data[4*w*v + 4*u + 2]),
+        float(data[4*w*v + 4*u + 3])
+    );
+
+    return result;
+}
+
+
+
+glm::vec4
+idk::gltools::textureQuery( float u, float v, size_t w, size_t h,
+                            std::unique_ptr<uint8_t[]> &data )
+{
+    u = u * 0.5f + 0.5f;
+    v = v * 0.5f + 0.5f;
+
+    int x = int(w*u) % w;
+    int y = int(h*v) % h;
+
+
+    glm::vec4 h00 = t_query(x,   y,   w, h, data);
+    glm::vec4 h01 = t_query(x,   y+1, w, h, data);
+    glm::vec4 h10 = t_query(x+1, y,   w, h, data);
+    glm::vec4 h11 = t_query(x+1, y+1, w, h, data);
+
+    glm::vec3 weights = idk::calculate_barycentric(
+        float(w)*u, float(h)*v,
+        glm::vec2(x,   y  ),
+        glm::vec2(x,   y+1),
+        glm::vec2(x+1, y  )
+    );
+
+
+    if (weights[0] >= 0.0f && weights[1] >= 0.0f && weights[2] >= 0.0f)
+    {
+        return weights[0]*h00 + weights[1]*h01 + weights[2]*h10;
+    }
+
+    weights = idk::calculate_barycentric(
+        float(w)*u, float(h)*v,
+        glm::vec2(x+1, y+1),
+        glm::vec2(x,   y+1),
+        glm::vec2(x+1, y  )
+    );
+
+    return weights[0]*h11 + weights[1]*h01 + weights[2]*h10;
+
+}
+
 
 
 
@@ -274,3 +255,24 @@ idk::gltools::loadCubemapMip( std::string directory, std::vector<std::string> fi
 }
 
 
+idk::glTexture
+idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &config )
+{
+    SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
+    SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
+    SDL_Surface      *img    = SDL_ConvertSurface(tmp, target, 0);
+
+    GLuint texture_id = gltools::loadTexture(img->w, img->h, (uint32_t *)(img->pixels), config);
+
+    SDL_FreeFormat(target);
+    SDL_FreeSurface(tmp);
+    SDL_FreeSurface(img);
+
+    idk::glTexture texture(
+        texture_id,
+        glm::ivec2(img->w, img->h),
+        config
+    );
+
+    return texture;
+}

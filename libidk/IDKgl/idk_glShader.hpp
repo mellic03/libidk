@@ -21,6 +21,10 @@ private:
     std::string                 m_geom_src;
     std::string                 m_frag_src;
 
+    std::string                 m_vert_name;
+    std::string                 m_geom_name;
+    std::string                 m_frag_name;
+
     std::set<std::string>       m_uniforms;
     std::map<std::string, Loc>  m_locations;
     std::map<std::string, Def>  m_definitions;

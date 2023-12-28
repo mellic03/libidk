@@ -26,6 +26,7 @@ public:
 
     int                     create  (          );
     int                     create  ( const T& );
+    int                     create  ( const T&& );
     T &                     get     ( int id   );
     void                    destroy ( int id   );
 
@@ -49,7 +50,30 @@ template <typename T>
 int
 idk::Allocator<T>::create()
 {
-    return create(T());
+    int id  = -1;
+
+    int data_idx = m_data.size();
+    m_data.push_back(T());
+
+
+    // Determine user-facing id
+    // ------------------------------------------------------------------------
+    if (m_available_ids.empty())
+    {
+        id = m_indirection.size();
+        m_indirection.push_back(data_idx);
+    }
+
+    else
+    {
+        id = m_available_ids.top();
+             m_available_ids.pop();
+    }
+    // ------------------------------------------------------------------------
+
+    m_reverse_indirection.push_back(id);
+
+    return id;
 }
 
 
@@ -85,10 +109,41 @@ idk::Allocator<T>::create( const T &data )
 
 
 template <typename T>
+int
+idk::Allocator<T>::create( const T &&data )
+{
+    int id  = -1;
+
+    int data_idx = m_data.size();
+    m_data.push_back(std::move(data));
+
+
+    // Determine user-facing id
+    // ------------------------------------------------------------------------
+    if (m_available_ids.empty())
+    {
+        id = m_indirection.size();
+        m_indirection.push_back(data_idx);
+    }
+
+    else
+    {
+        id = m_available_ids.top();
+             m_available_ids.pop();
+    }
+    // ------------------------------------------------------------------------
+
+    m_reverse_indirection.push_back(id);
+
+    return id;
+}
+
+
+template <typename T>
 T &
 idk::Allocator<T>::get( int id )
 {
-    IDK_ASSERT("Attemped access of non-existant object", id < m_indirection.size());
+    IDK_ASSERT("Attempted access of non-existant object", id < m_indirection.size());
 
     int data_idx = m_indirection[id];
     IDK_ASSERT("Attempted access of deleted object", data_idx != -1);
@@ -104,14 +159,7 @@ idk::Allocator<T>::destroy( int id )
     int data_idx = m_indirection[id];
     int back_idx = m_reverse_indirection.back();
 
-    std::cout
-        << "ID:       " << id << "\n"
-        << "data_idx: " << data_idx << "\n"
-        << "back_idx: " << back_idx << "\n"
-        << "Moving idx " << m_data.size()-1 << " into idx " << data_idx << "\n";
-
-
-    m_data[data_idx]  = std::move(m_data.back());
+    m_data[data_idx] = std::move(m_data.back());
     m_indirection[back_idx] = std::move(m_indirection[id]);
 
     m_data.pop_back();

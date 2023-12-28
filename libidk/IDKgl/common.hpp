@@ -15,29 +15,37 @@
 #include <string>
 
 
+namespace idk
+{
+    uint8_t glVersionFlags( int major, int minor );
+    int glVersionMajor( uint8_t version );
+    int glVersionMinor( uint8_t version );
+};
+
+
 #define GLClearError() \
 { \
-  while (glGetError() != GL_NO_ERROR); \
+    while (glGetError() != GL_NO_ERROR); \
 }
 
 #ifdef IDK_DEBUG
-  #define IDK_GLCALL(glFunc) \
-  { \
-    GLClearError(); \
-    glFunc \
-    GLenum err = glGetError(); \
-    if (err != GL_NO_ERROR) \
+    #define IDK_GLCALL(glFunc) \
     { \
-        printf("OpenGL Error: %s\n", gluErrorString(err)); \
-        fflush(stdout); \
-        assert(err == GL_NO_ERROR); \
-    } \
-  }
+        GLClearError(); \
+        glFunc \
+        GLenum err = glGetError(); \
+        if (err != GL_NO_ERROR) \
+        { \
+            printf("OpenGL Error: %s\n", gluErrorString(err)); \
+            fflush(stdout); \
+            assert(err == GL_NO_ERROR); \
+        } \
+    }
 #else
-  #define IDK_GLCALL(glFunc) \
-  { \
-    glFunc \
-  }
+    #define IDK_GLCALL(glFunc) \
+    { \
+        glFunc \
+    }
 #endif
 
 

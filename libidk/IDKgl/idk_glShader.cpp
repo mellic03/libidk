@@ -178,8 +178,8 @@ idk::glShader::compile_vf( const std::string &defines )
     v = m_version + defines + m_vert_src;
     f = m_version + defines + m_frag_src;
 
-    GLuint vert_id = compileShader("Ree", v, GL_VERTEX_SHADER);
-    GLuint frag_id = compileShader("Ree", f, GL_FRAGMENT_SHADER);
+    GLuint vert_id = compileShader(m_vert_name, v, GL_VERTEX_SHADER);
+    GLuint frag_id = compileShader(m_frag_name, f, GL_FRAGMENT_SHADER);
 
     GLuint program = glCreateProgram();
     IDK_GLCALL( glAttachShader(program, vert_id); )
@@ -210,9 +210,9 @@ idk::glShader::compile_vgf( const std::string &defines )
     g = m_version + defines + m_geom_src;
     f = m_version + defines + m_frag_src;
 
-    GLuint vert_id = compileShader("Ree", v, GL_VERTEX_SHADER);
-    GLuint geom_id = compileShader("Ree", g, GL_GEOMETRY_SHADER);
-    GLuint frag_id = compileShader("Ree", f, GL_FRAGMENT_SHADER);
+    GLuint vert_id = compileShader(m_vert_name, v, GL_VERTEX_SHADER);
+    GLuint geom_id = compileShader(m_geom_name, g, GL_GEOMETRY_SHADER);
+    GLuint frag_id = compileShader(m_frag_name, f, GL_FRAGMENT_SHADER);
 
     GLuint program = glCreateProgram();
     IDK_GLCALL( glAttachShader(program, vert_id); )
@@ -248,6 +248,9 @@ idk::glShader::loadFile( std::string root, std::string vert, std::string frag )
 {
     reset();
 
+    m_vert_name = root + vert;
+    m_frag_name = root + frag;
+
     std::stringstream vert_buf, frag_buf;
     vert_buf << std::ifstream(root + vert).rdbuf();
     frag_buf << std::ifstream(root + frag).rdbuf();
@@ -269,6 +272,10 @@ void
 idk::glShader::loadFile_vgf( std::string root, std::string v, std::string g, std::string f )
 {
     reset();
+
+    m_vert_name = root + v;
+    m_geom_name = root + g;
+    m_frag_name = root + f;
 
     std::stringstream vert_buf, geom_buf, frag_buf;
     vert_buf << std::ifstream(root + v).rdbuf();

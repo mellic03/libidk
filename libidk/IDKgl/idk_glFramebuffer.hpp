@@ -1,32 +1,14 @@
 #pragma once
 
 #include "common.hpp"
+#include "idk_glTexture.hpp"
 #include <vector>
 
 namespace idk
 {
-    struct glTextureConfig;
+
     struct DepthAttachmentConfig;
     class  glFramebuffer;
-};
-
-
-
-struct idk::glTextureConfig
-{
-    GLint  internalformat = GL_RGBA16F;
-    GLenum format         = GL_RGBA;
-    GLenum minfilter      = GL_NEAREST;
-    GLenum magfilter      = GL_LINEAR;
-    GLenum wrap_s         = GL_CLAMP_TO_EDGE;
-    GLenum wrap_t         = GL_CLAMP_TO_EDGE;
-    GLenum wrap_r         = GL_CLAMP_TO_EDGE;
-    GLenum datatype       = GL_FLOAT;
-    bool   anisotropic    = GL_FALSE;
-    bool   genmipmap      = GL_TRUE;
-    bool   setmipmap      = GL_FALSE;
-    GLint  texbaselevel   = 0;
-    GLint  texmaxlevel    = 4;
 };
 
 
