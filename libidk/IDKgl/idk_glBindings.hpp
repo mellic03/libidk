@@ -2,18 +2,6 @@
 
 #include "common.hpp"
 
-
-namespace idk
-{
-enum class UBOloc: GLuint
-{
-    GLOBAL_MATRICES     = 2,
-    GLOBAL_POINTLIGHTS  = 3,
-    GLOBAL_SPOTLIGHTS   = 4
-};
-};
-
-
 namespace idk::gl
 {
     inline void enable(GLenum cap)      { IDK_GLCALL( glEnable(cap);  ) };
@@ -34,8 +22,9 @@ namespace idk::gl
     void genFramebuffers  ( GLsizei n, GLuint *framebuffers     );
     void genRenderbuffers ( GLsizei n, GLuint *renderbuffers    );
 
-    void createBuffers( GLsizei n, GLuint *buffers );
-    void createTextures ( GLenum target, GLsizei n, GLuint *textures );
+    void createVertexArrays ( GLsizei n, GLuint *arrays );
+    void createBuffers      ( GLsizei n, GLuint *buffers );
+    void createTextures     ( GLenum target, GLsizei n, GLuint *textures );
 
     void deleteVertexArrays  ( GLsizei n, GLuint *arrays         );
     void deleteBuffers       ( GLsizei n, GLuint *buffers        );
@@ -46,7 +35,6 @@ namespace idk::gl
     void bindVertexArray( GLuint VAO );
     void bindBuffer( GLenum type, GLuint buf );
     void bindBufferBase( GLenum target, GLuint index, GLuint buffer );
-    void bindBufferBase( GLenum target, UBOloc loc, GLuint buffer );
     void bindFramebuffer( GLenum target, GLuint framebuffer );
     void bindRenderbuffer( GLenum target, GLuint renderbuffer );
     void bindTexture( GLenum target, GLuint texture );
@@ -63,9 +51,15 @@ namespace idk::gl
 
     void namedBufferData( GLuint buffer, GLsizeiptr size, const void *data, GLenum usage );
     void namedBufferSubData( GLuint buffer, GLintptr offset, GLsizeiptr size, const void *data );
+    void namedBufferStorage( GLuint buffer, GLsizeiptr size, const void *data, GLbitfield flags );
+
 
     void *mapBuffer( GLenum target, GLenum access );
     void unmapBuffer( GLenum target );
+
+    void *mapNamedBuffer( GLuint buffer, GLenum access );
+    void  unmapNamedBuffer( GLuint buffer );
+
 
     // glActiveXXX -----------------------------------------------------------------------------
     /**/
@@ -109,6 +103,9 @@ namespace idk::gl
     void textureParameterf( GLuint texture, GLenum pname, GLfloat param );
     // -----------------------------------------------------------------------------------------
 
+    GLuint64 getTextureHandleARB( GLuint texture );
+    void     makeTextureHandleResidentARB( GLuint64 handle );
+    void     makeTextureHandleNonResidentARB( GLuint64 handle );
 
     void generateTextureMipmap( GLuint texture );
     void generateMipmap( GLenum target );
@@ -139,11 +136,30 @@ namespace idk::gl
     void  uniform4fv( GLint loc, GLsizei count, float *value );
     void  uniformMatrix3fv( GLint loc, GLsizei count, GLboolean transpose, float *value );
     void  uniformMatrix4fv( GLint loc, GLsizei count, GLboolean transpose, float *value );
+
+    void  uniformHandleui64ARB( GLint location, GLuint64 value );
     // ---------------------------------------------------------------------------------------
 
     void vertexAttribPointer( GLuint index, GLint size, GLenum type, GLboolean normalized,
                               GLsizei stride, GLuint offset );
+
     void enableVertexAttribArray( GLuint index );
+
+
+    void vertexArrayVertexBuffer( GLuint vaobj, GLuint bindingindex, GLuint buffer,
+                                  GLintptr offset, GLsizei stride );
+
+    void vertexArrayElementBuffer( GLuint vaobj, GLuint buffer );
+
+    void enableVertexArrayAttrib( GLuint vaobj, GLuint index );
+
+    void vertexArrayAttribFormat( GLuint vaobj, GLuint attribindex, GLint size, GLenum type,
+                                  GLboolean normalized, GLuint relativeoffset );
+
+    void vertexArrayAttribBinding( GLuint vaobj, GLuint attribindex, GLuint bindingindex );
+
+
+
 
     void useProgram( GLuint program );
     void deleteProgram( GLuint program );

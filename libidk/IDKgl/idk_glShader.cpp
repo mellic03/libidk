@@ -482,6 +482,8 @@ void
 idk::glShader::set_mat4Array( const std::string &name, glm::mat4 *m, size_t n )
 {
     GLint loc = uniformLoc(name);
+    if (loc == -1)  return;   
+
     gl::uniformMatrix4fv(loc, n, GL_FALSE, glm::value_ptr(*m));
 }
 
@@ -504,6 +506,7 @@ idk::glShader::set_sampler2D( const std::string &name, GLuint texture_id )
     #endif
 
     GLint loc = uniformLoc(name);
+    if (loc == -1)  return;   
 
     gl::bindTextureUnit(m_texture_unit - GL_TEXTURE0, texture_id);
     gl::uniform1i(loc, m_texture_unit - GL_TEXTURE0);
@@ -530,6 +533,7 @@ idk::glShader::set_sampler2DArray( const std::string &name, GLuint texture_id )
     #endif
 
     GLint loc = uniformLoc(name);
+    if (loc == -1)  return;   
 
     gl::bindTextureUnit(m_texture_unit - GL_TEXTURE0, texture_id);
     gl::uniform1i(loc, m_texture_unit - GL_TEXTURE0);
@@ -550,6 +554,7 @@ idk::glShader::set_sampler3D( const std::string &name, GLuint texture_id )
     #endif
 
     GLint loc = uniformLoc(name);
+    if (loc == -1)  return;   
 
     gl::bindTextureUnit(m_texture_unit - GL_TEXTURE0, texture_id);
     gl::uniform1i(loc, m_texture_unit - GL_TEXTURE0);
@@ -577,9 +582,22 @@ idk::glShader::set_samplerCube( const std::string &name, GLuint texture_id )
     #endif
 
     GLint loc = uniformLoc(name);
+    if (loc == -1)  return;   
 
     gl::bindTextureUnit(m_texture_unit - GL_TEXTURE0, texture_id);
     gl::uniform1i(loc, m_texture_unit - GL_TEXTURE0);
 
     m_texture_unit += 1;
 }
+
+
+void
+idk::glShader::set_Handleui64ARB( const std::string &name, GLuint64 handle )
+{
+    GLint loc = uniformLoc(name);
+    if (loc == -1)  return;   
+
+    gl::uniformHandleui64ARB(loc, handle);
+
+}
+

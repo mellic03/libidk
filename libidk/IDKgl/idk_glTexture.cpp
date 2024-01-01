@@ -39,6 +39,7 @@ gl_format_num_elements( GLenum format )
 
 idk::glTexture::glTexture( const idk::glTexture &other )
 : m_id      (other.m_id),
+  m_handle  (other.m_handle),
   m_size    (other.m_size),
   m_nbytes  (other.m_nbytes),
   m_config  (other.m_config),
@@ -60,6 +61,7 @@ idk::glTexture::glTexture( const idk::glTexture &other )
 
 idk::glTexture::glTexture( const idk::glTexture &&other )
 : m_id      (other.m_id),
+  m_handle  (other.m_handle),
   m_size    (other.m_size),
   m_nbytes  (other.m_nbytes),
   m_config  (other.m_config),
@@ -105,6 +107,12 @@ idk::glTexture::glTexture( GLuint id, const glm::ivec2 &size, const glTextureCon
                 m_id, i, GL_RGBA, GL_UNSIGNED_BYTE, nbytes, m_mips[i].get()
             );
         )
+    }
+
+    if (m_config.bindless)
+    {
+        m_handle = gl::getTextureHandleARB(m_id);
+        gl::makeTextureHandleResidentARB(m_handle);
     }
 }
 

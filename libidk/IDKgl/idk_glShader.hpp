@@ -75,5 +75,8 @@ public:
     void        set_sampler2DArray  ( const std::string &, GLuint    );
     void        set_sampler3D       ( const std::string &, GLuint    );
     void        set_samplerCube     ( const std::string &, GLuint    );
+
+    void        set_Handleui64ARB   ( const std::string &, GLuint64  );
+
 };
 

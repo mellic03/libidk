@@ -21,6 +21,7 @@ public:
     virtual size_t  typesize (        ) = 0;
     virtual size_t  nbytes   (        ) = 0;
     virtual void    resize   ( size_t ) = 0;   
+
 };
 
 
@@ -37,6 +38,8 @@ public:
     virtual void    resize   ( size_t s ) final;
 
     void    push_back( const T &data ) { m_data.push_back(data); };
+
+    T &     operator[] ( int i ) { return m_data[i]; };
 
     typename std::vector<T>::iterator begin() { return m_data.begin(); };
     typename std::vector<T>::iterator end()   { return m_data.end();   };

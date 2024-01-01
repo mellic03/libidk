@@ -1,8 +1,10 @@
 #pragma once
+#include "../idk_export.hpp"
 
 
 namespace idk::internal
 {
+    IDK_VISIBLE
     void assert_msg( const char *msg, const bool expression );
 };
 

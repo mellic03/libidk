@@ -2,7 +2,9 @@
 
 #include <cstdint>
 #include <memory>
+
 #include <libidk/IDKcommon/idk_assert.hpp>
+#include "idk_buffer.hpp"
 
 
 namespace idk
@@ -13,7 +15,7 @@ namespace idk
 
 
 template <typename T>
-class idk::vector
+class idk::vector: public idk::iBuffer
 {
 private:
     static constexpr size_t INITIAL_CAPACITY = 1;
@@ -36,7 +38,13 @@ public:
     constexpr T &front() { return m_data[0]; };
     constexpr T &back()  { return m_data[m_size-1]; };
 
-    constexpr size_t size()      { return m_size; };
+    virtual void   *data     (          ) final { return m_data.get();     };
+    virtual size_t  size     (          ) final { return m_size;           };
+    virtual size_t  typesize (          ) final { return sizeof(T);        };
+    virtual size_t  nbytes   (          ) final { return m_size*sizeof(T); };
+    virtual void    resize   ( size_t s ) final;
+
+    // constexpr size_t size()      { return m_size; };
     constexpr size_t capacity()  { return m_capacity; };
 
 };
@@ -98,3 +106,21 @@ idk::vector<T>::push_back( const T &data )
     m_data[m_size-1] = data;
     m_size += 1;
 }
+
+
+
+template <typename T>
+void
+idk::vector<T>::resize( size_t s )
+{
+    if (s < m_size)
+    {
+        m_size = s;
+    }
+
+    else
+    {
+        this->_realloc(s);
+    }
+}
+

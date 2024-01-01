@@ -92,11 +92,6 @@ void idk::gl::bindBufferBase( GLenum target, GLuint index, GLuint buffer )
     glBindBufferBase(target, index, buffer);
 }
 
-void idk::gl::bindBufferBase( GLenum target, UBOloc loc, GLuint buffer )
-{
-    glBindBufferBase(target, static_cast<GLuint>(loc), buffer);
-}
-
 void idk::gl::bindFramebuffer( GLenum target, GLuint framebuffer )
 {
     IDK_GLCALL( glBindFramebuffer(target, framebuffer); )
@@ -172,6 +167,13 @@ idk::gl::bufferSubData( GLenum target, GLintptr offset, GLsizeiptr size, const v
 }
 
 void
+idk::gl::createVertexArrays( GLsizei n, GLuint *arrays )
+{
+    IDK_GLCALL( glCreateVertexArrays(n, arrays); )
+}
+
+
+void
 idk::gl::createBuffers( GLsizei n, GLuint *buffers )
 {
     IDK_GLCALL( glCreateBuffers(n, buffers); )
@@ -190,6 +192,14 @@ idk::gl::namedBufferSubData( GLuint buffer, GLintptr offset, GLsizeiptr size, co
 }
 
 
+void
+idk::gl::namedBufferStorage( GLuint buffer, GLsizeiptr size, const void *data, GLbitfield flags )
+{
+    IDK_GLCALL( glNamedBufferStorage(buffer, size, data, flags); )
+}
+
+
+
 void *
 idk::gl::mapBuffer( GLenum target, GLenum access )
 {
@@ -202,6 +212,20 @@ void
 idk::gl::unmapBuffer( GLenum target )
 {
     IDK_GLCALL( glUnmapBuffer(target); )
+}
+
+void *
+idk::gl::mapNamedBuffer( GLuint buffer, GLenum access )
+{
+    void *data;
+    IDK_GLCALL( data = glMapNamedBuffer(buffer, access); )
+    return data;
+}
+
+void 
+idk::gl::unmapNamedBuffer( GLuint buffer )
+{
+    IDK_GLCALL( glUnmapNamedBuffer(buffer); )
 }
 // ---------------------------------------------------------------------------------------
 
@@ -244,6 +268,28 @@ void
 idk::gl::texParameteri( GLenum target, GLenum pname, GLint param )
 {
     IDK_GLCALL( glTexParameteri(target, pname, param); )
+}
+
+
+GLuint64
+idk::gl::getTextureHandleARB( GLuint texture )
+{
+    GLuint64 handle;
+    IDK_GLCALL( handle = glGetTextureHandleARB(texture); )
+
+    return handle;
+}
+
+void
+idk::gl::makeTextureHandleResidentARB( GLuint64 handle )
+{
+    IDK_GLCALL( glMakeTextureHandleResidentARB(handle); )
+}
+
+void
+idk::gl::makeTextureHandleNonResidentARB( GLuint64 handle )
+{
+    IDK_GLCALL( glMakeTextureHandleNonResidentARB(handle); )
 }
 
 
@@ -411,6 +457,13 @@ idk::gl::uniformMatrix4fv( GLint loc, GLsizei count, GLboolean transpose, float 
 {
     IDK_GLCALL( glUniformMatrix4fv(loc, 1, transpose, value); )
 }
+
+
+void
+idk::gl::uniformHandleui64ARB( GLint location, GLuint64 value )
+{
+    IDK_GLCALL( glUniformHandleui64ARB(location, value); )
+}
 // ---------------------------------------------------------------------------------------
 
 
@@ -432,6 +485,44 @@ void
 idk::gl::enableVertexAttribArray( GLuint index )
 {
     IDK_GLCALL( glEnableVertexAttribArray(index); )
+}
+
+
+void
+idk::gl::vertexArrayVertexBuffer( GLuint vaobj, GLuint bindingindex, GLuint buffer,
+                                  GLintptr offset, GLsizei stride )
+{
+    IDK_GLCALL( glVertexArrayVertexBuffer(vaobj, bindingindex, buffer, offset, stride); )
+}
+
+void
+idk::gl::vertexArrayElementBuffer( GLuint vaobj, GLuint buffer )
+{
+    IDK_GLCALL( glVertexArrayElementBuffer(vaobj, buffer); )
+}
+
+
+void
+idk::gl::enableVertexArrayAttrib( GLuint vaobj, GLuint index )
+{
+    IDK_GLCALL( glEnableVertexArrayAttrib(vaobj, index); )
+}
+
+void
+idk::gl::vertexArrayAttribFormat( GLuint vaobj, GLuint attribindex, GLint size, GLenum type,
+                                  GLboolean normalized, GLuint relativeoffset )
+{
+    IDK_GLCALL(
+        glVertexArrayAttribFormat(
+            vaobj, attribindex, size, type, normalized, relativeoffset
+        );
+    )
+}
+
+void
+idk::gl::vertexArrayAttribBinding( GLuint vaobj, GLuint attribindex, GLuint bindingindex )
+{
+    IDK_GLCALL( glVertexArrayAttribBinding(vaobj, attribindex, bindingindex); )
 }
 
 

@@ -276,3 +276,18 @@ idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &c
 
     return texture;
 }
+
+
+idk::glTexture
+idk::gltools::loadTexture2( size_t w, size_t h, void *data, const glTextureConfig &config )
+{
+    GLuint texture_id = gltools::loadTexture(w, h, (uint32_t *)(data), config);
+
+    idk::glTexture texture(
+        texture_id,
+        glm::ivec2(w, h),
+        config
+    );
+
+    return texture;
+}
