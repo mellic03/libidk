@@ -5,7 +5,7 @@
 #include <stack>
 #include <vector>
 
-#include <libidk/IDKcommon/idk_assert.hpp>
+#include <libidk/idk_assert.hpp>
 
 
 namespace idk

@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <memory>
 
-#include <libidk/IDKcommon/idk_assert.hpp>
+#include <libidk/idk_assert.hpp>
 #include "idk_buffer.hpp"
 
 
