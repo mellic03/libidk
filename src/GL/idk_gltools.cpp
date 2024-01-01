@@ -1,11 +1,9 @@
 #include "idk_gltools.hpp"
+#include "../idk_math.hpp"
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <libidk/IDKcore/libidk.hpp>
-
-#include "../IDKcore/idk_utility.hpp"
-
 
 
 // GLuint

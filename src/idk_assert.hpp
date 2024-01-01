@@ -1,5 +1,5 @@
 #pragma once
-#include "../idk_export.hpp"
+#include "idk_export.hpp"
 
 
 namespace idk::internal

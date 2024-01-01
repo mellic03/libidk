@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libidk/IDKglm.hpp>
+#include "GL/idk_glm.hpp"
 
 
 namespace idk { class Transform; };

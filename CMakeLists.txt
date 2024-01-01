@@ -5,19 +5,19 @@ set(CMAKE_CXX_FLAGS "-std=c++17 -Wuninitialized -Winit-self -Wmaybe-uninitialize
 add_compile_options("-g" "-fPIC" "-fno-ident" "-fno-asynchronous-unwind-tables")
 add_definitions(-DIDK_DEBUG)
 
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
 
 project(idk)
 
-add_subdirectory(libidk/IDKgl)
-add_subdirectory(libidk/IDKcore)
-add_subdirectory(libidk/IDKcommon)
+file(GLOB SOURCES
+    "src/*.cpp"
+    "src/containers/*.cpp"
+    "src/GL/*.cpp"
+)
 
-add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/dummy.cpp)
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 target_link_libraries(
     ${PROJECT_NAME} PUBLIC
-    IDKcore
-    IDKgl
-    IDKcommon
 )
 

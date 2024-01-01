@@ -1,7 +1,7 @@
 #include "idk_glTexture.hpp"
 
-#include <libidk/IDKcommon/idk_assert.hpp>
-#include "../IDKcore/idk_utility.hpp"
+#include "../idk_assert.hpp"
+#include "../idk_math.hpp"
 
 
 static size_t
@@ -91,7 +91,7 @@ idk::glTexture::glTexture( GLuint id, const glm::ivec2 &size, const glTextureCon
 
     if (config.genmipmap)
     {
-        GLsizei levels = 1 + floor(log2(idk::max(size.x, size.y)));
+        GLsizei levels = 1 + floor(log2(std::max(size.x, size.y)));
         m_mips.resize(levels);
     }
 
