@@ -9,12 +9,12 @@ add_definitions(-DIDK_DEBUG)
 project(libidk)
 
 file(GLOB SOURCES
-    "src/*.cpp"
-    "src/containers/*.cpp"
-    "src/GL/*.cpp"
+    "src/libidk/*.cpp"
+    "src/libidk/containers/*.cpp"
+    "src/libidk/GL/*.cpp"
 )
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
 target_link_libraries(

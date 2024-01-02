@@ -17,9 +17,9 @@
 #include IDK_SDL2_INCLUDE_PATH
 
 
-namespace idk::Keycode
+namespace idk
 {
-    enum idk_Keycode
+    enum Keycode
     {
         A               = SDL_SCANCODE_A,
         B               = SDL_SCANCODE_B,
