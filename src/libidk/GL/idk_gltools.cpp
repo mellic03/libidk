@@ -1,6 +1,8 @@
 #include "idk_gltools.hpp"
 #include "../idk_math.hpp"
 
+#include "../idk_assert.hpp"
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -106,22 +108,25 @@ idk::gltools::loadTexture( size_t w, size_t h, void *data, const glTextureConfig
 
 
 
-static glm::vec4
-interpolate(glm::vec4 p00, glm::vec4 p10, glm::vec4 p01, glm::vec4 p11, float u, float v)
-{
-    float factor_u = u - floor(u);
-    float factor_v = v - floor(v);
+// static glm::vec4
+// interpolate(glm::vec4 p00, glm::vec4 p10, glm::vec4 p01, glm::vec4 p11, float u, float v)
+// {
+//     float factor_u = u - floor(u);
+//     float factor_v = v - floor(v);
 
-    glm::vec4 bottom = (p10 - p00) * factor_u + p00;
-    glm::vec4 top    = (p11 - p01) * factor_u + p01;
+//     glm::vec4 bottom = (p10 - p00) * factor_u + p00;
+//     glm::vec4 top    = (p11 - p01) * factor_u + p01;
 
-    return (top - bottom) * factor_v + bottom;
-}
+//     return (top - bottom) * factor_v + bottom;
+// }
 
 
 static glm::vec4
 t_query( int u, int v, size_t w, size_t h, std::unique_ptr<uint8_t[]> &data )
 {
+    u %= w;
+    v &= h;
+
     glm::vec4 result = glm::vec4(
         float(data[4*w*v + 4*u + 0]),
         float(data[4*w*v + 4*u + 1]),

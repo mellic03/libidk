@@ -33,7 +33,7 @@ public:
     void                translate( glm::vec3 );
     void                localTranslate( glm::vec3 );
     void                pitch( float );
-    void                roll( float );
+    // void                roll( float );
     void                yaw( float );
 
     void                scale( glm::vec3 );

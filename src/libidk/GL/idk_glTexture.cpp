@@ -48,7 +48,7 @@ idk::glTexture::glTexture( const idk::glTexture &other )
     size_t epp      = gl_format_num_elements(m_config.format);
     size_t typesize = (m_config.datatype == GL_FLOAT) ? sizeof(float) : sizeof(uint8_t);
 
-    for (int i=0; i<m_mips.size(); i++)
+    for (size_t i=0; i<m_mips.size(); i++)
     {
         glm::ivec2 mipsize = m_size / int(glm::pow(2, i));
         size_t     nbytes  = mipsize.x * mipsize.y * epp * typesize;
@@ -70,7 +70,7 @@ idk::glTexture::glTexture( const idk::glTexture &&other )
     size_t epp      = gl_format_num_elements(m_config.format);
     size_t typesize = (m_config.datatype == GL_FLOAT) ? sizeof(float) : sizeof(uint8_t);
 
-    for (int i=0; i<m_mips.size(); i++)
+    for (size_t i=0; i<m_mips.size(); i++)
     {
         glm::ivec2 mipsize = m_size / int(glm::pow(2, i));
         size_t     nbytes  = mipsize.x * mipsize.y * epp * typesize;
@@ -95,7 +95,7 @@ idk::glTexture::glTexture( GLuint id, const glm::ivec2 &size, const glTextureCon
         m_mips.resize(levels);
     }
 
-    for (int i=0; i<m_mips.size(); i++)
+    for (size_t i=0; i<m_mips.size(); i++)
     {
         glm::ivec2 mipsize = size / int(glm::pow(2, i));
         size_t     nbytes  = mipsize.x * mipsize.y * epp * typesize;
@@ -124,10 +124,7 @@ idk::glTexture::sample1f( float u, float v, int l ) const
     int iv = int(v);
 
     int w = m_size.x / int(glm::pow(2, l));
-    int h = m_size.y / int(glm::pow(2, l));
-
-    int x = int(w*u) % w;
-    int y = int(h*v) % h;
+    // int h = m_size.y / int(glm::pow(2, l));
 
     return *(&this->_data1f(l)[1*w*iv + 1*iu + 0]);
 }
@@ -140,10 +137,7 @@ idk::glTexture::sample1u( float u, float v, int l ) const
     int iv = int(v);
 
     int w = m_size.x / int(glm::pow(2, l));
-    int h = m_size.y / int(glm::pow(2, l));
-
-    int x = int(w*u) % w;
-    int y = int(h*v) % h;
+    // int h = m_size.y / int(glm::pow(2, l));
 
     return *(&this->_data1u(l)[1*w*iv + 1*iu + 0]);
 }

@@ -16,9 +16,9 @@ namespace idk
                           float     distanceSq( glm::vec3 a, glm::vec3 b );
 
 
-    template <typename T, typename... Args>
-    void    print( std::string sep, T head, Args... );
-    void    print( std::string sep );
+    // template <typename T, typename... Args>
+    // void    print( std::string sep, T head, Args... );
+    // void    print( std::string sep );
 
     glm::vec3 calculate_barycentric( float x, float y, glm::vec2 v1, glm::vec2 v2, glm::vec2 v3 );
 };
@@ -58,12 +58,12 @@ idk::swap( T&a, T&b )
 
 
 
-template <typename T, typename... Args> void
-idk::print( std::string sep, T head, Args... rest )
-{
-    std::cout << head << sep;
-    idk::print(sep, rest...);
-}
+// template <typename T, typename... Args> void
+// idk::print( std::string sep, T head, Args... rest )
+// {
+//     std::cout << head << sep;
+//     idk::print(sep, rest...);
+// }
 
 
 

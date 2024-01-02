@@ -18,11 +18,11 @@ idk::distanceSq( glm::vec3 a, glm::vec3 b )
 
 
 
-void
-idk::print( std::string sep )
-{
-    std::cout << "\n";
-}
+// void
+// idk::print( std::string sep )
+// {
+//     std::cout << "\n";
+// }
 
 
 

@@ -449,13 +449,13 @@ idk::gl::uniform4fv( GLint loc, GLsizei count, float *value )
 void
 idk::gl::uniformMatrix3fv( GLint loc, GLsizei count, GLboolean transpose, float *value )
 {
-    IDK_GLCALL( glUniformMatrix3fv(loc, 1, transpose, value); )
+    IDK_GLCALL( glUniformMatrix3fv(loc, count, transpose, value); )
 }
 
 void
 idk::gl::uniformMatrix4fv( GLint loc, GLsizei count, GLboolean transpose, float *value )
 {
-    IDK_GLCALL( glUniformMatrix4fv(loc, 1, transpose, value); )
+    IDK_GLCALL( glUniformMatrix4fv(loc, count, transpose, value); )
 }
 
 

@@ -117,9 +117,9 @@ idk::Transform::pitch( float f )
 }
 
 
-void
-idk::Transform::roll( float f )
-{
+// void
+// idk::Transform::roll( float f )
+// {
     // m_view = glm::rotate(m_view, f, _front);
 
     // // if (_noroll == false)
@@ -127,7 +127,7 @@ idk::Transform::roll( float f )
     //     _right = glm::inverse(m_view) * _default_right;
     //     _up = glm::inverse(m_view) * _default_up;
     // }
-}
+// }
 
 
 void
