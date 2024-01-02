@@ -5,9 +5,8 @@ set(CMAKE_CXX_FLAGS "-std=c++17 -Wuninitialized -Winit-self -Wmaybe-uninitialize
 add_compile_options("-g" "-fPIC" "-fno-ident" "-fno-asynchronous-unwind-tables")
 add_definitions(-DIDK_DEBUG)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
 
-project(idk)
+project(libidk)
 
 file(GLOB SOURCES
     "src/*.cpp"
@@ -16,6 +15,7 @@ file(GLOB SOURCES
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
 target_link_libraries(
     ${PROJECT_NAME} PUBLIC
