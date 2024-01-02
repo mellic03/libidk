@@ -14,7 +14,7 @@ file(GLOB SOURCES
     "src/GL/*.cpp"
 )
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
 target_link_libraries(
