@@ -3,34 +3,23 @@
 #include "idk_dynamiclib.hpp"
 
 
+namespace idk
+{
+    class APILoader;
+};
 
-namespace idk { class APILoader; };
+
 
 class idk::APILoader
 {
 private:
     void *m_lib;
 
-
 public:
-    APILoader( const char *path )
-    {
-        m_lib = idk::dynamiclib::loadObject(path);
-    };
-
-    ~APILoader()
-    {
-        idk::dynamiclib::unloadObject(m_lib);
-    };
-
-    void *function_ptr( const char *symbol )
-    {
-        return idk::dynamiclib::loadFunction(m_lib, symbol);
-    };
-
+        APILoader( const char *path );
 
     template <typename return_type, typename ...Args>
-    return_type *function_call( const char *symbol, Args ...args );
+    return_type *call( const char *symbol, Args ...args );
 
 };
 
@@ -38,7 +27,7 @@ public:
 
 template <typename return_type, typename ...Args>
 return_type *
-idk::APILoader::function_call( const char *symbol, Args ...args )
+idk::APILoader::call( const char *symbol, Args ...args )
 {
     typedef return_type *(*functionptr_type)( Args... );
     void *ptr = idk::dynamiclib::loadFunction(m_lib, symbol);

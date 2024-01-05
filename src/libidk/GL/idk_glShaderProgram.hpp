@@ -2,14 +2,22 @@
 
 #include "common.hpp"
 #include "idk_glBindings.hpp"
-
-namespace idk { class glShader; };
-
+#include <string>
 
 
-class idk::glShader
+namespace idk
+{
+    class glShaderStage;
+    class glShaderProgram;
+};
+
+
+
+class idk::glShaderProgram
 {
 public:
+    static GLuint compileShader( GLenum type, const char *filepath );
+
     struct Loc { GLint value = -1; };
     struct Def { std::string value = "NONE"; };
 
@@ -38,9 +46,24 @@ private:
     GLuint        compile_vf    ( const std::string &defines );
     GLuint        compile_vgf   ( const std::string &defines );
 
-    void        reset();
+    void          reset();
 
 public:
+
+                glShaderProgram() {  };
+
+    template <typename ...Args>
+    glShaderProgram( Args... args )
+    {
+        glShaderStage shader_stages[] = { static_cast<glShaderStage>(args)... };
+
+        m_program_id = gl::createProgram();
+        for (auto &stage: shader_stages)
+        {
+            gl::attachShader(m_program_id, stage.m_shader_id);
+        }
+    }
+
 
     void        loadFile  ( std::string root, std::string vert, std::string frag );
     GLuint      loadFileC ( std::string root, std::string vert, std::string frag );

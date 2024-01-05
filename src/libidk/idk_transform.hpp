@@ -43,6 +43,7 @@ public:
     void                rotate( glm::vec3 v );
 
     glm::mat4           modelMatrix();
+    glm::mat4 &         modelMat();
 
 };
 

@@ -16,21 +16,36 @@ namespace idk::gl
     void getFloatv( GLenum pname, GLfloat *params );
 
 
-    void genVertexArrays  ( GLsizei n, GLuint *arrays           );
-    void genBuffers       ( GLsizei n, GLuint *buffers          );
-    void genTextures      ( GLsizei n, GLuint *textures         );
-    void genFramebuffers  ( GLsizei n, GLuint *framebuffers     );
-    void genRenderbuffers ( GLsizei n, GLuint *renderbuffers    );
+    void genVertexArrays  ( GLsizei n, GLuint *arrays );
+    void genBuffers       ( GLsizei n, GLuint *buffers );
+    void genTextures      ( GLsizei n, GLuint *textures );
+    void genFramebuffers  ( GLsizei n, GLuint *framebuffers );
+    void genRenderbuffers ( GLsizei n, GLuint *renderbuffers );
 
     void createVertexArrays ( GLsizei n, GLuint *arrays );
     void createBuffers      ( GLsizei n, GLuint *buffers );
     void createTextures     ( GLenum target, GLsizei n, GLuint *textures );
 
-    void deleteVertexArrays  ( GLsizei n, GLuint *arrays         );
-    void deleteBuffers       ( GLsizei n, GLuint *buffers        );
-    void deleteTextures      ( GLsizei n, GLuint *textures       );
-    void deleteFramebuffers  ( GLsizei n, GLuint *framebuffers   );
-    void deleteRenderbuffers ( GLsizei n, GLuint *renderbuffers  );
+    GLuint createProgram    ();
+    GLuint createShader     ( GLenum type );
+
+    void   shaderSource     ( GLuint shader, GLsizei count, const GLchar *const *string,
+                              const GLint *length );
+
+    void   compileShader    ( GLuint shader );
+    void   getShaderiv      ( GLuint shader, GLenum pname, GLint *param );
+    void   getShaderInfoLog ( GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog );
+    void   attachShader     ( GLuint program, GLuint shader );
+    void   deleteShader     ( GLuint shader );
+    void   validateProgram  ( GLuint program );
+    void   linkProgram      ( GLuint program );
+
+
+    void deleteVertexArrays  ( GLsizei n, GLuint *arrays );
+    void deleteBuffers       ( GLsizei n, GLuint *buffers );
+    void deleteTextures      ( GLsizei n, GLuint *textures );
+    void deleteFramebuffers  ( GLsizei n, GLuint *framebuffers );
+    void deleteRenderbuffers ( GLsizei n, GLuint *renderbuffers );
 
     void bindVertexArray( GLuint VAO );
     void bindBuffer( GLenum type, GLuint buf );
@@ -128,7 +143,7 @@ namespace idk::gl
 
     // Uniforms ------------------------------------------------------------------------------
     /**/
-    GLint getUniformLocation( GLuint program, std::string name );
+    GLint getUniformLocation( GLuint program, const char *name );
     void  uniform1i( GLint loc, int i );
     void  uniform1f( GLint loc, float f );
     void  uniform2fv( GLint loc, GLsizei count, float *value );

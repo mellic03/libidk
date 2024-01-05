@@ -179,6 +179,79 @@ idk::gl::createBuffers( GLsizei n, GLuint *buffers )
     IDK_GLCALL( glCreateBuffers(n, buffers); )
 }
 
+
+GLuint
+idk::gl::createProgram()
+{
+    IDK_GLCALL( return glCreateProgram(); )
+}
+
+
+GLuint
+idk::gl::createShader( GLenum type )
+{
+    IDK_GLCALL( return glCreateShader(type); )
+}
+
+
+void
+idk::gl::shaderSource( GLuint shader, GLsizei count, const GLchar *const *string,
+                       const GLint *length )
+{
+    IDK_GLCALL( glShaderSource(shader, count, string, length); )
+}
+
+
+void
+idk::gl::compileShader( GLuint shader )
+{
+    IDK_GLCALL( glCompileShader(shader); )
+}
+
+
+void
+idk::gl::getShaderiv( GLuint shader, GLenum pname, GLint *param )
+{
+    IDK_GLCALL( glGetShaderiv(shader, pname, param); )
+}
+
+
+void
+idk::gl::getShaderInfoLog( GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog )
+{
+    IDK_GLCALL( glGetShaderInfoLog(shader, bufSize, length, infoLog); )
+}
+
+
+void
+idk::gl::attachShader( GLuint program, GLuint shader )
+{
+    IDK_GLCALL( glAttachShader(program, shader); )
+}
+
+
+void
+idk::gl::deleteShader( GLuint shader )
+{
+    IDK_GLCALL( glDeleteShader(shader); )
+
+}
+
+
+void
+idk::gl::validateProgram( GLuint program )
+{
+    IDK_GLCALL( glValidateProgram(program); )
+}
+
+
+void
+idk::gl::linkProgram( GLuint program )
+{
+    IDK_GLCALL( glLinkProgram(program); )
+}
+
+
 void
 idk::gl::namedBufferData( GLuint buffer, GLsizeiptr size, const void *data, GLenum usage )
 {
@@ -412,9 +485,9 @@ idk::gl::namedFramebufferTextureLayer( GLuint framebuffer, GLenum attachment, GL
 // Uniforms ------------------------------------------------------------------------------
 /**/
 GLint
-idk::gl::getUniformLocation( GLuint program, std::string name )
+idk::gl::getUniformLocation( GLuint program, const char *name )
 {
-    return glGetUniformLocation(program, name.c_str());
+    return glGetUniformLocation(program, name);
 }
 
 void

@@ -200,3 +200,14 @@ idk::Transform::modelMatrix()
     return m_model_mat * m_point_to * m_rotation;
 }
 
+
+glm::mat4 &
+idk::Transform::modelMat()
+{
+    // glm::mat4 model_mat = glm::translate(glm::mat4(1.0f), _position) * glm::mat4_cast(_orientation);
+    // model_mat = glm::scale(model_mat, _scale);
+
+    // return glm::scale(m_rotation * m_model_mat, m_scale);
+    return m_model_mat;
+}
+
