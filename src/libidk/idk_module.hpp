@@ -2,6 +2,7 @@
 
 #include "idk_api_loader.hpp"
 
+#include <typeinfo>
 #include <vector>
 #include <string>
 
@@ -18,15 +19,22 @@ class idk::Module
 {
 protected:
     int                                 m_id;
+    size_t                              m_typeid;
     std::string                         m_name;
     std::vector<std::string>            m_dependencies;
 
 public:
     virtual                             ~Module() = default;
-    void                                base_init( int id, std::string name ) { m_id = id; m_name = name; };
+    void base_init( int id, std::string name )
+    {
+        m_id = id;
+        m_typeid = typeid(*this).hash_code();
+        m_name = name;
+    };
     
-    constexpr int                       ID() const { return m_id; };
-    constexpr const std::string &       name() const { return m_name; };
+    constexpr int                       ID()     const { return m_id;     };
+    constexpr size_t                    typeID() const { return m_typeid; };
+    constexpr const std::string &       name()   const { return m_name;   };
 
     virtual void                        init( idk::EngineAPI & ) = 0;
     virtual void                        stage_A( idk::EngineAPI & ) = 0;

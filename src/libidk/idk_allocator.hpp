@@ -119,7 +119,6 @@ idk::Allocator<T>::create( const T &&data )
     int data_idx = m_data.size();
     m_data.push_back(std::move(data));
 
-
     // Determine user-facing id
     // ------------------------------------------------------------------------
     if (m_available_ids.empty())
@@ -161,8 +160,9 @@ idk::Allocator<T>::destroy( int id )
     int data_idx = m_forward[id];
     int back_idx = m_reverse.back();
 
-    m_data[data_idx] = std::move(m_data.back());
-    m_forward[back_idx] = std::move(m_forward[id]);
+    std::swap(m_data[data_idx], m_data.back());
+    std::swap(m_forward[back_idx], m_forward[id]);
+    std::swap(m_reverse[data_idx], m_reverse.back());
 
     m_data.pop_back();
     m_reverse.pop_back();
