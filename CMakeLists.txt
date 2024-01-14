@@ -11,7 +11,7 @@ file(GLOB SOURCES
     # "src/libidk/GL/*.cpp"
 )
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 set_target_properties(
     ${PROJECT_NAME} PROPERTIES

@@ -23,6 +23,9 @@ public:
     /*              Called when the component is assigned. */
     virtual void    onObjectAssignment( int obj_id, idk::Engine & ) = 0;
 
+    /*              Called when the component is removed. */
+    virtual void    onObjectDeassignment ( int obj_id, idk::Engine & ) = 0;
+
     /*              Called when a new game object is created. */
     virtual void    onObjectCreation( int obj_id, idk::Engine & ) = 0;
 

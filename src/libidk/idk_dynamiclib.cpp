@@ -36,11 +36,26 @@
 
 
 
-
 void *
 idk::dynamiclib::loadObject( const char *filepath )
 {
     std::string relpath   = filepath;
+
+    if (relpath.substr(relpath.length() - 3) == ".so")
+    {
+        relpath.pop_back();
+        relpath.pop_back();
+        relpath.pop_back();
+    }
+
+    else if (relpath.substr(relpath.length() - 4) == ".dll")
+    {
+        relpath.pop_back();
+        relpath.pop_back();
+        relpath.pop_back();
+        relpath.pop_back();
+    }
+
     std::string extension = IDK_DYNAMIC_LIBRARY_FILE_EXTENSION;
     std::string path = std::filesystem::absolute(relpath + extension);
 
@@ -52,7 +67,6 @@ idk::dynamiclib::loadObject( const char *filepath )
     return lib;
 }
 
-#include <iostream>
 
 void *
 idk::dynamiclib::loadFunction( void *lib, const char *symbol )
@@ -61,10 +75,10 @@ idk::dynamiclib::loadFunction( void *lib, const char *symbol )
 
     std::string msg = "Could not load symbol: " + std::string(symbol);
 
-    if (function_ptr == nullptr)
-    {
-        std::cout << SDL_GetError() << "\n";
-    }
+    // if (function_ptr == nullptr)
+    // {
+        // std::cout << SDL_GetError() << "\n";
+    // }
 
     IDK_ASSERT(msg.c_str(), function_ptr != nullptr);
 
