@@ -52,6 +52,7 @@ idk::dynamiclib::loadObject( const char *filepath )
     return lib;
 }
 
+#include <iostream>
 
 void *
 idk::dynamiclib::loadFunction( void *lib, const char *symbol )
@@ -59,6 +60,12 @@ idk::dynamiclib::loadFunction( void *lib, const char *symbol )
     void *function_ptr = IDK_DYNAMIC_LIBRARY_LOAD_FUNCTION(lib, symbol);
 
     std::string msg = "Could not load symbol: " + std::string(symbol);
+
+    if (function_ptr == nullptr)
+    {
+        std::cout << SDL_GetError() << "\n";
+    }
+
     IDK_ASSERT(msg.c_str(), function_ptr != nullptr);
 
     return function_ptr;

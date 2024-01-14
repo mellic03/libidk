@@ -15,7 +15,7 @@ private:
     std::string m_name = "WOOP";
 
 public:
-                    Game( std::string name ): m_name(name) {  };
+                    Game( const std::string &name ): m_name(name) {  };
 
     int             ID()   const { return m_id; };
     std::string     name() const { return m_name; };

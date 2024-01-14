@@ -1,27 +1,12 @@
 #pragma once
 
+#include "idk_ibuffer.hpp"
 #include <vector>
 
 namespace idk
 {
-    class iBuffer;
-
     template <typename T>
     class Buffer;
-};
-
-
-class idk::iBuffer
-{
-public:
-    virtual        ~iBuffer() = default;
-
-    virtual void *  data     (        ) = 0;
-    virtual size_t  size     (        ) = 0;
-    virtual size_t  typesize (        ) = 0;
-    virtual size_t  nbytes   (        ) = 0;
-    virtual void    resize   ( size_t ) = 0;   
-
 };
 
 

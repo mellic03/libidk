@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 #include <memory>
 
-#include "idk_assert.hpp"
 #include "idk_buffer.hpp"
 
 
@@ -11,116 +11,88 @@ namespace idk
 {
     template <typename T>
     class vector;
+
 };
+
 
 
 template <typename T>
 class idk::vector: public idk::iBuffer
 {
-private:
-    static constexpr size_t INITIAL_CAPACITY = 1;
-
+protected:
     std::unique_ptr<T[]> m_data;
-    size_t               m_capacity;
-    size_t               m_size;
 
-    void    _realloc( size_t capacity );
+private:
+    static constexpr size_t DEFAULT_CAP = 4;
+    size_t      m_size;
+    size_t      m_cap;
+
+    void        _realloc( size_t size );
+
 
 public:
+                vector();
+                vector( size_t size );
+                vector( size_t size, const T &data );
 
-            vector();
-            vector( size_t size );
-            vector( size_t reserve, size_t size );
+    size_t      capacity() const { return m_cap; };
 
-    void    push_back( const T &data );
-    void    pop_back() { m_size -= 1; };
 
-    constexpr T &front() { return m_data[0]; };
-    constexpr T &back()  { return m_data[m_size-1]; };
+    // idk::iBuffer compliance
+    // -----------------------------------------------------------------------------------------
+    virtual void *  data()      final { return m_data.get();     };
+    virtual size_t  size()      final { return m_size;           };
+    virtual size_t  typesize()  final { return sizeof(T);        };
+    virtual size_t  nbytes()    final { return size()*sizeof(T); };
+    virtual void    resize( size_t s ) final;
+    // -----------------------------------------------------------------------------------------
 
-    virtual void   *data     (          ) final { return m_data.get();     };
-    virtual size_t  size     (          ) final { return m_size;           };
-    virtual size_t  typesize (          ) final { return sizeof(T);        };
-    virtual size_t  nbytes   (          ) final { return m_size*sizeof(T); };
-    virtual void    resize   ( size_t s ) final;
+    void        push_back( const T &data );
+    void        pop_back();
 
-    // constexpr size_t size()      { return m_size; };
-    constexpr size_t capacity()  { return m_capacity; };
+    const T&    front() const { return m_data[0];        };
+    const T&    back()  const { return m_data[m_size-1]; };
+
+    T&          operator [] ( int i ) { return m_data[i]; };
+    const T&    operator [] ( int i ) const { return m_data[i]; };
+
+
+    struct iterator;
+
+    iterator begin() { return iterator(&m_data[0]);          };
+    iterator end()   { return iterator(&m_data[0] + size()); };
 
 };
 
 
-template <typename T>
-void
-idk::vector<T>::_realloc( size_t capacity)
-{
-    std::unique_ptr<T[]> new_data(new T[capacity]);
-
-    T *start = m_data.get();
-    T *end   = m_data.get() + std::min(m_capacity, capacity);
-    T *dest  = new_data.get();
-    std::copy(start, end, dest);
-
-    m_data     = std::move(new_data);
-    m_capacity = capacity;
-}
-
-
 
 template <typename T>
-idk::vector<T>::vector()
-: m_data(new T[INITIAL_CAPACITY]), m_capacity(INITIAL_CAPACITY), m_size(0) 
+struct idk::vector<T>::iterator
 {
+    T *ptr;
 
-}
+    iterator( T *p )                 : ptr(p)         {  };
+    iterator( const iterator &other ): ptr(other.ptr) {  };
 
-
-
-template <typename T>
-idk::vector<T>::vector( size_t size )
-: m_data(new T[2*size]), m_capacity(2*size), m_size(size)
-{
-
-}
-
-
-
-template <typename T>
-idk::vector<T>::vector( size_t reserve, size_t size )
-: m_data(new T[reserve]), m_capacity(reserve), m_size(size)
-{
-    IDK_ASSERT("[reserve] must be >= [size]", reserve >= size);
-}
-
-
-
-template <typename T>
-void
-idk::vector<T>::push_back( const T &data )
-{
-    if (m_size+1 >= m_capacity)
+    iterator &operator ++ ()
     {
-        this->_realloc(2*m_capacity);
-    }
+        ptr++;
+        return *this;
+    };
 
-    m_data[m_size-1] = data;
-    m_size += 1;
-}
-
-
-
-template <typename T>
-void
-idk::vector<T>::resize( size_t s )
-{
-    if (s < m_size)
+    iterator operator ++ (int)
     {
-        m_size = s;
-    }
+        return iterator(ptr++);
+    };
 
-    else
-    {
-        this->_realloc(s);
-    }
-}
+    bool operator == ( const iterator &rhs ) { return ptr == rhs.ptr; };
+    bool operator != ( const iterator &rhs ) { return ptr != rhs.ptr; };
+    T &operator * () { return *ptr; };
+
+};
+
+
+
+#include "idk_vector.inl"
+
 

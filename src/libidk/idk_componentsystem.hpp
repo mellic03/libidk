@@ -34,7 +34,7 @@ public:
 
 
     /*              Called when the EditorUI module is used to inspect a given game object */
-    virtual void    onObjectInspect( int obj_id ) {  };
+    virtual void    onObjectSelection( int obj_id ) {  };
 
     virtual idk::CSFile onFileSave( idk::Engine & ) { return {nullptr, 0}; };
     virtual void        onFileLoad( idk::Engine &, const idk::CSFile & ) {  };

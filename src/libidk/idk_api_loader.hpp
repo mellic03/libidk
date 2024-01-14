@@ -6,8 +6,8 @@
 namespace idk
 {
     class APILoader;
-};
 
+};
 
 
 class idk::APILoader
@@ -22,7 +22,6 @@ public:
     return_type *call( const char *symbol, Args ...args );
 
 };
-
 
 
 template <typename return_type, typename ...Args>
