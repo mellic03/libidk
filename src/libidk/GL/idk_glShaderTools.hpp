@@ -5,7 +5,7 @@
 
 namespace idk::shadertools
 {
-    void   checkError( GLuint shader );
+    bool   checkError( GLuint shader );
     void   checkCompilation( GLuint shader );
 
     GLuint compileShader( GLenum type, const char *filepath );

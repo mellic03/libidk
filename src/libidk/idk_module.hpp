@@ -2,12 +2,12 @@
 
 #include "idk_api_loader.hpp"
 
-#include <typeinfo>
+#include <typeindex>
 #include <vector>
 #include <string>
 
 
-namespace idk { class EngineAPI; };
+namespace idk { class Engine; class EngineAPI; };
 
 namespace idk
 {
@@ -28,7 +28,7 @@ public:
     void base_init( int id, std::string name )
     {
         m_id = id;
-        m_typeid = typeid(*this).hash_code();
+        m_typeid = std::type_index(typeid(*this)).hash_code();
         m_name = name;
     };
     
@@ -36,7 +36,10 @@ public:
     constexpr size_t                    typeID() const { return m_typeid; };
     constexpr const std::string &       name()   const { return m_name;   };
 
+    virtual void                        preinit( idk::Engine & ) {  };
     virtual void                        init( idk::EngineAPI & ) = 0;
+    virtual void                        deinit() {  };
+
     virtual void                        stage_A( idk::EngineAPI & ) = 0;
     virtual void                        stage_B( idk::EngineAPI & ) = 0;
     virtual void                        stage_C( idk::EngineAPI & ) = 0;
@@ -57,4 +60,5 @@ idk::Module::addDependencies( std::string head, Args... rest )
     addDependency(head);
     addDependencies(rest...);
 }
+
 

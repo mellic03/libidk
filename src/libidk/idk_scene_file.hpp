@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <cstddef>
 #include <vector>
 
@@ -20,9 +21,19 @@ namespace idk::Scene
 
 struct idk::CSFile
 {
-    void  *data;
-    size_t nbytes;
+    uint32_t  cs_id;
+    void     *data;
+    uint32_t  nbytes;
 };
+
+
+// struct idk::CSFile
+// {
+//     int32_t  obj_id;
+//     uint32_t cs_id;
+//     std::vector<uint32_t> data;
+// };
+
 
 
 struct idk::SceneFile

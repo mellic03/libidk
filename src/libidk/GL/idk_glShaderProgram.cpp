@@ -1,6 +1,10 @@
 #include "idk_glShaderProgram.hpp"
 #include "idk_glShaderStage.hpp"
+#include "idk_glShaderTools.hpp"
 #include "idk_gltools.hpp"
+
+#include "../idk_assert.hpp"
+
 
 #include <string>
 #include <memory>
@@ -8,28 +12,79 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <filesystem>
 
 
-// Static member initialization
-// ---------------------------------------------------------------------------------------------
-GLuint idk::glShaderProgram::current_bound_id = 0;
-// ---------------------------------------------------------------------------------------------
 
 
-// idk::glShaderProgram::glShaderProgram( const glShaderStage &A, const glShaderStage &B )
+// idk::glShaderProgram::glShaderProgram( idk::glShaderProgram &other )
 // {
-//     GLuint program = gl::createProgram();
+//     m_definitions   = other.m_definitions;
+//     m_version       = other.m_version;
+//     m_vert_src      = other.m_vert_src;
+//     m_geom_src      = other.m_geom_src;
+//     m_frag_src      = other.m_frag_src;
+//     m_vert_name     = other.m_vert_name;
+//     m_geom_name     = other.m_geom_name;
+//     m_frag_name     = other.m_frag_name;
+//     m_uniforms      = other.m_uniforms;
+//     m_locations     = other.m_locations;
+//     m_definitions   = other.m_definitions;
+//     m_texture_unit  = other.m_texture_unit;
+//     m_program_id    = other.m_program_id;
+// }
 
-//     // gl::attachShader(program, A.m_shader_id)
+
+// idk::glShaderProgram::glShaderProgram( idk::glShaderProgram &&other )
+// {
+//     *this = std::move(other);
+//     // m_definitions   = other.m_definitions;
+//     // m_version       = other.m_version;
+//     // m_vert_src      = other.m_vert_src;
+//     // m_geom_src      = other.m_geom_src;
+//     // m_frag_src      = other.m_frag_src;
+//     // m_vert_name     = other.m_vert_name;
+//     // m_geom_name     = other.m_geom_name;
+//     // m_frag_name     = other.m_frag_name;
+//     // m_uniforms      = other.m_uniforms;
+//     // m_locations     = other.m_locations;
+//     // m_definitions   = other.m_definitions;
+//     // m_texture_unit  = other.m_texture_unit;
+//     // m_program_id    = other.m_program_id;
+// }
+
+
+// idk::glShaderProgram::~glShaderProgram()
+// {
 
 // }
 
 
-// idk::glShaderProgram::glShaderProgram( const glShaderStage &A, const glShaderStage &B,
-//                                        const glShaderStage &C )
+// idk::glShaderProgram &
+// idk::glShaderProgram::operator = ( idk::glShaderProgram &&other )
 // {
+//     if (this == &other)
+//     {
+//         return *this;
+//     }
 
+//     m_definitions   = std::move(other.m_definitions);
+//     m_version       = std::move(other.m_version);
+//     m_vert_src      = std::move(other.m_vert_src);
+//     m_geom_src      = std::move(other.m_geom_src);
+//     m_frag_src      = std::move(other.m_frag_src);
+//     m_vert_name     = std::move(other.m_vert_name);
+//     m_geom_name     = std::move(other.m_geom_name);
+//     m_frag_name     = std::move(other.m_frag_name);
+//     m_uniforms      = std::move(other.m_uniforms);
+//     m_locations     = std::move(other.m_locations);
+//     m_definitions   = std::move(other.m_definitions);
+//     m_texture_unit  = std::move(other.m_texture_unit);
+//     m_program_id    = std::move(other.m_program_id);
+
+//     return *this;
 // }
+
 
 
 
@@ -67,48 +122,33 @@ _line_has_include( std::string &line )
 
 
 std::string
-idk::glShaderProgram::parse_shader_include( std::string root, std::string includeline )
+idk::glShaderProgram::parse_shader_include( const std::string &current_path,
+                                            const std::string &include_line )
 {
+    namespace fs = std::filesystem;
+
+    std::string relpath = include_line;
+    size_t pos;
+    
+    pos     = relpath.find("\"");
+    relpath = relpath.substr(pos+1);
+    pos     = relpath.find("\"");
+    relpath = relpath.substr(0, pos);
+
+
+    fs::path include_path = fs::path(current_path).parent_path() / fs::path(relpath);
+
+
     std::string src;
 
-    std::istringstream iss(includeline);
-    std::string line, includepath;
-    iss >> line >> includepath;
-    
-    includepath = includepath.substr(1, includepath.size()-2);
-    includepath = root + includepath;
+    std::ifstream stream(include_path);
+    std::string line;
 
-    std::ifstream instream(includepath);
-    while (getline(instream, line))
+    while (std::getline(stream, line))
     {
-        auto tokens = tokenize(line);
-
-        if (tokens.size() > 0 && tokens[0] == "#version")
-        {
-            m_version = line + "\n";
-            continue;
-        }
-
-        if (tokens.size() == 3 && tokens[0] == "uniform")
-        {
-            if (tokens[2].back() == ';')
-                tokens[2].pop_back();
-
-            m_uniforms.emplace(tokens[2]);
-        }
-
-        else if (tokens.size() > 0 && tokens[0] == "#define")
-        {
-            m_definitions[tokens[1]].value = line.substr(tokens[0].length() + tokens[1].length() + 1);
-            continue;
-        }
-
-
-        if (_line_has_include(line))
-            src += parse_shader_include(root, line);
-        else
-            src += line + '\n';
+        src += line + "\n";
     }
+
     return src;
 }
 
@@ -121,6 +161,11 @@ idk::glShaderProgram::parse_shader_source( std::string root, std::stringstream s
 
     while (getline(source, line))
     {
+        if (line == "#extension GL_GOOGLE_include_directive: require")
+        {
+            continue;
+        }
+
         auto tokens = tokenize(line);
 
         if (tokens.size() > 0 && tokens[0] == "#version")
@@ -145,7 +190,9 @@ idk::glShaderProgram::parse_shader_source( std::string root, std::stringstream s
 
 
         if (_line_has_include(line))
-            src += parse_shader_include(root, line);
+        {
+            src += parse_shader_include(root, line) + "\n";
+        }
         else
             src += line + "\n";
     }
@@ -162,6 +209,9 @@ idk::glShaderProgram::compileShader( std::string name, std::string &src, GLenum 
 
     gl::shaderSource(shader_id, 1, &str, nullptr);
     gl::compileShader(shader_id);
+
+
+    shadertools::checkError(shader_id);
 
     int result;
     gl::getShaderiv(shader_id, GL_COMPILE_STATUS, &result);
@@ -184,7 +234,7 @@ idk::glShaderProgram::compileShader( std::string name, std::string &src, GLenum 
         std::cout << message << std::endl;
         delete[] message;
 
-        exit(1);
+        IDK_ASSERT("Shader compilation failure", false);
     }
 
     return shader_id;
@@ -208,10 +258,18 @@ idk::glShaderProgram::compile_vf( const std::string &defines )
     gl::attachShader(program, frag_id);
     gl::linkProgram(program);
 
-    // GLchar *str = new GLchar[1024];
-    // glGetProgramInfoLog(program, 1024, nullptr, str);
-    // std::cout << str << "";
-    // delete[] str;
+
+    GLchar *str = new GLchar[1024];
+    glGetProgramInfoLog(program, 1024, nullptr, str);
+
+    if (std::strlen(str) > 1)
+    {
+        std::cout << str << "";
+        IDK_ASSERT("Rip", false);
+    }
+
+    delete[] str;
+
 
     gl::validateProgram(program);
     gl::deleteShader(vert_id);
@@ -253,6 +311,22 @@ idk::glShaderProgram::compile_vgf( const std::string &defines )
 }
 
 
+
+void
+idk::glShaderProgram::_attach_shader( idk::glShaderStage first )
+{
+    gl::attachShader(m_program_id, first.m_shader_id);
+}
+
+
+void
+idk::glShaderProgram::_link_validate()
+{
+    gl::linkProgram(m_program_id);
+    gl::validateProgram(m_program_id);
+}
+
+
 void
 idk::glShaderProgram::reset()
 {
@@ -278,8 +352,8 @@ idk::glShaderProgram::loadFile( std::string root, std::string vert, std::string 
     vert_buf << std::ifstream(root + vert).rdbuf();
     frag_buf << std::ifstream(root + frag).rdbuf();
 
-    m_vert_src = parse_shader_source(root, std::stringstream(vert_buf.str()));
-    m_frag_src = parse_shader_source(root, std::stringstream(frag_buf.str()));
+    m_vert_src = parse_shader_source(root+vert, std::stringstream(vert_buf.str()));
+    m_frag_src = parse_shader_source(root+frag, std::stringstream(frag_buf.str()));
 }
 
 
@@ -341,14 +415,10 @@ idk::glShaderProgram::loadStringC( const std::string &vert, const std::string &f
 bool
 idk::glShaderProgram::setDefinition( std::string name, std::string value )
 {
+    // IDK_ASSERT("Definition does not exist", m_program_id != 0);
+
     if (m_definitions[name].value == "NONE")
     {
-        #ifdef IDK_DEBUG
-            std::cout
-                << "[idk::glShader::setDefinition] Definition \"" << name
-                << "\" does not exist\n";
-            exit(1);
-        #endif
         return false;
     }
 
@@ -409,18 +479,12 @@ idk::glShaderProgram::uniformLoc( const std::string &name )
 void
 idk::glShaderProgram::bind()
 {
+    // IDK_ASSERT("idk::glShaderProgram not initialized!", m_program_id != 0);
+
     if (glShaderProgram::current_bound_id == m_program_id)
     {
         return;
     }
-
-    #ifdef IDK_DEBUG
-    if (m_program_id == 0)
-    {
-        std::cout << "[idk::glShader::bind] Program not initialized!\n";
-        exit(1);
-    }
-    #endif
 
     gl::useProgram(m_program_id);
     m_texture_unit = GL_TEXTURE0;
@@ -443,6 +507,22 @@ idk::glShaderProgram::unbind()
 
     glShaderProgram::current_bound_id = 0;
 };
+
+
+
+void
+idk::glShaderProgram::dispatch( GLuint size )
+{
+    gl::dispatchCompute(size, size, size);
+}
+
+
+void
+idk::glShaderProgram::dispatch( GLuint x, GLuint y, GLuint z )
+{
+    gl::dispatchCompute(x, y, z);
+}
+
 
 
 #define IDK_GL_SHADER_GET_UNIFORM_LOC(name) uniformLoc(name); if (loc == -1) return;

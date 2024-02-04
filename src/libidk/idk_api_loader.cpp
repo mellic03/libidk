@@ -9,4 +9,3 @@ idk::APILoader::APILoader( const char *filepath )
     m_lib = idk::dynamiclib::loadObject(filepath);
 }
 
-

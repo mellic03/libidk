@@ -27,6 +27,9 @@ namespace idk
     while (glGetError() != GL_NO_ERROR); \
 }
 
+
+inline int IDK_NUM_GLCALL = 0;
+
 #ifdef IDK_DEBUG
     #define IDK_GLCALL(glFunc) \
     { \
@@ -39,6 +42,7 @@ namespace idk
             fflush(stdout); \
             assert(err == GL_NO_ERROR); \
         } \
+        IDK_NUM_GLCALL += 1; \
     }
 #else
     #define IDK_GLCALL(glFunc) \

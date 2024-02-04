@@ -12,7 +12,6 @@ set_target_properties(
     ${PROJECT_NAME} PROPERTIES
     PREFIX ""
     POSITION_INDEPENDENT_CODE ON
-    CXX_STANDARD 17
 )
 
 if(MSVC)

@@ -41,7 +41,7 @@ public:
     void    reset( int w, int h, size_t num_attachments );
     void    cubemapColorAttachment( const idk::glTextureConfig &config );
     void    colorAttachment( int idx, const idk::glTextureConfig &config );
-    void    depthAttachment( int idx, const idk::DepthAttachmentConfig &config );
+    void    depthAttachment( const idk::DepthAttachmentConfig &config );
     void    depthArrayAttachment( GLsizei depth, const idk::DepthAttachmentConfig &config );
     void    generateMipmap( int idx );
     void    generateMipmapCube();

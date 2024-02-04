@@ -3,6 +3,20 @@
 
 
 void
+idk::gl::dispatchCompute( GLuint num_groups_x, GLuint num_groups_y, GLuint num_groups_z )
+{
+    IDK_GLCALL( glDispatchCompute(num_groups_x, num_groups_y, num_groups_z); )
+}
+
+
+void
+idk::gl::memoryBarrier( GLbitfield barriers )
+{
+    IDK_GLCALL( glMemoryBarrier(barriers); )
+}
+
+
+void
 idk::gl::getFloatv( GLenum pname, GLfloat *params )
 {
     IDK_GLCALL( glGetFloatv(pname, params); )
@@ -112,6 +126,13 @@ void idk::gl::bindTextureUnit( GLuint unit, GLuint texture )
     IDK_GLCALL( glBindTextureUnit(unit, texture); )
 }
 
+
+void
+idk::gl::bindImageTexture( GLuint unit, GLuint texture, GLint level, GLboolean layered,
+                           GLint layer, GLenum access, GLenum format )
+{
+    IDK_GLCALL( glBindImageTexture(unit, texture, level, layered, layer, access, format); )
+}
 // ---------------------------------------------------------------------------------------
 
 

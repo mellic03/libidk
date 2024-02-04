@@ -7,6 +7,8 @@
 #include "idk_dynamiclib.hpp"
 
 
+namespace fs = std::filesystem;
+
 
 static std::string
 idk_genCompileCommand( const std::string &compiler,
@@ -20,7 +22,7 @@ idk_genCompileCommand( const std::string &compiler,
                 cmd += "-std=" + cppstd + " ";
                 cmd += inpath + " ";
                 cmd += "-shared -fPIC ";
-                cmd += "-o " + outpath + ".so ";
+                cmd += "-o " + outpath + " ";
                 cmd += "-I" + includepath + " -L" + libpath + " ";
                 cmd += "-lidk -lIDKGraphics -lIDKGameEngine ";
 
@@ -34,8 +36,10 @@ idk::RuntimeScript::_load( const std::string &filepath )
 {
     m_filepath = filepath;
 
-    std::filesystem::path path(filepath);
-    m_libpath = "IDKGE/temp/" + path.relative_path().stem().string();
+    fs::path path(filepath);
+    m_name = path.stem();
+
+    m_libpath = "IDKGE/temp/" + path.relative_path().stem().string() + ".so";
 
     std::string cmd = idk_genCompileCommand(
         "g++",
@@ -48,11 +52,11 @@ idk::RuntimeScript::_load( const std::string &filepath )
 
     std::cout << "Compiling script: \"" << cmd << "\"\n";
     int result = std::system(cmd.c_str());
-    IDK_ASSERT("Error compiling script", result != 0);
+    IDK_ASSERT("Error compiling script", result == 0);
 
     m_lib   = idk::dynamiclib::loadObject(m_libpath.c_str());
-    m_entry = idk::dynamiclib::loadFunction(m_lib, "idk_scriptentry");
-    m_libpath += ".so";
+    m_entry = idk::dynamiclib::loadFunction(m_lib, "idk_ScriptMain");
+    m_ready = true;
 }
 
 
@@ -60,8 +64,8 @@ void
 idk::RuntimeScript::_unload()
 {
     idk::dynamiclib::unloadObject(m_lib);
-    std::string cmd = "rm " + m_libpath;
-    std::system(cmd.c_str());
+    // fs::remove(m_libpath);
+    m_ready = false;
 }
 
 
@@ -72,24 +76,69 @@ idk::RuntimeScript::RuntimeScript( const std::string &filepath )
 }
 
 
-idk::RuntimeScript::~RuntimeScript()
+idk::RuntimeScript::RuntimeScript( const RuntimeScript &s )
+:   m_filepath  (s.m_filepath),
+    m_libpath   (s.m_libpath),
+    m_lib       (nullptr),
+    m_entry     (nullptr),
+    m_ready     (s.m_ready)
 {
-    this->_unload();
-    
+    this->_load(m_filepath);
 }
 
 
-int
-idk::RuntimeScript::execute( idk::EngineAPI &api )
+idk::RuntimeScript::RuntimeScript( RuntimeScript &&s )
+:   m_filepath  (s.m_filepath),
+    m_libpath   (s.m_libpath),
+    m_lib       (nullptr),
+    m_entry     (nullptr),
+    m_ready     (s.m_ready)
 {
-    return idk::dynamiclib::call<int, idk::EngineAPI &>(m_entry, api);
+    s.m_lib   = nullptr;
+    s.m_entry = nullptr;
+    s.m_ready = false;
+}
+
+
+idk::RuntimeScript::~RuntimeScript()
+{
+    if (this->is_ready())
+        this->_unload();
+}
+
+
+idk::RuntimeScript
+idk::RuntimeScript::operator = ( const idk::RuntimeScript &s )
+{
+    if (this != &s)
+    {
+        m_filepath = s.m_filepath;
+        m_libpath  = s.m_libpath;
+
+        if (this->is_ready())
+            this->_unload();
+
+        this->_load(s.m_filepath);
+    }
+
+    return *this;
+}
+
+
+
+int
+idk::RuntimeScript::execute( idk::EngineAPI &api, int obj_id, int other_id )
+{
+    return idk::dynamiclib::call<int, idk::EngineAPI &, int, int>(m_entry, api, obj_id, other_id);
 }
 
 
 void
 idk::RuntimeScript::reload()
 {
-    this->_unload();
+    if (this->is_ready())
+        this->_unload();
+
     this->_load(m_filepath);
 }
 

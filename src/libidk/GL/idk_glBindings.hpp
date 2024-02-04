@@ -12,6 +12,8 @@ namespace idk::gl
     template <typename... GLenums> inline void     enable( GLenum, GLenums... );
     template <typename... GLenums> inline void     disable( GLenum, GLenums... );
 
+    void dispatchCompute( GLuint num_groups_x, GLuint num_groups_y, GLuint num_groups_z );
+    void memoryBarrier( GLbitfield barriers );
 
     void getFloatv( GLenum pname, GLfloat *params );
 
@@ -54,6 +56,9 @@ namespace idk::gl
     void bindRenderbuffer( GLenum target, GLuint renderbuffer );
     void bindTexture( GLenum target, GLuint texture );
     void bindTextureUnit( GLuint unit, GLuint texture );
+
+    void bindImageTexture( GLuint unit, GLuint texture, GLint level, GLboolean layered,
+                           GLint layer, GLenum access, GLenum format );
 
     void drawArrays( GLenum mode, GLint first, GLsizei count );
     void drawElements( GLenum mode, GLsizei count, GLenum type, const void *indices );

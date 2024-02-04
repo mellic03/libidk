@@ -39,8 +39,16 @@ public:
     /*              Called when the EditorUI module is used to inspect a given game object */
     virtual void    onObjectSelection( int obj_id ) {  };
 
-    virtual idk::CSFile onFileSave( idk::Engine & ) { return {nullptr, 0}; };
+
+    virtual idk::CSFile onObjectSerialization   ( int obj_id )  { return idk::CSFile(); };
+    virtual void        onObjectDeserialization ( idk::CSFile ) {  };
+
+
+    virtual idk::CSFile onFileSave( idk::Engine & ) { return {0, nullptr, 0}; };
     virtual void        onFileLoad( idk::Engine &, const idk::CSFile & ) {  };
+
+    virtual void        luaExpose( void *Lmod ) {  };
+
 
 };
 

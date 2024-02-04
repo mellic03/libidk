@@ -1,4 +1,6 @@
 #pragma once
+
+#include <iostream>
 #include "idk_export.hpp"
 
 
@@ -15,4 +17,8 @@ namespace idk::internal
 #else
     #define IDK_ASSERT( msg, expression )
 #endif
+
+
+
+#define idk_printvalue(v) std::cout << #v << ": " << v << "\n"
 

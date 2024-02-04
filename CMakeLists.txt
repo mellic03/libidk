@@ -3,12 +3,13 @@ project(libidk)
 
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/GL/)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/memory/)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/scripting/)
 
 
 file(GLOB SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/containers/*.cpp
-    # "src/libidk/GL/*.cpp"
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
@@ -17,7 +18,6 @@ set_target_properties(
     ${PROJECT_NAME} PROPERTIES
     PREFIX ""
     POSITION_INDEPENDENT_CODE ON
-    CXX_STANDARD 17
 )
 
 if(MSVC)
@@ -30,6 +30,8 @@ endif()
 target_link_libraries(
     ${PROJECT_NAME} PUBLIC
     IDKGL
+    libidk-idk_memory
+    libidk-idk_scripting
 )
 
 

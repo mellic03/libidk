@@ -121,30 +121,38 @@ idk::glFramebuffer::colorAttachment( int idx, const idk::glTextureConfig &config
 
 
 void
-idk::glFramebuffer::depthAttachment( int idx, const idk::DepthAttachmentConfig &config )
+idk::glFramebuffer::depthAttachment( const idk::DepthAttachmentConfig &config )
 {
-    gl::deleteTextures(1, &attachments[idx]);
-    gl::genTextures(1, &attachments[idx]);
-    gl::bindTexture(GL_TEXTURE_2D, attachments[idx]);
+    gl::deleteTextures(1, &depth_attachment);
+    gl::genTextures(1, &depth_attachment);
+    gl::bindTexture(GL_TEXTURE_2D, depth_attachment);
 
     gl::texImage2D(
-        GL_TEXTURE_2D, 0, config.internalformat,
-        m_size.x, m_size.y, 0, config.format, config.datatype, NULL
+        GL_TEXTURE_2D,
+        0,
+        config.internalformat,
+        m_size.x, m_size.y,
+        0,
+        GL_DEPTH_COMPONENT,
+        config.datatype,
+        nullptr
     );
 
-    gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-    gl::framebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, attachments[idx], 0);
-
-    IDK_GLCALL( glDrawBuffer(GL_NONE); )
-    IDK_GLCALL( glReadBuffer(GL_NONE); )
-
-    gl::texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    gl::texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    gl::texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    gl::texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     gl::texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     gl::texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
+    gl::texParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    gl::texParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+
+    gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+    gl::framebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth_attachment, 0);
+
+    // IDK_GLCALL( glDrawBuffer(GL_NONE); )
+    // IDK_GLCALL( glReadBuffer(GL_NONE); )
+
     gl::bindFramebuffer(GL_FRAMEBUFFER, 0);
-    gl::bindTexture(GL_TEXTURE_2D, 0);
 }
 
 

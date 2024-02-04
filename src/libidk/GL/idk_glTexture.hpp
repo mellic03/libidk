@@ -44,8 +44,8 @@ private:
 
 
 public:
-            glTexture( const idk::glTexture &  );
-            glTexture( const idk::glTexture && );
+            // glTexture( const idk::glTexture &  );
+            // glTexture( const idk::glTexture && );
             glTexture( GLuint, const glm::ivec2 &, const glTextureConfig & );
 
     // glTexture &operator = ( const glTexture &  );
@@ -54,17 +54,17 @@ public:
     GLuint   ID()     const { return m_id;     };
     GLuint64 handle() const { return m_handle; };
 
-    const float     &sample1f ( float u, float v, int l=0 ) const;
-    const uint8_t   &sample1u ( float u, float v, int l=0 ) const;
-    const uint8_t   *sample4u ( float u, float v, int l=0 ) const;
+    // const float     &sample1f ( float u, float v, int l=0 ) const;
+    // const uint8_t   &sample1u ( float u, float v, int l=0 ) const;
+    // const uint8_t   *sample4u ( float u, float v, int l=0 ) const;
 
-    glm::vec4  isample4f  ( int   x, int   y, int l=0 ) const;
-    glm::vec4  sample4f   ( float u, float v, int l=0 ) const;
-    glm::vec4  bisample4f ( float u, float v, int l=0 ) const;
+    // glm::vec4  isample4f  ( int   x, int   y, int l=0 ) const;
+    // glm::vec4  sample4f   ( float u, float v, int l=0 ) const;
+    // glm::vec4  bisample4f ( float u, float v, int l=0 ) const;
 
-    glm::ivec2 size( int level=0 ) const { return m_size / int(glm::pow(2, level)); };
+    // glm::ivec2 size( int level=0 ) const { return m_size / int(glm::pow(2, level)); };
 
-    const glTextureConfig &config()  const { return m_config; };
+    // const glTextureConfig &config()  const { return m_config; };
 };
 
 

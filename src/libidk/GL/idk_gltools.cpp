@@ -89,6 +89,39 @@ idk::gltools::loadTexture( size_t w, size_t h, void *data, const glTextureConfig
 }
 
 
+GLuint
+idk::gltools::genTexture3D( size_t w, size_t h, size_t d, const glTextureConfig &config )
+{
+    GLuint texture_id;
+    gl::createTextures(config.target, 1, &texture_id);
+
+    GLsizei levels = 1 + floor(log2(idk::max(w, idk::max(h, d))));
+            levels = config.genmipmap ? levels : 1;
+
+    gl::textureStorage3D(texture_id, levels, config.internalformat, w, h, d);
+    gl::textureSubImage3D(texture_id, 0, 0, 0, 0, w, h, d, config.format, config.datatype, nullptr);
+
+    gl::textureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, config.minfilter);
+    gl::textureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, config.magfilter);
+    gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_S, config.wrap_s);
+    gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_T, config.wrap_t);
+
+    if (config.anisotropic)
+    {
+        float anisotropy;
+        gl::getFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisotropy);
+        gl::textureParameterf(texture_id, GL_TEXTURE_MAX_ANISOTROPY, anisotropy);
+    }
+
+    if (config.genmipmap)
+    {
+        gl::generateTextureMipmap(texture_id);
+    }
+
+    return texture_id;
+}
+
+
 
 // GLuint
 // idk::gltools::loadTexture( std::string filepath, const glTextureConfig &config )

@@ -2,15 +2,16 @@
 
 #include "common.hpp"
 #include "idk_glBindings.hpp"
-#include <string>
+#include "idk_glShaderStage.hpp"
 
+
+#include <string>
 
 namespace idk
 {
     class glShaderStage;
     class glShaderProgram;
 };
-
 
 
 class idk::glShaderProgram
@@ -22,7 +23,7 @@ public:
     struct Def { std::string value = "NONE"; };
 
 private:
-    static GLuint current_bound_id;
+    inline static GLuint current_bound_id = 0;
 
     std::string                 m_version;
     std::string                 m_vert_src;
@@ -39,30 +40,37 @@ private:
     GLuint                      m_texture_unit = GL_TEXTURE0;
     GLuint                      m_program_id   = 0;
 
-    std::string parse_shader_include ( std::string root, std::string includeline  );
+    std::string parse_shader_include ( const std::string &, const std::string & );
     std::string parse_shader_source  ( std::string root, std::stringstream source );
 
     static GLuint compileShader ( std::string name, std::string &src, GLenum type );
     GLuint        compile_vf    ( const std::string &defines );
     GLuint        compile_vgf   ( const std::string &defines );
 
+    void          _link_validate();
+
+    void          _attach_shader( idk::glShaderStage first );
+
+    template <typename ...Args>
+    void          _attach_shader( idk::glShaderStage first, Args ...rest );
+
+
     void          reset();
 
 public:
-
                 glShaderProgram() {  };
 
     template <typename ...Args>
-    glShaderProgram( Args... args )
+    glShaderProgram( idk::glShaderStage first, Args... rest )
     {
-        glShaderStage shader_stages[] = { static_cast<glShaderStage>(args)... };
-
         m_program_id = gl::createProgram();
-        for (auto &stage: shader_stages)
-        {
-            gl::attachShader(m_program_id, stage.m_shader_id);
-        }
+        _attach_shader(first, rest...);
+        _link_validate();
     }
+
+
+
+    GLuint      ID() const { return m_program_id; };
 
 
     void        loadFile  ( std::string root, std::string vert, std::string frag );
@@ -81,6 +89,10 @@ public:
     GLuint      compile();
     void        bind();
     static void unbind();
+
+    void        dispatch( GLuint size );
+    void        dispatch( GLuint x, GLuint y, GLuint z );
+
     void        popTextureUnits() { m_texture_unit = GL_TEXTURE0; };
 
 
@@ -103,3 +115,12 @@ public:
 
 };
 
+
+
+template <typename ...Args>
+void
+idk::glShaderProgram::_attach_shader( idk::glShaderStage first, Args ...rest )
+{
+    gl::attachShader(m_program_id, first.m_shader_id);
+    _attach_shader(rest...);
+}

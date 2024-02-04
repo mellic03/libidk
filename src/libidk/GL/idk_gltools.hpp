@@ -11,6 +11,7 @@ namespace idk::gltools
 {
     GLuint  loadTexture( size_t w, size_t h, void *data, const glTextureConfig &config );
     // GLuint  loadTexture( std::string filepath, const glTextureConfig &config );
+    GLuint  genTexture3D( size_t w, size_t h, size_t d, const glTextureConfig &config );
 
     idk::glTexture loadTexture( const std::string &, const glTextureConfig &config );
     idk::glTexture loadTexture2( size_t w, size_t h, void *data, const glTextureConfig &config );

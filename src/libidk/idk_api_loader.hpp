@@ -6,7 +6,6 @@
 namespace idk
 {
     class APILoader;
-
 };
 
 

@@ -1,24 +1,37 @@
 #pragma once
-#include "idk_vector.hpp"
+
+#include "idk_memory.hpp"
+#include <string>
+#include <cstdint>
+#include <cstddef>
+#include <fstream>
 
 
-namespace idk { class string; };
-
-class idk::string: public idk::vector<char>
+namespace idk
 {
-private:
-
-public:
-
-        string();
-        string( const idk::string & );
-        string( const char * );
-
-    const char *c_str() const { return m_data.get(); };
-
+    using string  = std::string;
+    using tstring = std::basic_string<char, std::char_traits<char>, idk::frame_allocator<char>>;
+    using pstring = std::basic_string<char, std::char_traits<char>, idk::linear_allocator<char>>;
 };
 
-std::ofstream &operator << ( std::ofstream &, const idk::string & );
 
-#include "idk_string.inl"
+
+
+inline std::ofstream &operator << ( std::ofstream &stream, const idk::string &str )
+{
+    uint32_t num_elements = str.size();
+    stream.write(reinterpret_cast<const char *>(&num_elements), sizeof(uint32_t));
+    stream.write(reinterpret_cast<const char *>(str.data()), str.size()*sizeof(char));
+    return stream;
+}
+
+
+inline void operator >> ( std::ifstream &stream, idk::string &str )
+{
+    uint32_t num_elements;
+    stream.read(reinterpret_cast<char *>(&num_elements), sizeof(uint32_t));
+
+    str.resize(num_elements);
+    stream.read(reinterpret_cast<char *>(str.data()), str.size()*sizeof(char));
+}
 
