@@ -11,12 +11,12 @@ namespace idk::internal
 };
 
 
-#ifdef IDK_DEBUG
+// #ifdef IDK_DEBUG
     #define IDK_ASSERT( msg, expression ) idk::internal::assert_msg(msg, expression)
 
-#else
-    #define IDK_ASSERT( msg, expression )
-#endif
+// #else
+//     #define IDK_ASSERT( msg, expression )
+// #endif
 
 
 

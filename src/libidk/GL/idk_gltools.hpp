@@ -9,21 +9,15 @@
 
 namespace idk::gltools
 {
-    GLuint  loadTexture( size_t w, size_t h, void *data, const glTextureConfig &config );
-    // GLuint  loadTexture( std::string filepath, const glTextureConfig &config );
-    GLuint  genTexture3D( size_t w, size_t h, size_t d, const glTextureConfig &config );
+    GLuint  loadTexture2D( size_t w, size_t h, void *data, const glTextureConfig &config );
+    GLuint  loadTexture3D( size_t w, size_t h, size_t d, void *data, const glTextureConfig &config );
 
-    idk::glTexture loadTexture( const std::string &, const glTextureConfig &config );
+    GLuint loadTexture( const std::string &, const glTextureConfig &config );
     idk::glTexture loadTexture2( size_t w, size_t h, void *data, const glTextureConfig &config );
 
 
-    GLuint loadTextureArray( size_t w, size_t h, size_t d, void **data, const glTextureConfig &config );
-
     glm::vec4 textureQuery( float u, float v, size_t w, size_t h,
                             std::unique_ptr<uint8_t[]> &data );
-
-    // GLuint  loadTexture( size_t w, size_t h, void *data, bool srgb, GLint minfilter, GLint magfilter );
-    // GLuint  loadTexture( std::string filepath, bool srgb, GLint minfilter, GLint magfilter );
 
 
     GLuint  loadCubemap( std::string              root,
@@ -36,6 +30,8 @@ namespace idk::gltools
                             GLuint                   cubemap,
                             GLint                    level );
 
+
+    GLuint  loadCubemap2( size_t w, void *data, const idk::glTextureConfig & );
 
 };
 

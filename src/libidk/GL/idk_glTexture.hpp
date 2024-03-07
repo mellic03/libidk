@@ -17,6 +17,8 @@ struct idk::glTextureConfig
     GLenum wrap_s         = GL_CLAMP_TO_EDGE;
     GLenum wrap_t         = GL_CLAMP_TO_EDGE;
     GLenum wrap_r         = GL_CLAMP_TO_EDGE;
+    GLint  comp_fn        = GL_LEQUAL;
+    GLint  comp_mode      = GL_COMPARE_REF_TO_TEXTURE;
     GLenum datatype       = GL_FLOAT;
     bool   anisotropic    = GL_FALSE;
     bool   genmipmap      = GL_TRUE;

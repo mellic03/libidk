@@ -3,9 +3,9 @@
 #include <cstdint>
 
 
-namespace idk { struct glDrawElementsIndirectCommand; };
+namespace idk { struct glDrawCmd; };
 
-struct idk::glDrawElementsIndirectCommand
+struct idk::glDrawCmd
 {
     GLuint count;
     GLuint instanceCount;

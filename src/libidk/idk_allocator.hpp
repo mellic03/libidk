@@ -1,19 +1,31 @@
 #pragma once
 
-// #include <stack>
-// #include <vector>
-#include <algorithm>
-
 #include "idk_assert.hpp"
 #include "idk_memory.hpp"
 #include "idk_io.hpp"
-
+#include "idk_serialize.hpp"
 #include "idk_vector.hpp"
+
+
+#include <cstring>
+#include <algorithm>
+#include <memory>
+
+
+
+
+#define IDK_ALLOCATOR_ACCESS( name, type, instance ) \
+int         create##name  (                  ) { return instance.create();     }; \
+int         create##name  ( const type &data ) { return instance.create(data); }; \
+type&       get##name     ( int id           ) { return instance.get(id);      }; \
+void        destroy##name ( int id           ) { instance.destroy(id);         }; \
+idk::Allocator<type> &get##name##Allocator()   { return instance; };
+
 
 
 namespace idk
 {
-    template <typename T, typename A>
+    template <typename T, typename A = std::allocator<T>>
     class Allocator;
 
     template <typename T>
@@ -29,7 +41,7 @@ namespace idk
 
 
 
-template <typename T, typename A = std::allocator<T>>
+template <typename T, typename A>
 class idk::Allocator
 {
 private:
@@ -60,7 +72,6 @@ public:
     std::vector<T> &        vector   ()       { return m_data;           };
     T *                     data     ()       { return m_data.data();    };
     size_t                  size     () const { return m_data.size();    };
-    size_t                  nbytes   () const { return size()*sizeof(T); };
 
     T &                     operator [] ( int i ) { return m_data.get(i); };
 
@@ -71,24 +82,8 @@ public:
     typename idk::vector<T, A>::const_iterator begin() const { return m_data.begin(); };
     typename idk::vector<T, A>::const_iterator end()   const { return m_data.end();   };
 
-
-    friend std::ofstream &operator << ( std::ofstream &stream, idk::Allocator<T, A> &v )
-    {
-        stream << v.m_data;
-        stream << v.m_forward;
-        stream << v.m_reverse;
-        stream << v.m_available_ids;
-        return stream;
-    };
-
-    friend std::ifstream &operator >> ( std::ifstream &stream, idk::Allocator<T, A> &v )
-    {
-        stream >> v.m_data;
-        stream >> v.m_forward;
-        stream >> v.m_reverse;
-        stream >> v.m_available_ids;
-        return stream;
-    };
+    size_t serialize( std::ofstream &stream ) const;
+    size_t deserialize( std::ifstream &stream );
 
 };
 
@@ -257,27 +252,28 @@ idk::Allocator<T, A>::clear()
 }
 
 
-
-// template <typename T, typename A>
-// void
-// idk::Allocator<T, A>::serialize( std::ofstream &stream )
-// {
-//     idk::streamWrite(stream, m_data);
-//     idk::streamWrite(stream, m_forward);
-//     idk::streamWrite(stream, m_reverse);
-//     idk::streamWrite(stream, m_available_ids);
-// }
-
-
-// template <typename T, typename A>
-// void
-// idk::Allocator<T, A>::deserialize( std::ifstream &stream )
-// {
-//     m_data    = idk::streamRead<std::vector< T >>(stream);
-//     m_forward = idk::streamRead<std::vector<int>>(stream);
-//     m_reverse = idk::streamRead<std::vector<int>>(stream);
-//     m_available_ids = idk::streamRead<std::vector<int>>(stream);
-// }
+template <typename T, typename A>
+size_t
+idk::Allocator<T, A>::serialize( std::ofstream &stream ) const
+{
+    size_t n = 0;
+    n += idk::streamwrite<idk::vector<T>>(stream, m_data);
+    n += idk::streamwrite<idk::vector<int>>(stream, m_forward);
+    n += idk::streamwrite<idk::vector<int>>(stream, m_reverse);
+    n += idk::streamwrite<idk::vector<int>>(stream, m_available_ids);
+    return n;
+}
 
 
+template <typename T, typename A>
+size_t
+idk::Allocator<T, A>::deserialize( std::ifstream &stream )
+{
+    size_t n = 0;
+    n += idk::streamread(stream, m_data);
+    n += idk::streamread(stream, m_forward);
+    n += idk::streamread(stream, m_reverse);
+    n += idk::streamread(stream, m_available_ids);
+    return n;
+}
 

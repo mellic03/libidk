@@ -4,7 +4,11 @@
 #include "idk_glXXBO.hpp"
 
 
-namespace idk { class glUBO; };
+namespace idk
+{
+    class glUBO;
+};
+
 
 int round_up( int n, int multipleof );
 

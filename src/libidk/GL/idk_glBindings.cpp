@@ -133,6 +133,22 @@ idk::gl::bindImageTexture( GLuint unit, GLuint texture, GLint level, GLboolean l
 {
     IDK_GLCALL( glBindImageTexture(unit, texture, level, layered, layer, access, format); )
 }
+
+
+void
+idk::gl::bindImageTextures( GLuint first, GLsizei count, const GLuint *textures )
+{
+    IDK_GLCALL( glBindImageTextures(first, count, textures); )
+}
+
+
+void
+idk::gl::clearTexImage( GLuint texture, GLint level, GLenum format, GLenum type,
+                        const void *data )
+{
+    IDK_GLCALL( glClearTexImage(texture, level, format, type, data); )
+}
+
 // ---------------------------------------------------------------------------------------
 
 
@@ -321,6 +337,14 @@ idk::gl::unmapNamedBuffer( GLuint buffer )
 {
     IDK_GLCALL( glUnmapNamedBuffer(buffer); )
 }
+
+void *
+idk::gl::mapNamedBufferRange( GLuint buffer, GLintptr offset, GLsizeiptr length, GLbitfield access )
+{
+    void *data;
+    IDK_GLCALL( data = glMapNamedBufferRange(buffer, offset, length, access); )
+    return data;
+}
 // ---------------------------------------------------------------------------------------
 
 
@@ -362,6 +386,14 @@ void
 idk::gl::texParameteri( GLenum target, GLenum pname, GLint param )
 {
     IDK_GLCALL( glTexParameteri(target, pname, param); )
+}
+
+
+void
+idk::gl::getTextureImage( GLuint texture, GLint level, GLenum format, GLenum type,
+                          GLsizei bufSize, void *pixels )
+{
+    IDK_GLCALL( glGetTextureImage(texture, level, format, type, bufSize, pixels); )
 }
 
 
@@ -479,6 +511,7 @@ idk::gl::framebufferTexture( GLenum target, GLenum attachment, GLuint texture, G
     IDK_GLCALL( glFramebufferTexture(target, attachment, texture, level); )
 }
 
+
 void
 idk::gl::framebufferTexture2D( GLenum target, GLenum attachment, GLenum textarget,
                                GLuint texture, GLint level )
@@ -486,12 +519,36 @@ idk::gl::framebufferTexture2D( GLenum target, GLenum attachment, GLenum textarge
     IDK_GLCALL( glFramebufferTexture2D(target, attachment, textarget, texture, level); )
 }
 
+
 void
 idk::gl::framebufferTextureLayer( GLenum target, GLenum attachment, GLuint texture,
                                   GLint level, GLint layer )
 {
     IDK_GLCALL( glFramebufferTextureLayer(target, attachment, texture, level, layer); )
 }
+
+
+void
+idk::gl::namedFramebufferTexture( GLuint framebuffer, GLenum attachment, GLuint texture,
+                                  GLint level )
+{
+    IDK_GLCALL( glNamedFramebufferTexture(framebuffer, attachment, texture, level); )
+}
+
+
+void
+idk::gl::namedFramebufferDrawBuffer( GLuint framebuffer, GLenum mode )
+{
+    IDK_GLCALL( glNamedFramebufferDrawBuffer(framebuffer, mode); )
+}
+
+
+void
+idk::gl::namedFramebufferDrawBuffers( GLuint framebuffer, GLsizei n, const GLenum *bufs )
+{
+    IDK_GLCALL( glNamedFramebufferDrawBuffers(framebuffer, n, bufs); )
+}
+
 
 void
 idk::gl::namedFramebufferTextureLayer( GLuint framebuffer, GLenum attachment, GLuint texture,
@@ -520,6 +577,18 @@ idk::gl::uniform1i( GLint loc, int i )
 void idk::gl::uniform1f( GLint loc, float f )
 {
     IDK_GLCALL( glUniform1f(loc, f); )
+}
+
+void
+idk::gl::uniform2iv( GLint loc, GLsizei count, const int *value )
+{
+    IDK_GLCALL( glUniform2iv(loc, count, value); )
+}
+
+void
+idk::gl::uniform3iv( GLint loc, GLsizei count, const int *value )
+{
+    IDK_GLCALL( glUniform3iv(loc, count, value); )
 }
 
 void

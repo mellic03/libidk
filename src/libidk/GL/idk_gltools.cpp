@@ -8,50 +8,10 @@
 #include <iostream>
 
 
-// GLuint
-// idk::gltools::loadTextureArray( size_t w, size_t h, size_t d, void **data, const glTextureConfig &config )
-// {
-//     GLuint texture_id;
-
-//     gl::createTextures(GL_TEXTURE_2D_ARRAY, 1, &texture_id);
-
-//     gl::textureStorage3D(texture_id, 0, config.internalformat, w, h, d);
-//     gl::textureSubImage3D(texture_id, 0, 0, 0, 0, w, h, d, config.format, config.datatype, data[1]);
-
-//     gl::textureStorage2D(texture_id, 1, config.internalformat, w, h);
-//     gl::textureSubImage2D(texture_id, 0, 0, 0, w, h, config.format, config.datatype, data);
-
-//     gl::textureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, config.minfilter);
-//     gl::textureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, config.magfilter);
-//     gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_S, config.wrap_s);
-//     gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_T, config.wrap_t);
-
-
-//     if (config.anisotropic)
-//     {
-//         float anisotropy;
-//         gl::getFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisotropy);
-//         gl::textureParameterf(texture_id, GL_TEXTURE_MAX_ANISOTROPY, anisotropy);
-//     }
-
-//     if (config.genmipmap)
-//     {
-//         gl::generateTextureMipmap(texture_id);
-//     }
-
-//     else if (config.setmipmap)
-//     {
-//         gl::textureParameteri(texture_id, GL_TEXTURE_BASE_LEVEL, config.texbaselevel);
-//         gl::textureParameteri(texture_id, GL_TEXTURE_MAX_LEVEL,  config.texmaxlevel);
-//     }
-
-//     return texture_id;
-// }
-
 
 
 GLuint
-idk::gltools::loadTexture( size_t w, size_t h, void *data, const glTextureConfig &config )
+idk::gltools::loadTexture2D( size_t w, size_t h, void *data, const glTextureConfig &config )
 {
     GLuint texture_id;
     gl::createTextures(config.target, 1, &texture_id);
@@ -79,18 +39,12 @@ idk::gltools::loadTexture( size_t w, size_t h, void *data, const glTextureConfig
         gl::generateTextureMipmap(texture_id);
     }
 
-    // else if (config.setmipmap)
-    // {
-    //     gl::textureParameteri(texture_id, GL_TEXTURE_BASE_LEVEL, config.texbaselevel);
-    //     gl::textureParameteri(texture_id, GL_TEXTURE_MAX_LEVEL,  config.texmaxlevel);
-    // }
-
     return texture_id;
 }
 
 
 GLuint
-idk::gltools::genTexture3D( size_t w, size_t h, size_t d, const glTextureConfig &config )
+idk::gltools::loadTexture3D( size_t w, size_t h, size_t d, void *data, const glTextureConfig &config )
 {
     GLuint texture_id;
     gl::createTextures(config.target, 1, &texture_id);
@@ -99,12 +53,19 @@ idk::gltools::genTexture3D( size_t w, size_t h, size_t d, const glTextureConfig 
             levels = config.genmipmap ? levels : 1;
 
     gl::textureStorage3D(texture_id, levels, config.internalformat, w, h, d);
-    gl::textureSubImage3D(texture_id, 0, 0, 0, 0, w, h, d, config.format, config.datatype, nullptr);
+    gl::textureSubImage3D(texture_id, 0, 0, 0, 0, w, h, d, config.format, config.datatype, data);
 
     gl::textureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, config.minfilter);
     gl::textureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, config.magfilter);
     gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_S, config.wrap_s);
     gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_T, config.wrap_t);
+
+
+    if (config.comp_fn != 0 && config.comp_mode != 0)
+    {
+        gl::textureParameteri(texture_id, GL_TEXTURE_COMPARE_FUNC, config.comp_fn);
+        gl::textureParameteri(texture_id, GL_TEXTURE_COMPARE_MODE, config.comp_mode);
+    }
 
     if (config.anisotropic)
     {
@@ -122,36 +83,6 @@ idk::gltools::genTexture3D( size_t w, size_t h, size_t d, const glTextureConfig 
 }
 
 
-
-// GLuint
-// idk::gltools::loadTexture( std::string filepath, const glTextureConfig &config )
-// {
-//     SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
-//     SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
-//     SDL_Surface      *img    = SDL_ConvertSurface(tmp, target, 0);
-
-//     GLuint texture_id = gltools::loadTexture(img->w, img->h, (uint32_t *)(img->pixels), config);
-
-//     SDL_FreeFormat(target);
-//     SDL_FreeSurface(tmp);
-//     SDL_FreeSurface(img);
-
-//     return texture_id;
-// }
-
-
-
-// static glm::vec4
-// interpolate(glm::vec4 p00, glm::vec4 p10, glm::vec4 p01, glm::vec4 p11, float u, float v)
-// {
-//     float factor_u = u - floor(u);
-//     float factor_v = v - floor(v);
-
-//     glm::vec4 bottom = (p10 - p00) * factor_u + p00;
-//     glm::vec4 top    = (p11 - p01) * factor_u + p01;
-
-//     return (top - bottom) * factor_v + bottom;
-// }
 
 
 static glm::vec4
@@ -212,6 +143,44 @@ idk::gltools::textureQuery( float u, float v, size_t w, size_t h,
 
 }
 
+
+
+GLuint
+idk::gltools::loadCubemap2( size_t w, void *data, const idk::glTextureConfig &config )
+{
+    GLuint texture_id;
+
+    gl::genTextures(1, &texture_id);
+    gl::bindTexture(GL_TEXTURE_CUBE_MAP, texture_id);
+
+    for (int i=0; i<6; i++)
+    {
+        gl::texImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
+            0, config.internalformat, w, w, 0, config.format,
+            config.datatype, data
+        );
+    }
+
+    gl::texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, config.minfilter);
+    gl::texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, config.magfilter);
+    gl::texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    gl::texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    gl::texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    if (config.genmipmap)
+    {
+        gl::generateMipmap(GL_TEXTURE_CUBE_MAP);
+    }
+
+    else if (config.setmipmap)
+    {
+        gl::texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, config.texbaselevel);
+        gl::texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL,  config.texmaxlevel);
+    }
+
+    return texture_id;
+}
 
 
 
@@ -291,33 +260,33 @@ idk::gltools::loadCubemapMip( std::string directory, std::vector<std::string> fi
 }
 
 
-idk::glTexture
+GLuint
 idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &config )
 {
     SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
     SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
     SDL_Surface      *img    = SDL_ConvertSurface(tmp, target, 0);
 
-    GLuint texture_id = gltools::loadTexture(img->w, img->h, (uint32_t *)(img->pixels), config);
+    GLuint texture_id = gltools::loadTexture2D(img->w, img->h, (uint32_t *)(img->pixels), config);
 
     SDL_FreeFormat(target);
     SDL_FreeSurface(tmp);
     SDL_FreeSurface(img);
 
-    idk::glTexture texture(
-        texture_id,
-        glm::ivec2(img->w, img->h),
-        config
-    );
+    // idk::glTexture texture(
+    //     texture_id,
+    //     glm::ivec2(img->w, img->h),
+    //     config
+    // );
 
-    return texture;
+    return texture_id;
 }
 
 
 idk::glTexture
 idk::gltools::loadTexture2( size_t w, size_t h, void *data, const glTextureConfig &config )
 {
-    GLuint texture_id = gltools::loadTexture(w, h, (uint32_t *)(data), config);
+    GLuint texture_id = gltools::loadTexture2D(w, h, (uint32_t *)(data), config);
 
     idk::glTexture texture(
         texture_id,

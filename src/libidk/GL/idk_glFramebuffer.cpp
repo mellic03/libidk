@@ -1,5 +1,6 @@
 #include "idk_glFramebuffer.hpp"
 #include "idk_glBindings.hpp"
+#include "idk_gltools.hpp"
 
 
 void
@@ -77,6 +78,14 @@ idk::glFramebuffer::cubemapColorAttachment( const idk::glTextureConfig &config )
 void
 idk::glFramebuffer::colorAttachment( int idx, const idk::glTextureConfig &config )
 {
+//     gl::deleteTextures(1, &attachments[idx]);
+
+//     attachments[idx] = gltools::loadTexture2D(m_size.x, m_size.y, nullptr, config);
+//     m_gl_attachments.push_back(GL_COLOR_ATTACHMENT0 + idx);
+
+//     gl::namedFramebufferTexture(m_FBO, m_gl_attachments.back(), attachments[idx], 0);
+//     gl::namedFramebufferDrawBuffers(m_FBO, m_gl_attachments.size(), m_gl_attachments.data());
+
     gl::bindFramebuffer(GL_FRAMEBUFFER, m_FBO);
 
     gl::deleteTextures(1, &attachments[idx]);
@@ -120,8 +129,29 @@ idk::glFramebuffer::colorAttachment( int idx, const idk::glTextureConfig &config
 }
 
 
+
+
 void
-idk::glFramebuffer::depthAttachment( const idk::DepthAttachmentConfig &config )
+idk::glFramebuffer::depthAttachment( const idk::DepthAttachmentConfig &ree )
+// {
+//     static constexpr idk::glTextureConfig config = {
+//         .target         = GL_TEXTURE_2D,
+//         .internalformat = GL_DEPTH_COMPONENT24,
+//         .format         = GL_DEPTH_COMPONENT,
+//         .minfilter      = GL_NEAREST,
+//         .magfilter      = GL_LINEAR,
+//         .wrap_s         = GL_CLAMP_TO_BORDER,
+//         .wrap_t         = GL_CLAMP_TO_BORDER,
+//         .comp_fn        = 0,
+//         .comp_mode      = 0,
+//         .genmipmap      = GL_FALSE
+//     };
+
+//     gl::deleteTextures(1, &depth_attachment);
+//     depth_attachment = gltools::loadTexture2D(m_size.x, m_size.y, nullptr, config);
+//     gl::namedFramebufferTexture(m_FBO, GL_DEPTH_ATTACHMENT, depth_attachment, 0);
+
+// }
 {
     gl::deleteTextures(1, &depth_attachment);
     gl::genTextures(1, &depth_attachment);
@@ -130,11 +160,11 @@ idk::glFramebuffer::depthAttachment( const idk::DepthAttachmentConfig &config )
     gl::texImage2D(
         GL_TEXTURE_2D,
         0,
-        config.internalformat,
+        ree.internalformat,
         m_size.x, m_size.y,
         0,
         GL_DEPTH_COMPONENT,
-        config.datatype,
+        ree.datatype,
         nullptr
     );
 
@@ -156,8 +186,27 @@ idk::glFramebuffer::depthAttachment( const idk::DepthAttachmentConfig &config )
 }
 
 
+
 void
-idk::glFramebuffer::depthArrayAttachment( GLsizei depth, const idk::DepthAttachmentConfig &config )
+idk::glFramebuffer::depthArrayAttachment( GLsizei depth, const idk::DepthAttachmentConfig &ree )
+// {
+//     static constexpr idk::glTextureConfig config = {
+//         .target         = GL_TEXTURE_2D_ARRAY,
+//         .internalformat = GL_DEPTH_COMPONENT24,
+//         .format         = GL_DEPTH_COMPONENT,
+//         .minfilter      = GL_NEAREST,
+//         .magfilter      = GL_LINEAR,
+//         .wrap_s         = GL_CLAMP_TO_BORDER,
+//         .wrap_t         = GL_CLAMP_TO_BORDER,
+//         .comp_fn        = GL_LEQUAL,
+//         .comp_mode      = GL_COMPARE_REF_TO_TEXTURE,
+//         .genmipmap      = GL_FALSE
+//     };
+
+//     gl::deleteTextures(1, &depth_attachment);
+//     depth_attachment = gltools::loadTexture3D(m_size.x, m_size.y, depth, nullptr, config);
+//     gl::namedFramebufferTexture(m_FBO, GL_DEPTH_ATTACHMENT, depth_attachment, 0);
+// }
 {
     gl::deleteTextures(1, &depth_attachment);
     gl::genTextures(1, &depth_attachment);
@@ -166,12 +215,12 @@ idk::glFramebuffer::depthArrayAttachment( GLsizei depth, const idk::DepthAttachm
     gl::texImage3D(
         GL_TEXTURE_2D_ARRAY,
         0,
-        config.internalformat,
+        ree.internalformat,
         m_size.x, m_size.y,
         depth,
         0,
         GL_DEPTH_COMPONENT,
-        config.datatype,
+        ree.datatype,
         nullptr
     );
 
@@ -239,5 +288,4 @@ idk::glFramebuffer::clear( GLbitfield mask )
     gl::clearColor(0.0f, 0.0f, 0.0f, 0.0f);
     gl::clear(mask); 
 }
-
 

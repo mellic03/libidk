@@ -9,7 +9,7 @@ namespace idk::noisegen3D
 {
     // GLuint worley( int w );
     // GLuint worleyvec( int w );
-    // GLuint white( int w, int h, int d );
+    std::unique_ptr<uint8_t[]> white( size_t w, size_t h, size_t d );
 };
 
 

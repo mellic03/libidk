@@ -11,8 +11,6 @@ idk::glShaderStage::glShaderStage( const char *filepath )
     m_refcount += 1;
 
     std::string ext = std::filesystem::path(filepath).extension();    
-    std::cout << "filepath: " << filepath << "\n";
-    std::cout << "ext: " << ext << "\n";
 
     m_type = GL_NONE;
 

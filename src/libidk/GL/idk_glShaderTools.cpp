@@ -30,8 +30,11 @@ idk::shadertools::checkError( GLuint shader )
 
 
 
+
+static std::set<std::string> included_files;
+
 static std::string
-idk_shadertools_include( const std::string &current_path, const std::string &include_line )
+idk_shadertools_include( const std::string &current_path, const std::string &include_line, size_t &line_number )
 {
     namespace fs = std::filesystem;
 
@@ -46,6 +49,16 @@ idk_shadertools_include( const std::string &current_path, const std::string &inc
 
     fs::path include_path = fs::path(current_path).parent_path() / fs::path(relpath);
 
+    if (included_files.contains(include_path))
+    {
+        std::cout << "She works!!!\n";
+        exit(1);
+        return "";
+    }
+
+    included_files.emplace(include_path);
+
+
     std::string src;
 
     std::ifstream stream(include_path);
@@ -53,7 +66,20 @@ idk_shadertools_include( const std::string &current_path, const std::string &inc
 
     while (std::getline(stream, line))
     {
-        src += line + "\n";
+        src += "/* " + std::to_string(line_number) + "\t*/\t";
+
+        if (line.find("include") != std::string::npos)
+        {
+            std::cout << "Moving to: " << include_path << "\n";
+            src += idk_shadertools_include(include_path, line, line_number) + "\n";
+        }
+
+        else
+        {
+            src += line + "\n";
+        }
+
+        line_number += 1;
     }
 
     return src;
@@ -63,23 +89,31 @@ idk_shadertools_include( const std::string &current_path, const std::string &inc
 static std::string
 idk_shadertools_parse( const char *filepath )
 {
+    included_files.clear();
+
     std::string src = "";
 
     std::stringstream stream;
     stream << std::ifstream(filepath).rdbuf();
     std::string line;
 
+    size_t line_number = 0;
+
     while (std::getline(stream, line))
     {
+        src += "/* " + std::to_string(line_number) + "\t*/\t";
+
         if (line.find("include") != std::string::npos)
         {
-            src += idk_shadertools_include(filepath, line) + "\n";
+            src += idk_shadertools_include(filepath, line, line_number) + "\n";
         }
 
         else
         {
             src += line + "\n";
         }
+
+        line_number += 1;
     }
 
     return src;
@@ -101,7 +135,9 @@ idk::shadertools::compileShader( GLenum type, const char *filepath )
 
     if (shadertools::checkError(shader_id))
     {
-        std::cout << source << "\n";
+        std::cout << "Error compiling file: \"" << filepath << "\"\n";
+        std::cout << str << "\n";
+        IDK_ASSERT("Rip", false);
     }
 
     GLint result;

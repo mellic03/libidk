@@ -16,78 +16,6 @@
 
 
 
-
-// idk::glShaderProgram::glShaderProgram( idk::glShaderProgram &other )
-// {
-//     m_definitions   = other.m_definitions;
-//     m_version       = other.m_version;
-//     m_vert_src      = other.m_vert_src;
-//     m_geom_src      = other.m_geom_src;
-//     m_frag_src      = other.m_frag_src;
-//     m_vert_name     = other.m_vert_name;
-//     m_geom_name     = other.m_geom_name;
-//     m_frag_name     = other.m_frag_name;
-//     m_uniforms      = other.m_uniforms;
-//     m_locations     = other.m_locations;
-//     m_definitions   = other.m_definitions;
-//     m_texture_unit  = other.m_texture_unit;
-//     m_program_id    = other.m_program_id;
-// }
-
-
-// idk::glShaderProgram::glShaderProgram( idk::glShaderProgram &&other )
-// {
-//     *this = std::move(other);
-//     // m_definitions   = other.m_definitions;
-//     // m_version       = other.m_version;
-//     // m_vert_src      = other.m_vert_src;
-//     // m_geom_src      = other.m_geom_src;
-//     // m_frag_src      = other.m_frag_src;
-//     // m_vert_name     = other.m_vert_name;
-//     // m_geom_name     = other.m_geom_name;
-//     // m_frag_name     = other.m_frag_name;
-//     // m_uniforms      = other.m_uniforms;
-//     // m_locations     = other.m_locations;
-//     // m_definitions   = other.m_definitions;
-//     // m_texture_unit  = other.m_texture_unit;
-//     // m_program_id    = other.m_program_id;
-// }
-
-
-// idk::glShaderProgram::~glShaderProgram()
-// {
-
-// }
-
-
-// idk::glShaderProgram &
-// idk::glShaderProgram::operator = ( idk::glShaderProgram &&other )
-// {
-//     if (this == &other)
-//     {
-//         return *this;
-//     }
-
-//     m_definitions   = std::move(other.m_definitions);
-//     m_version       = std::move(other.m_version);
-//     m_vert_src      = std::move(other.m_vert_src);
-//     m_geom_src      = std::move(other.m_geom_src);
-//     m_frag_src      = std::move(other.m_frag_src);
-//     m_vert_name     = std::move(other.m_vert_name);
-//     m_geom_name     = std::move(other.m_geom_name);
-//     m_frag_name     = std::move(other.m_frag_name);
-//     m_uniforms      = std::move(other.m_uniforms);
-//     m_locations     = std::move(other.m_locations);
-//     m_definitions   = std::move(other.m_definitions);
-//     m_texture_unit  = std::move(other.m_texture_unit);
-//     m_program_id    = std::move(other.m_program_id);
-
-//     return *this;
-// }
-
-
-
-
 std::vector<std::string> tokenize( std::string str, size_t num_tokens=~0 )
 {
     std::vector<std::string> tokens;
@@ -545,6 +473,22 @@ idk::glShaderProgram::set_float( const std::string &name, float f )
 
 
 void
+idk::glShaderProgram::set_ivec2( const std::string &name, const glm::ivec2 &v )
+{
+    GLint loc = IDK_GL_SHADER_GET_UNIFORM_LOC(name);
+    gl::uniform2iv(loc, 1, glm::value_ptr(v));
+}
+
+
+void
+idk::glShaderProgram::set_ivec3( const std::string &name, const glm::ivec3 &v )
+{
+    GLint loc = IDK_GL_SHADER_GET_UNIFORM_LOC(name);
+    gl::uniform3iv(loc, 1, glm::value_ptr(v));
+}
+
+
+void
 idk::glShaderProgram::set_vec2( const std::string &name, glm::vec2 v )
 {
     GLint loc = IDK_GL_SHADER_GET_UNIFORM_LOC(name);
@@ -581,6 +525,14 @@ idk::glShaderProgram::set_mat4( const std::string &name, glm::mat4 m )
 {
     GLint loc = IDK_GL_SHADER_GET_UNIFORM_LOC(name);
     gl::uniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
+}
+
+
+void
+idk::glShaderProgram::set_mat4( const std::string &name, size_t n, glm::mat4 *matrices )
+{
+    GLint loc = IDK_GL_SHADER_GET_UNIFORM_LOC(name);
+    gl::uniformMatrix4fv(loc, n, GL_FALSE, glm::value_ptr(matrices[0]));
 }
 
 

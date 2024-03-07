@@ -57,12 +57,16 @@ private:
 
     void          reset();
 
+    int m_refcount = 0;
+
 public:
-                glShaderProgram() {  };
+            glShaderProgram() {  };
 
     template <typename ...Args>
     glShaderProgram( idk::glShaderStage first, Args... rest )
     {
+        m_refcount += 1;
+
         m_program_id = gl::createProgram();
         _attach_shader(first, rest...);
         _link_validate();
@@ -100,11 +104,16 @@ public:
 
     void        set_int             ( const std::string &, int       );
     void        set_float           ( const std::string &, float     );
+
+    void        set_ivec2           ( const std::string &, const glm::ivec2 & );
+    void        set_ivec3           ( const std::string &, const glm::ivec3 & );
+
     void        set_vec2            ( const std::string &, glm::vec2 );
     void        set_vec3            ( const std::string &, glm::vec3 );
     void        set_vec4            ( const std::string &, glm::vec4 );
     void        set_mat3            ( const std::string &, glm::mat3 );
     void        set_mat4            ( const std::string &, glm::mat4 );
+    void        set_mat4            ( const std::string &, size_t n, glm::mat4 * );
     void        set_mat4Array       ( const std::string &, glm::mat4 *, size_t );
     void        set_sampler2D       ( const std::string &, GLuint    );
     void        set_sampler2DArray  ( const std::string &, GLuint    );

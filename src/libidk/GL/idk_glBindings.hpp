@@ -60,6 +60,10 @@ namespace idk::gl
     void bindImageTexture( GLuint unit, GLuint texture, GLint level, GLboolean layered,
                            GLint layer, GLenum access, GLenum format );
 
+    void bindImageTextures( GLuint first, GLsizei count, const GLuint *textures );
+
+    void clearTexImage( GLuint texture, GLint level, GLenum format, GLenum type, const void *data );
+
     void drawArrays( GLenum mode, GLint first, GLsizei count );
     void drawElements( GLenum mode, GLsizei count, GLenum type, const void *indices );
     void drawElementsInstanced( GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei instancecount );
@@ -80,6 +84,7 @@ namespace idk::gl
     void *mapNamedBuffer( GLuint buffer, GLenum access );
     void  unmapNamedBuffer( GLuint buffer );
 
+    void *mapNamedBufferRange( GLuint buffer, GLintptr offset, GLsizeiptr length, GLbitfield access );
 
     // glActiveXXX -----------------------------------------------------------------------------
     /**/
@@ -123,6 +128,9 @@ namespace idk::gl
     void textureParameterf( GLuint texture, GLenum pname, GLfloat param );
     // -----------------------------------------------------------------------------------------
 
+    void    getTextureImage( GLuint texture, GLint level, GLenum format, GLenum type,
+                             GLsizei bufSize, void *pixels );
+
     GLuint64 getTextureHandleARB( GLuint texture );
     void     makeTextureHandleResidentARB( GLuint64 handle );
     void     makeTextureHandleNonResidentARB( GLuint64 handle );
@@ -142,6 +150,13 @@ namespace idk::gl
     void framebufferTextureLayer( GLenum target, GLenum attachment, GLuint texture,
                                   GLint level, GLint layer );
 
+    void namedFramebufferTexture ( GLuint framebuffer, GLenum attachment, GLuint texture,
+                                   GLint level );
+
+    void namedFramebufferDrawBuffer( GLuint framebuffer, GLenum mode );
+
+    void namedFramebufferDrawBuffers( GLuint framebuffer, GLsizei n, const GLenum *bufs );
+
     void namedFramebufferTextureLayer( GLuint framebuffer, GLenum attachment, GLuint texture,
                                        GLint level, GLint layer );
     // ---------------------------------------------------------------------------------------
@@ -150,6 +165,8 @@ namespace idk::gl
     /**/
     GLint getUniformLocation( GLuint program, const char *name );
     void  uniform1i( GLint loc, int i );
+    void  uniform2iv( GLint loc, GLsizei count, const int * );
+    void  uniform3iv( GLint loc, GLsizei count, const int * );
     void  uniform1f( GLint loc, float f );
     void  uniform2fv( GLint loc, GLsizei count, float *value );
     void  uniform3fv( GLint loc, GLsizei count, float *value );
