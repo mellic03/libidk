@@ -2,11 +2,14 @@
 #include "../idk_math.hpp"
 
 #include "../idk_assert.hpp"
+#include <libidk/idk_log.hpp>
 
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <filesystem>
 
+namespace fs = std::filesystem;
 
 
 
@@ -261,38 +264,66 @@ idk::gltools::loadCubemapMip( std::string directory, std::vector<std::string> fi
 
 
 GLuint
-idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &config )
+idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &config,
+                           TextureRef *wrapper )
 {
+    if (fs::exists(filepath) == false)
+    {
+        LOG_ERROR() << "File does not exist: " << filepath;
+    }
+
     SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
     SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
     SDL_Surface      *img    = SDL_ConvertSurface(tmp, target, 0);
 
     GLuint texture_id = gltools::loadTexture2D(img->w, img->h, (uint32_t *)(img->pixels), config);
 
+    if (wrapper)
+    {
+        *wrapper = idk::TextureRef(texture_id, img->w, img->h);
+    }
+
     SDL_FreeFormat(target);
     SDL_FreeSurface(tmp);
     SDL_FreeSurface(img);
-
-    // idk::glTexture texture(
-    //     texture_id,
-    //     glm::ivec2(img->w, img->h),
-    //     config
-    // );
 
     return texture_id;
 }
 
 
-idk::glTexture
-idk::gltools::loadTexture2( size_t w, size_t h, void *data, const glTextureConfig &config )
+idk::TextureRef
+idk::gltools::loadTextureWrapper( const std::string &filepath, const glTextureConfig &config )
 {
-    GLuint texture_id = gltools::loadTexture2D(w, h, (uint32_t *)(data), config);
+    if (fs::exists(filepath) == false)
+    {
+        LOG_ERROR() << "File does not exist: " << filepath;
+    }
 
-    idk::glTexture texture(
-        texture_id,
-        glm::ivec2(w, h),
-        config
-    );
+    SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
+    SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
+    SDL_Surface      *img    = SDL_ConvertSurface(tmp, target, 0);
+
+    GLuint texture_id = gltools::loadTexture2D(img->w, img->h, (uint32_t *)(img->pixels), config);
+    idk::TextureRef texture(texture_id, img->w, img->h);
+
+    SDL_FreeFormat(target);
+    SDL_FreeSurface(tmp);
+    SDL_FreeSurface(img);
 
     return texture;
 }
+
+
+// idk::glTexture
+// idk::gltools::loadTexture2( size_t w, size_t h, void *data, const glTextureConfig &config )
+// {
+//     GLuint texture_id = gltools::loadTexture2D(w, h, (uint32_t *)(data), config);
+
+//     idk::glTexture texture(
+//         texture_id,
+//         glm::ivec2(w, h),
+//         config
+//     );
+
+//     return texture;
+// }

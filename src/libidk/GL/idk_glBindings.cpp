@@ -53,10 +53,24 @@ void idk::gl::genRenderbuffers( GLsizei n, GLuint *renderbuffers )
 // ---------------------------------------------------------------------------------------
 
 
-void idk::gl::createTextures ( GLenum target, GLsizei n, GLuint *textures )
+void idk::gl::createTextures( GLenum target, GLsizei n, GLuint *textures )
 {
     IDK_GLCALL( glCreateTextures(target, n, textures); )
 }
+
+
+void idk::gl::createFramebuffers( GLsizei n, GLuint *framebuffers )
+{
+    IDK_GLCALL( glCreateFramebuffers(n, framebuffers); )
+
+}
+
+void idk::gl::createRenderbuffers( GLsizei n, GLuint *framebuffers )
+{
+    IDK_GLCALL( glCreateRenderbuffers(n, framebuffers); )
+
+}
+
 
 
 
@@ -306,6 +320,20 @@ void
 idk::gl::namedBufferStorage( GLuint buffer, GLsizeiptr size, const void *data, GLbitfield flags )
 {
     IDK_GLCALL( glNamedBufferStorage(buffer, size, data, flags); )
+}
+
+void
+idk::gl::namedRenderbufferStorage( GLuint renderbuffer, GLenum internalformat, GLsizei width,
+                                   GLsizei height )
+{
+    IDK_GLCALL( glNamedRenderbufferStorage(renderbuffer, internalformat, width, height); )
+}
+
+void
+idk::gl::namedFramebufferRenderbuffer( GLuint framebuffer, GLenum attachment,
+                                       GLenum renderbuffertarget, GLuint renderbuffer )
+{
+    glNamedFramebufferRenderbuffer(framebuffer, attachment, renderbuffertarget, renderbuffer);
 }
 
 

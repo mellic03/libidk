@@ -2,15 +2,19 @@
 
 
 
-namespace idk { class Identifiable; };
+namespace idk
+{
+    class Identifiable;
+};
 
 
 class idk::Identifiable
 {
 private:
-    int m_id;
 
 public:
+    int m_id;
+
     Identifiable( int id ): m_id(id) {  };
     constexpr int ID() const { return m_id; };
 

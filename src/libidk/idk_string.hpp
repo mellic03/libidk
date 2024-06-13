@@ -17,21 +17,21 @@ namespace idk
 
 
 
-inline std::ofstream &operator << ( std::ofstream &stream, const idk::string &str )
-{
-    uint32_t num_elements = str.size();
-    stream.write(reinterpret_cast<const char *>(&num_elements), sizeof(uint32_t));
-    stream.write(reinterpret_cast<const char *>(str.data()), str.size()*sizeof(char));
-    return stream;
-}
+// inline std::ofstream &operator << ( std::ofstream &stream, const idk::string &str )
+// {
+//     uint32_t num_elements = str.size();
+//     stream.write(reinterpret_cast<const char *>(&num_elements), sizeof(uint32_t));
+//     stream.write(reinterpret_cast<const char *>(str.data()), str.size()*sizeof(char));
+//     return stream;
+// }
 
 
-inline void operator >> ( std::ifstream &stream, idk::string &str )
-{
-    uint32_t num_elements;
-    stream.read(reinterpret_cast<char *>(&num_elements), sizeof(uint32_t));
+// inline void operator >> ( std::ifstream &stream, idk::string &str )
+// {
+//     uint32_t num_elements;
+//     stream.read(reinterpret_cast<char *>(&num_elements), sizeof(uint32_t));
 
-    str.resize(num_elements);
-    stream.read(reinterpret_cast<char *>(str.data()), str.size()*sizeof(char));
-}
+//     str.resize(num_elements);
+//     stream.read(reinterpret_cast<char *>(str.data()), str.size()*sizeof(char));
+// }
 

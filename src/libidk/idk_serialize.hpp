@@ -31,6 +31,16 @@ namespace idk
 
 
     template <typename T>
+    concept is_set = requires( T t )
+    {
+        { t.size()  };
+        { t.insert()  };
+        { t.begin() };
+        { t.end()   };
+    };
+
+
+    template <typename T>
     concept is_numeric = std::is_integral_v<T> || std::is_floating_point_v<T>;
 
 
@@ -45,6 +55,17 @@ namespace idk
         }
 
         else if constexpr (idk::is_vector<T>)
+        {
+            uint32_t size = data.size();
+            n += idk::streamwrite(stream, size);
+
+            for (const auto &element: data)
+            {
+                n += idk::streamwrite(stream, element);
+            }
+        }
+
+        else if constexpr (idk::is_set<T>)
         {
             uint32_t size = data.size();
             n += idk::streamwrite(stream, size);
@@ -85,6 +106,21 @@ namespace idk
             for (auto &element: data)
             {
                 n += idk::streamread(stream, element);
+            }
+        }
+
+        else if constexpr (idk::is_set<T>)
+        {
+            uint32_t size;
+            n += idk::streamread(stream, size);
+            // data.resize(size);
+
+            // for (auto &element: data)
+            for (uint32_t i=0; i<size; i++)
+            {
+                typename T::value_type element;
+                n += idk::streamread(stream, element);
+                data.insert(element);
             }
         }
 

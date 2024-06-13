@@ -26,14 +26,13 @@ private:
     bool m_first = true;
     bool m_bound = false;
     glm::ivec2 m_size;
-    std::vector<GLuint> m_gl_attachments;
+    std::vector<GLenum> m_gl_attachments;
 
 protected:
-    void    f_reset( int w, int h, size_t num_attachments );
+    void   _reset( int w, int h, size_t num_attachments );
 
 public:
     GLuint              m_FBO;
-    GLuint              m_RBO;
     std::vector<GLuint> attachments;
     GLuint              cubemap_attachment;
     GLuint              depth_attachment;

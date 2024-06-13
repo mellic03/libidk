@@ -1,4 +1,5 @@
 #include "idk_assert.hpp"
+#include "idk_log.hpp"
 
 #include <iostream>
 #include <cassert>
@@ -12,6 +13,10 @@ idk::internal::assert_msg( const char *msg, const bool expression )
         std::cerr
             << "Assertion failed: " << "\"" << msg << "\"\n"
             << __FILE__ << ":" << __LINE__ << "\n";
+
+        LOG_ERROR() << msg;
+        idk::Logger::print();
+        idk::Logger::write();
 
         assert(false);
     }

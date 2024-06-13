@@ -30,4 +30,30 @@ extern "C" \
         delete mod; \
     } \
 } \
+
+
+
+
+
+#define IDK_EXPORT_GAME(game_type) \
+\
+extern "C" \
+{ \
+    IDK_VISIBLE \
+    idk::Game *getInstance() \
+    { \
+        static game_type *game = nullptr; \
+        if (game == nullptr) game = new game_type(); \
+        return dynamic_cast<idk::Game *>(game); \
+    } \
+\
+    IDK_VISIBLE \
+    void deleteInstance( void *instance ) \
+    { \
+        game_type *game = reinterpret_cast<game_type *>(instance); \
+        game->shutdown(); \
+        delete game; \
+    } \
+} \
+
 // ---------------------------------------------------------------------------------------------

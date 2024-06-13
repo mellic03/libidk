@@ -4,7 +4,11 @@
 #include <memory>
 
 
-namespace idk { struct glTextureConfig; class glTexture; };
+namespace idk
+{
+    struct glTextureConfig;
+    struct TextureRef;
+}
 
 
 struct idk::glTextureConfig
@@ -29,44 +33,18 @@ struct idk::glTextureConfig
 };
 
 
-class idk::glTexture
+struct idk::TextureRef
 {
 private:
-    GLuint                      m_id;
-    GLuint64                    m_handle;
-    glm::ivec2                  m_size;
-    size_t                      m_nbytes;
-    glTextureConfig             m_config;
-
-    std::vector<std::unique_ptr<uint8_t[]>> m_mips;
-
-    float     *_data1f( int l ) const { return reinterpret_cast<float *>     (m_mips[l].get()); };
-    glm::vec4 *_data4f( int l ) const { return reinterpret_cast<glm::vec4 *> (m_mips[l].get()); };
-    uint8_t   *_data1u( int l ) const { return reinterpret_cast<uint8_t *>   (m_mips[l].get()); };
-
+    std::shared_ptr<uint32_t> m_texture;
 
 public:
-            // glTexture( const idk::glTexture &  );
-            // glTexture( const idk::glTexture && );
-            glTexture( GLuint, const glm::ivec2 &, const glTextureConfig & );
+    size_t   width;
+    size_t   height;
 
-    // glTexture &operator = ( const glTexture &  );
-    // glTexture &operator = ( const glTexture && );
+    TextureRef();
+    TextureRef( uint32_t texture, size_t w, size_t h );
 
-    GLuint   ID()     const { return m_id;     };
-    GLuint64 handle() const { return m_handle; };
-
-    // const float     &sample1f ( float u, float v, int l=0 ) const;
-    // const uint8_t   &sample1u ( float u, float v, int l=0 ) const;
-    // const uint8_t   *sample4u ( float u, float v, int l=0 ) const;
-
-    // glm::vec4  isample4f  ( int   x, int   y, int l=0 ) const;
-    // glm::vec4  sample4f   ( float u, float v, int l=0 ) const;
-    // glm::vec4  bisample4f ( float u, float v, int l=0 ) const;
-
-    // glm::ivec2 size( int level=0 ) const { return m_size / int(glm::pow(2, level)); };
-
-    // const glTextureConfig &config()  const { return m_config; };
+    uint32_t ID();
 };
-
 

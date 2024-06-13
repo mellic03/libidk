@@ -7,9 +7,9 @@ namespace idk
 {
     struct Transform
     {
-        glm::vec3 position;
-        glm::quat rotation;
-        glm::vec3 scale;
+        glm::vec3 position = glm::vec3(0.0f);
+        glm::quat rotation = glm::quat(glm::vec3(0.0f));
+        glm::vec4 scale    = glm::vec4(1.0f);
     };
 };
 

@@ -10,10 +10,13 @@
 namespace idk::gltools
 {
     GLuint  loadTexture2D( size_t w, size_t h, void *data, const glTextureConfig &config );
+
     GLuint  loadTexture3D( size_t w, size_t h, size_t d, void *data, const glTextureConfig &config );
 
-    GLuint loadTexture( const std::string &, const glTextureConfig &config );
-    idk::glTexture loadTexture2( size_t w, size_t h, void *data, const glTextureConfig &config );
+    GLuint loadTexture( const std::string &, const glTextureConfig &config,
+                        TextureRef *wrapper = nullptr );
+
+    idk::TextureRef loadTextureWrapper( const std::string&, const glTextureConfig &config );
 
 
     glm::vec4 textureQuery( float u, float v, size_t w, size_t h,

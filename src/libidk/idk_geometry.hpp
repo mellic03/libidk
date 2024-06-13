@@ -14,6 +14,25 @@ namespace idk::geometry
     float distPlaneSphere( const glm::vec3 &plane, const glm::vec3 &N, const glm::vec3 &sphere, float r );
 
 
+    glm::vec3 line_point_NearestPoint( const glm::vec3 &A, const glm::vec3 &B, const glm::vec3 &p );
+    glm::vec3 line_rect_NearestPoint( const glm::vec3 &A, const glm::vec3 &B, const glm::vec3 &p );
+
+
+    struct SphereRectResponse
+    {
+        glm::vec3 s_pos;
+        float     s_rad;
+        glm::vec3 i_pos;
+        glm::vec3 dir;
+    };
+
+    bool sphereRectIntersection( glm::vec3 s_pos, float s_radius, const glm::mat4 &rect,
+                                 glm::vec3 &res );
+
+    bool capsuleRectIntersection( const glm::vec3 &c_pos, float c_bot, float c_top, float c_rad,
+                                  const glm::mat4 &rect, glm::vec3 &res );
+
+
     struct CameraFrustum
     {
         glm::vec3 positions[6];

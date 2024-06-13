@@ -24,9 +24,11 @@ namespace idk::gl
     void genFramebuffers  ( GLsizei n, GLuint *framebuffers );
     void genRenderbuffers ( GLsizei n, GLuint *renderbuffers );
 
-    void createVertexArrays ( GLsizei n, GLuint *arrays );
-    void createBuffers      ( GLsizei n, GLuint *buffers );
-    void createTextures     ( GLenum target, GLsizei n, GLuint *textures );
+    void createVertexArrays  ( GLsizei n, GLuint *arrays );
+    void createBuffers       ( GLsizei n, GLuint *buffers );
+    void createTextures      ( GLenum target, GLsizei n, GLuint *textures );
+    void createFramebuffers  ( GLsizei n, GLuint *framebuffers );
+    void createRenderbuffers ( GLsizei n, GLuint *renderbuffers );
 
     GLuint createProgram    ();
     GLuint createShader     ( GLenum type );
@@ -76,6 +78,8 @@ namespace idk::gl
     void namedBufferData( GLuint buffer, GLsizeiptr size, const void *data, GLenum usage );
     void namedBufferSubData( GLuint buffer, GLintptr offset, GLsizeiptr size, const void *data );
     void namedBufferStorage( GLuint buffer, GLsizeiptr size, const void *data, GLbitfield flags );
+    void namedRenderbufferStorage( GLuint renderbuffer, GLenum internalformat, GLsizei width, GLsizei height );
+    void namedFramebufferRenderbuffer( GLuint framebuffer, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer );
 
 
     void *mapBuffer( GLenum target, GLenum access );
