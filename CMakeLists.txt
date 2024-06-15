@@ -4,7 +4,6 @@ project(libidk)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/GL/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/memory/)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/scripting/)
 
 
 file(GLOB SOURCES
@@ -12,7 +11,7 @@ file(GLOB SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/containers/*.cpp
 )
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 set_target_properties(
     ${PROJECT_NAME} PROPERTIES
@@ -31,7 +30,6 @@ target_link_libraries(
     ${PROJECT_NAME} PUBLIC
     IDKGL
     libidk-idk_memory
-    libidk-idk_scripting
 )
 
 

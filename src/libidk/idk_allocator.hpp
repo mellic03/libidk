@@ -69,6 +69,8 @@ public:
     void                    destroy ( int id   );
     void                    clear   (          );
 
+    bool                    contains( int id   );
+
     std::vector<T> &        vector   ()       { return m_data;           };
     T *                     data     ()       { return m_data.data();    };
     size_t                  size     () const { return m_data.size();    };
@@ -250,6 +252,39 @@ idk::Allocator<T, A>::clear()
     }
 
 }
+
+
+
+
+template <typename T, typename A>
+bool
+idk::Allocator<T, A>::contains( int id )
+{
+    if (id < 0)
+    {
+        return false;
+    }
+
+    if (id >= m_forward.size())
+    {
+        return false;
+    }
+
+    for (int i: m_available_ids)
+    {
+        if (i == id)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+
+
+
 
 
 template <typename T, typename A>

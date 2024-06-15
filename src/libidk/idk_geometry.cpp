@@ -97,7 +97,7 @@ idk::geometry::line_point_NearestPoint( const glm::vec3 &A, const glm::vec3 &B,
 
 
 
-glm::mat4 extractRotation( const glm::mat4 &M )
+glm::mat4 extractRotation0( const glm::mat4 &M )
 {
     glm::vec3 r_scale;
     glm::quat r_rot;
@@ -251,6 +251,8 @@ idk::geometry::createCameraFrustum( float near, float far, float vfov, float asp
 bool
 idk::geometry::inFrustum( const CameraFrustum &frustum, const glm::mat4 &T, float radius )
 {
+    return true;
+
     glm::vec3 position = glm::vec3(T[3]);
     float scale = glm::length(T[0]);
 
