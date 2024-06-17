@@ -208,6 +208,8 @@ namespace idk::gl
     void clear( GLbitfield mask );
     void viewport( GLint x, GLint y, GLsizei w, GLsizei h );
     void cullFace( GLenum mode );
+    void blendFunc( GLenum sfactor, GLenum dfactor );
+
 };
 
 

@@ -13,6 +13,8 @@ namespace idk::geometry
     */
     float distPlaneSphere( const glm::vec3 &plane, const glm::vec3 &N, const glm::vec3 &sphere, float r );
 
+    bool pointInsideRect( float px, float py, float x, float y, float w, float h );
+
 
     glm::vec3 line_point_NearestPoint( const glm::vec3 &A, const glm::vec3 &B, const glm::vec3 &p );
     glm::vec3 line_rect_NearestPoint( const glm::vec3 &A, const glm::vec3 &B, const glm::vec3 &p );

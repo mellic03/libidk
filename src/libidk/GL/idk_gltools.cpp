@@ -263,6 +263,101 @@ idk::gltools::loadCubemapMip( std::string directory, std::vector<std::string> fi
 }
 
 
+
+
+// GLuint
+// idk::gltools::loadCubemap( std::string root, std::vector<std::string> filenames, glTextureConfig config )
+// {
+//     GLuint texture;
+
+//     gl::createTextures(GL_TEXTURE_CUBE_MAP, 1, &texture);
+
+//     {
+//         std::string       tmp_filepath = root + filenames[0];
+//         SDL_Surface      *tmp_tmp      = IMG_Load(tmp_filepath.c_str());
+//         SDL_PixelFormat  *tmp_target   = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
+//         SDL_Surface      *tmp_img      = SDL_ConvertSurface(tmp_tmp, tmp_target, 0);
+
+//         gl::textureStorage2D(texture, config.texmaxlevel+1, GL_RGBA8, tmp_img->w, tmp_img->h);
+
+//         SDL_FreeFormat(tmp_target);
+//         SDL_FreeSurface(tmp_tmp);
+//         SDL_FreeSurface(tmp_img);
+//     }
+
+
+//     for (int face=0; face<6; face++)
+//     {
+//         std::string       filepath = root + filenames[face];
+//         SDL_Surface      *tmp      = IMG_Load(filepath.c_str());
+//         SDL_PixelFormat  *target   = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
+//         SDL_Surface      *img      = SDL_ConvertSurface(tmp, target, 0);
+
+//         gl::textureSubImage3D(
+//             texture, 0,
+//             0, 0, face,
+//             img->w, img->h, 1,
+//             config.format, config.datatype,
+//             img->pixels
+//         );
+    
+//         SDL_FreeFormat(target);
+//         SDL_FreeSurface(tmp);
+//         SDL_FreeSurface(img);
+//     }
+
+//     gl::textureParameteri(texture, GL_TEXTURE_MIN_FILTER, config.minfilter);
+//     gl::textureParameteri(texture, GL_TEXTURE_MAG_FILTER, config.magfilter);
+//     gl::textureParameteri(texture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//     gl::textureParameteri(texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//     gl::textureParameteri(texture, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+//     if (config.genmipmap)
+//     {
+//         gl::generateTextureMipmap(texture);
+//     }
+
+//     else if (config.setmipmap)
+//     {
+//         gl::textureParameteri(texture, GL_TEXTURE_BASE_LEVEL, config.texbaselevel);
+//         gl::textureParameteri(texture, GL_TEXTURE_MAX_LEVEL,  config.texmaxlevel);
+//     }
+
+//     return texture;
+// }
+
+
+// void
+// idk::gltools::loadCubemapMip( std::string directory, std::vector<std::string> filenames,
+//                               glTextureConfig config, GLuint cubemap, GLint level )
+// {
+//     for (GLuint face=0; face<6; face++)
+//     {
+//         std::string       filepath = directory + std::to_string(level) + filenames[face];
+//         SDL_Surface      *tmp      = IMG_Load(filepath.c_str());
+//         SDL_PixelFormat  *target   = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
+//         SDL_Surface      *img      = SDL_ConvertSurface(tmp, target, 0);
+
+//         gl::textureSubImage3D(
+//             cubemap, level,
+//             0, 0, face,
+//             img->w, img->h, 1,
+//             config.format, config.datatype,
+//             img->pixels
+//         );
+
+//         SDL_FreeFormat(target);
+//         SDL_FreeSurface(tmp);
+//         SDL_FreeSurface(img);
+//     }
+
+// }
+
+
+
+
+
+
 GLuint
 idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &config,
                            TextureRef *wrapper )

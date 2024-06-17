@@ -756,3 +756,10 @@ idk::gl::cullFace( GLenum mode )
 {
     IDK_GLCALL( glCullFace(mode); )
 }
+
+
+void
+idk::gl::blendFunc( GLenum sfactor, GLenum dfactor )
+{
+    IDK_GLCALL( glBlendFunc(sfactor, dfactor); )
+}

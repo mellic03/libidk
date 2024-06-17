@@ -33,6 +33,14 @@ idk::geometry::distPlaneSphere( const glm::vec3 &plane, const glm::vec3 &N, cons
 }
 
 
+bool
+idk::geometry::pointInsideRect( float px, float py, float x, float y, float w, float h )
+{
+    return (x <= px && px <= x+w) && (y <= py && py <= y+h);
+}
+
+
+
 glm::vec3 nearestPointOnLineSegment(const glm::vec3& A, const glm::vec3& B, const glm::vec3& P)
 {
     // Vector from A to B

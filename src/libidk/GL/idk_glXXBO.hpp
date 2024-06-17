@@ -23,6 +23,9 @@ protected:
     GLuint  m_index;
 
 public:
+
+    GLuint ID() { return m_buffer; };
+
     void    init();
     void    init( GLuint index );
 
