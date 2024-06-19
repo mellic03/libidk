@@ -34,9 +34,6 @@ namespace idk
     template <typename T>
     using pAllocator = idk::Allocator<T, idk::linear_allocator<T>>;
 
-    template <typename T, typename A = std::allocator<T>>
-    using convector = idk::Allocator<T, A>;
-
 };
 
 
@@ -225,11 +222,14 @@ void
 idk::Allocator<T, A>::destroy( int id )
 {
     int data_idx = m_forward[id];
+    IDK_ASSERT("Attempted access of deleted object", data_idx != -1);
+
+
     int back_idx = m_reverse.back();
 
-    std::swap(m_data[data_idx], m_data.back());
+    std::swap(m_data[data_idx],    m_data[m_data.size() - 1]);
     std::swap(m_forward[back_idx], m_forward[id]);
-    std::swap(m_reverse[data_idx], m_reverse.back());
+    std::swap(m_reverse[data_idx], m_reverse[m_reverse.size() - 1]);
 
     m_data.pop_back();
     m_reverse.pop_back();
