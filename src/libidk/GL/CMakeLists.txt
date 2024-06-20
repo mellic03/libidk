@@ -14,15 +14,19 @@ set_target_properties(
     POSITION_INDEPENDENT_CODE ON
 )
 
-if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
+if (IDK_DEBUG)
+    target_compile_options(${PROJECT_NAME} PUBLIC -O0 -g)
 else()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wextra -Wpedantic -Werror)
-endif()
+    target_compile_options(${PROJECT_NAME} PUBLIC -Ofast)
+endif ()
+
 
 
 target_link_libraries(
     ${PROJECT_NAME} PUBLIC
+    GLEW
+    SDL2
+    SDL2_image
 )
 
 
