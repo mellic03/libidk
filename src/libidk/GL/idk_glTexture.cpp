@@ -7,6 +7,34 @@
 
 
 
+idk::TextureWrapper::TextureWrapper()
+{
+
+}
+
+
+idk::TextureWrapper::TextureWrapper( uint32_t *pixels, size_t w, size_t h )
+{
+    m_data = std::make_shared<uint32_t[]>(w*h);
+    std::memcpy(m_data.get(), pixels, w*h*sizeof(uint32_t));
+
+    width  = w;
+    height = h;
+}
+
+
+
+void*
+idk::TextureWrapper::data()
+{
+    return (void *)(m_data.get());
+}
+
+
+
+
+
+
 static void deleter( uint32_t *p )
 {
     if (p)

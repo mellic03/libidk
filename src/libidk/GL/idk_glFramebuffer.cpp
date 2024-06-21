@@ -80,13 +80,13 @@ idk::glFramebuffer::depthAttachment( const idk::DepthAttachmentConfig &config )
         m_size.x, m_size.y
     );
 
-    gl::textureParameteri(depth_attachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    gl::textureParameteri(depth_attachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    gl::textureParameteri(depth_attachment, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    gl::textureParameteri(depth_attachment, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     gl::textureParameterf(depth_attachment, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     gl::textureParameterf(depth_attachment, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-    gl::textureParameteri(depth_attachment, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-    gl::textureParameteri(depth_attachment, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    // gl::textureParameteri(depth_attachment, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    // gl::textureParameteri(depth_attachment, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 
     gl::namedFramebufferTexture(m_FBO, GL_DEPTH_ATTACHMENT, depth_attachment, 0);
 }

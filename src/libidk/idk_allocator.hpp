@@ -1,6 +1,7 @@
 #pragma once
 
 #include "idk_assert.hpp"
+#include "idk_log.hpp"
 #include "idk_memory.hpp"
 #include "idk_io.hpp"
 #include "idk_serialize.hpp"
@@ -119,7 +120,7 @@ idk::Allocator<T, A>::create()
     int id  = -1;
 
     int data_idx = m_data.size();
-    m_data.emplace_back(std::move(T()));
+    m_data.emplace_back(T());
 
 
     // Determine user-facing id
@@ -137,7 +138,13 @@ idk::Allocator<T, A>::create()
     }
     // ------------------------------------------------------------------------
 
-    m_reverse.push_back(id);
+    m_forward[id] = data_idx;
+
+    // if (m_reverse.size() <= data_idx)
+    // {
+    //     m_reverse.resize(data_idx+1);
+    // }
+    // m_reverse[data_idx] = id;
 
     return id;
 }
@@ -150,7 +157,7 @@ idk::Allocator<T, A>::create( const T &data )
     int id  = -1;
 
     int data_idx = m_data.size();
-    m_data.emplace_back(std::move(data));
+    m_data.emplace_back(data);
 
 
     // Determine user-facing id
@@ -168,7 +175,13 @@ idk::Allocator<T, A>::create( const T &data )
     }
     // ------------------------------------------------------------------------
 
-    m_reverse.push_back(id);
+    m_forward[id] = data_idx;
+
+    // if (m_reverse.size() <= data_idx)
+    // {
+    //     m_reverse.resize(data_idx+1);
+    // }
+    // m_reverse[data_idx] = id;
 
     return id;
 }
@@ -198,7 +211,13 @@ idk::Allocator<T, A>::create( T &&data )
     }
     // ------------------------------------------------------------------------
 
-    m_reverse.push_back(id);
+    m_forward[id] = data_idx;
+
+    // if (m_reverse.size() <= data_idx)
+    // {
+    //     m_reverse.resize(data_idx+1);
+    // }
+    // m_reverse[data_idx] = id;
 
     return id;
 }
@@ -222,17 +241,33 @@ void
 idk::Allocator<T, A>::destroy( int id )
 {
     int data_idx = m_forward[id];
-    IDK_ASSERT("Attempted access of deleted object", data_idx != -1);
+
+    if (data_idx == -1)
+    {
+        LOG_WARN() << "[Allocator<T, A>] Object " << id << " already deleted";
+        return;
+    }
+    // IDK_ASSERT("Attempted access of deleted object", data_idx != -1);
 
 
-    int back_idx = m_reverse.back();
+    // Find id of object which points to end of m_data
+    int back_idx = -1;
 
-    std::swap(m_data[data_idx],    m_data[m_data.size() - 1]);
-    std::swap(m_forward[back_idx], m_forward[id]);
-    std::swap(m_reverse[data_idx], m_reverse[m_reverse.size() - 1]);
+    for (int i=0; i<m_forward.size(); i++)
+    {
+        if (m_forward[i] == m_data.size()-1)
+        {
+            back_idx = i;
+        }
+    }
 
+    IDK_ASSERT("Ruh roh", back_idx != -1);
+
+    std::swap(m_data[data_idx], m_data.back());
     m_data.pop_back();
-    m_reverse.pop_back();
+
+    m_forward[back_idx] = data_idx;
+    m_forward[id] = -1;
 
     m_available_ids.push_back(id);
 }
@@ -244,7 +279,6 @@ idk::Allocator<T, A>::clear()
 {
     m_data.clear();
     m_forward.clear();
-    m_reverse.clear();
 
     while (m_available_ids.empty() == false)
     {
@@ -260,25 +294,25 @@ template <typename T, typename A>
 bool
 idk::Allocator<T, A>::contains( int id )
 {
-    if (id < 0)
-    {
-        return false;
-    }
+    // if (id < 0)
+    // {
+    //     return false;
+    // }
 
-    if (id >= m_forward.size())
-    {
-        return false;
-    }
+    // if (id >= m_forward.size())
+    // {
+    //     return false;
+    // }
 
-    for (int i: m_available_ids)
+    for (int i=0; i<m_forward.size(); i++)
     {
-        if (i == id)
+        if (i == id && m_forward[i] != -1)
         {
-            return false;
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
 

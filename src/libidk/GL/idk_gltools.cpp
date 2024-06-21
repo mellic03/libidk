@@ -360,7 +360,7 @@ idk::gltools::loadCubemapMip( std::string directory, std::vector<std::string> fi
 
 GLuint
 idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &config,
-                           TextureRef *wrapper )
+                           idk::TextureWrapper *wrapper )
 {
     if (fs::exists(filepath) == false)
     {
@@ -375,7 +375,7 @@ idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &c
 
     if (wrapper)
     {
-        *wrapper = idk::TextureRef(texture_id, img->w, img->h);
+        (*wrapper) = idk::TextureWrapper((uint32_t *)(img->pixels), img->w, img->h);
     }
 
     SDL_FreeFormat(target);
@@ -384,6 +384,35 @@ idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &c
 
     return texture_id;
 }
+
+
+
+// GLuint
+// idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &config,
+//                            std::shared_ptr<uint32_t> *wrapper )
+// {
+//     if (fs::exists(filepath) == false)
+//     {
+//         LOG_ERROR() << "File does not exist: " << filepath;
+//     }
+
+//     SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
+//     SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
+//     SDL_Surface      *img    = SDL_ConvertSurface(tmp, target, 0);
+
+//     GLuint texture_id = gltools::loadTexture2D(img->w, img->h, (uint32_t *)(img->pixels), config);
+
+//     if (wrapper)
+//     {
+//         *wrapper = idk::TextureRef(texture_id, img->w, img->h);
+//     }
+
+//     SDL_FreeFormat(target);
+//     SDL_FreeSurface(tmp);
+//     SDL_FreeSurface(img);
+
+//     return texture_id;
+// }
 
 
 idk::TextureRef

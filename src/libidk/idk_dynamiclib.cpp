@@ -6,9 +6,7 @@
 #include <filesystem>
 #include <iostream>
 
-
-#define IDK_DYNAMIC_LIBRARY_IDK
-// #define IDK_DYNAMIC_LIBRARY_SDL2
+#include <SDL2/SDL_loadso.h>
 
 
 #ifdef IDK_UNIX
@@ -16,20 +14,6 @@
 #elif defined(IDK_WINDOWS)
     #define IDK_DYNAMIC_LIBRARY_FILE_EXTENSION ".dll"
 #endif
-
-
-#ifdef IDK_DYNAMIC_LIBRARY_IDK
-    #include <dlfcn.h>
-    // #define IDK_DYNAMIC_LIBRARY_LOAD_OBJECT(filepath) dlopen(filepath, RTLD_NOW)
-    // #define IDK_DYNAMIC_LIBRARY_LOAD_FUNCTION(lib, symbol) dlsym(lib, symbol)
-    // #define IDK_DYNAMIC_LIBRARY_UNLOAD_OBJECT(lib) dlclose(lib)
-#elif defined(IDK_DYNAMIC_LIBRARY_SDL2)
-    #include <SDL2/SDL_loadso.h>
-    // #define IDK_DYNAMIC_LIBRARY_LOAD_OBJECT(filepath) SDL_LoadObject(filepath)
-    // #define IDK_DYNAMIC_LIBRARY_LOAD_FUNCTION(lib, symbol) SDL_LoadFunction(lib, symbol)
-    // #define IDK_DYNAMIC_LIBRARY_UNLOAD_OBJECT(lib) SDL_UnloadObject(lib)
-#endif
-
 
 
 
@@ -57,10 +41,10 @@ idk::dynamiclib::loadObject( const char *filepath )
     std::string extension = IDK_DYNAMIC_LIBRARY_FILE_EXTENSION;
     std::string path = std::filesystem::absolute(relpath + extension);
 
-    void *lib = dlopen(path.c_str(), RTLD_LAZY);
+    void *lib = SDL_LoadObject(path.c_str());
     if (lib == nullptr)
     {
-        std::cout << dlerror() << "\n";
+        std::cout << SDL_GetError() << "\n";
     }
 
     std::string msg = "Could not load shared library from path: " + path;
@@ -73,10 +57,10 @@ idk::dynamiclib::loadObject( const char *filepath )
 void *
 idk::dynamiclib::loadFunction( void *lib, const char *symbol )
 {
-    void *function_ptr = dlsym(lib, symbol);
+    void *function_ptr = SDL_LoadFunction(lib, symbol);
     if (function_ptr == nullptr)
     {
-        std::cout << dlerror() << "\n";
+        std::cout << SDL_GetError() << "\n";
     }
 
     std::string msg = "Could not load symbol: " + std::string(symbol);
@@ -86,11 +70,10 @@ idk::dynamiclib::loadFunction( void *lib, const char *symbol )
 }
 
 
-int
+void
 idk::dynamiclib::unloadObject( void *lib )
 {
-    int res = dlclose(lib);
-    return res;
+    SDL_UnloadObject(lib);
 }
 
 

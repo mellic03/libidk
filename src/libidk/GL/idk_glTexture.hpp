@@ -8,6 +8,7 @@ namespace idk
 {
     struct glTextureConfig;
     struct TextureRef;
+    struct TextureWrapper;
 }
 
 
@@ -30,6 +31,22 @@ struct idk::glTextureConfig
     GLint  texbaselevel   = 0;
     GLint  texmaxlevel    = 4;
     bool   bindless       = GL_FALSE;
+};
+
+
+struct idk::TextureWrapper
+{
+private:
+    std::shared_ptr<uint32_t[]> m_data;
+
+public:
+    size_t   width;
+    size_t   height;
+
+    TextureWrapper();
+    TextureWrapper( uint32_t *pixels, size_t w, size_t h );
+
+    void *data();
 };
 
 

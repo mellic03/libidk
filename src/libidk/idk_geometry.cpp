@@ -34,7 +34,7 @@ idk::geometry::distPlaneSphere( const glm::vec3 &plane, const glm::vec3 &N, cons
 
 
 bool
-idk::geometry::pointInsideRect( float px, float py, float x, float y, float w, float h )
+idk::geometry::pointInRect( float px, float py, float x, float y, float w, float h )
 {
     return (x <= px && px <= x+w) && (y <= py && py <= y+h);
 }
