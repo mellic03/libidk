@@ -39,7 +39,7 @@ idk::dynamiclib::loadObject( const char *filepath )
     }
 
     std::string extension = IDK_DYNAMIC_LIBRARY_FILE_EXTENSION;
-    std::string path = std::filesystem::absolute(relpath + extension);
+    std::string path = std::filesystem::absolute(relpath + extension).string();
 
     void *lib = SDL_LoadObject(path.c_str());
     if (lib == nullptr)

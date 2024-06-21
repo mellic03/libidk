@@ -48,7 +48,7 @@ public:
     LogStream( uint32_t flags, idk::LogType type, const std::string &file,
                const std::string &func, int line )
     :   m_flags (flags),
-        m_file  (std::filesystem::path(file).filename()),
+        m_file  (std::filesystem::path(file).filename().string()),
         m_func  (func),
         m_line  (line)
     {
@@ -61,7 +61,7 @@ public:
             case idk::LogType::ERROR: m_type = "[error]"; break;
         }
 
-        m_ss << "[" << std::chrono::utc_clock::now() << "] "
+        m_ss << "[" << std::chrono::high_resolution_clock::now() << "] "
              << m_type << " ";
             //  << m_file << " "
             //  << m_func << " "
@@ -110,7 +110,7 @@ public:
 private:
     struct LogToken
     {
-        std::chrono::utc_clock::time_point timestamp;
+        std::chrono::high_resolution_clock::time_point timestamp;
         LogType     type;
         std::string data[IDX_NUM_IDX];
     };
@@ -153,7 +153,7 @@ public:
     static void write()
     {
         std::stringstream ss;
-        ss << std::chrono::utc_clock::now();
+        ss << std::chrono::high_resolution_clock::now();
         std::string filepath = "log/" + ss.str() + ".txt";
 
         std::ofstream stream(filepath);
