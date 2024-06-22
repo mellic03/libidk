@@ -40,6 +40,13 @@ idk::geometry::pointInRect( float px, float py, float x, float y, float w, float
 }
 
 
+bool
+idk::geometry::pointInRectCentered( float px, float py, float x, float y, float w, float h )
+{
+    return pointInRect(px, py, x-w/2, y-h/2, w, h);
+}
+
+
 
 glm::vec3 nearestPointOnLineSegment(const glm::vec3& A, const glm::vec3& B, const glm::vec3& P)
 {
