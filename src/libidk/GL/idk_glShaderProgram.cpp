@@ -465,6 +465,14 @@ idk::glShaderProgram::set_int( const std::string &name, int i )
 
 
 void
+idk::glShaderProgram::set_uint( const std::string &name, uint32_t i )
+{
+    GLint loc = IDK_GL_SHADER_GET_UNIFORM_LOC(name);
+    IDK_GLCALL( glUniform1ui(loc, i); )
+}
+
+
+void
 idk::glShaderProgram::set_float( const std::string &name, float f )
 {
     GLint loc = IDK_GL_SHADER_GET_UNIFORM_LOC(name);

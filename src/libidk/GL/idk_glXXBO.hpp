@@ -55,6 +55,7 @@ void
 idk::glBufferObject<gl_target>::init()
 {
     gl::createBuffers(1, &m_buffer);
+    this->bind();
 }
 
 

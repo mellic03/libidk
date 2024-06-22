@@ -103,6 +103,7 @@ public:
     GLint       uniformLoc    ( const std::string &name );
 
     void        set_int             ( const std::string &, int       );
+    void        set_uint            ( const std::string &, uint32_t  );
     void        set_float           ( const std::string &, float     );
 
     void        set_ivec2           ( const std::string &, const glm::ivec2 & );
