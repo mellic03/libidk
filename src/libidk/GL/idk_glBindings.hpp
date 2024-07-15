@@ -151,6 +151,9 @@ namespace idk::gl
     void framebufferTexture2D( GLenum target, GLenum attachment, GLenum textarget,
                                 GLuint texture, GLint level );
 
+    void framebufferTexture3D( GLenum target, GLenum attachment, GLenum textarget,
+                               GLuint texture, GLint level, GLint layer );
+
     void framebufferTextureLayer( GLenum target, GLenum attachment, GLuint texture,
                                   GLint level, GLint layer );
 

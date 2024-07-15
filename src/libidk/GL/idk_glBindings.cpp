@@ -549,6 +549,15 @@ idk::gl::framebufferTexture2D( GLenum target, GLenum attachment, GLenum textarge
 
 
 void
+idk::gl::framebufferTexture3D( GLenum target, GLenum attachment, GLenum textarget,
+                               GLuint texture, GLint level, GLint layer )
+
+{
+    IDK_GLCALL( glFramebufferTexture3D(target, attachment, textarget, texture, level, layer); )
+}
+
+
+void
 idk::gl::framebufferTextureLayer( GLenum target, GLenum attachment, GLuint texture,
                                   GLint level, GLint layer )
 {

@@ -6,6 +6,137 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 
+bool
+idk::geometry::AABB_AABB_Intersects( const AABB &A, const AABB &B )
+{
+    glm::vec3 Amin = A.center - (A.extents / 2.0f);
+    glm::vec3 Amax = A.center + (A.extents / 2.0f);
+
+    glm::vec3 Bmin = B.center - (B.extents / 2.0f);
+    glm::vec3 Bmax = B.center + (B.extents / 2.0f);
+
+    // return (Amin <= Bmax) && (Amax >= Bmin); 
+
+    bool x_axis = (Amin.x <= Bmax.x) && (Amax.x >= Bmin.x);
+    bool y_axis = (Amin.y <= Bmax.y) && (Amax.y >= Bmin.y);
+    bool z_axis = (Amin.z <= Bmax.z) && (Amax.z >= Bmin.z);
+
+    return x_axis && y_axis && z_axis;
+}
+
+
+
+bool
+idk::geometry::rayAABBIntersection( const glm::vec3 &origin, const glm::vec3 &dir,
+                                    const glm::vec3 &rect, const glm::vec3 &bounds,
+                                    glm::vec3 *hit, glm::vec3 *N )
+{
+    // r.dir is unit direction vector of ray
+    glm::vec3 inv_dir = 1.0f / dir;
+
+    // lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
+    // r.org is origin of ray
+    float t1 = ((rect.x - bounds.x) - origin.x) * inv_dir.x;
+    float t2 = ((rect.x + bounds.x) - origin.x) * inv_dir.x;
+    float t3 = ((rect.y - bounds.y) - origin.y) * inv_dir.y;
+    float t4 = ((rect.y + bounds.y) - origin.y) * inv_dir.y;
+    float t5 = ((rect.z - bounds.z) - origin.z) * inv_dir.z;
+    float t6 = ((rect.z + bounds.z) - origin.z) * inv_dir.z;
+
+    float tmin = glm::max(glm::max(glm::min(t1, t2), glm::min(t3, t4)), glm::min(t5, t6));
+    float tmax = glm::min(glm::min(glm::max(t1, t2), glm::max(t3, t4)), glm::max(t5, t6));
+
+    // if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
+    if (tmax < 0)
+    {
+        return false;
+    }
+
+    // if tmin > tmax, ray doesn't intersect AABB
+    if (tmin > tmax)
+    {
+        return false;
+    }
+
+    if (hit)
+    {
+        (*hit) = origin + tmin*dir;
+
+        if (N)
+        {
+            glm::vec3 n = *hit - rect;
+
+            float nx = fabs(n.x) / fabs(bounds.x);
+            float ny = fabs(n.y) / fabs(bounds.y);
+            float nz = fabs(n.z) / fabs(bounds.z);
+
+            if (nx > ny && nx > nz)
+            {
+                *N = glm::normalize(glm::vec3(n.x, 0.0f, 0.0f));
+            }
+
+            if (ny > nx && ny > nz)
+            {
+                *N = glm::normalize(glm::vec3(0.0f, n.y, 0.0f));
+            }
+
+            if (nz > nx && nz > ny)
+            {
+                *N = glm::normalize(glm::vec3(0.0f, 0.0f, n.z));
+            }
+
+            return true;
+        }
+    }
+
+    return true;
+}
+
+
+
+bool
+idk::geometry::raySphereIntersects( const glm::vec3 &ray_origin, const glm::vec3 &ray_dir,
+                                    const glm::vec3 &sphere_origin, float sphere_radius,
+                                    glm::vec3 *hit, glm::vec3 *N )
+{
+    glm::vec3 L = sphere_origin - ray_origin;
+
+    float l   = length(L);
+    float r   = sphere_radius;
+    float tc  = dot(ray_dir, L);
+    float d   = sqrt(l*l - tc*tc);
+    float t1c = sqrt(r*r - d*d);
+
+    if (d >= r)
+    {
+        return false;
+    }
+
+    float t1 = tc - t1c;
+    float t2 = tc + t1c;
+
+    if (hit)
+    {
+        if (t1 < 0.0f)
+        {
+            *hit = ray_origin + t2*ray_dir;
+        }
+
+        else
+        {
+            *hit = ray_origin + t1*ray_dir;
+        }
+
+        if (N)
+        {
+            *N = glm::normalize(*hit - sphere_origin);
+        }
+    }
+
+    return true;
+
+}
+
 
 
 float
@@ -146,8 +277,7 @@ idk::geometry::capsuleRectIntersection( const glm::vec3 &c_pos,
     glm::vec3 bottom = c_pos - glm::vec3(0.0f,   c_bot, 0.0f);
 
     glm::vec3 rect_pos = glm::vec3(rect[3]);
-    glm::vec3 c_nearest = nearestPointOnLineSegment(bottom, top, rect_pos);
-
+    // glm::vec3 c_nearest = nearestPointOnLineSegment(bottom, top, rect_pos);
 
     res = glm::vec3(0.0f);
     glm::vec3 result = glm::vec3(0.0f);
@@ -171,11 +301,11 @@ idk::geometry::capsuleRectIntersection( const glm::vec3 &c_pos,
         count += 1;
     }
 
-    if (sphereRectIntersection(c_nearest, c_rad, rect, res))
-    {
-        res += result;
-        count += 1;
-    }
+    // if (sphereRectIntersection(c_nearest, c_rad, rect, res))
+    // {
+    //     res += result;
+    //     count += 1;
+    // }
 
     if (count > 0)
     {
@@ -184,6 +314,15 @@ idk::geometry::capsuleRectIntersection( const glm::vec3 &c_pos,
 
     return count > 0;
 }
+
+
+
+bool
+idk::geometry::pointInTriangle( const glm::vec3 &point, const Triangle &tri )
+{
+    return false;
+}
+
 
 
 
@@ -222,6 +361,100 @@ idk::geometry::sphereRectIntersection( glm::vec3 s_pos, float s_radius, const gl
     return false;
 }
 
+
+
+
+bool ray_intersects_triangle( glm::vec3 ray_pos, glm::vec3 ray_dir,
+                              glm::vec3 v0, glm::vec3 v1, glm::vec3 v2,
+                              glm::vec3 *intersect_point )
+{
+    const float EPSILON = 0.0000001;
+    glm::vec3 edge1, edge2, h, s, q;
+    float a,f,u,v;
+    edge1 = v1 - v0;
+    edge2 = v2 - v0;
+
+    h = glm::cross(ray_dir, edge2);
+    a = glm::dot(edge1, h);
+    if (a > -EPSILON && a < EPSILON)
+        return false;
+
+    f = 1.0/a;
+    s = ray_pos - v0;
+    u = f * glm::dot(s, h);
+    if (u < 0.0 || u > 1.0)
+        return false;
+
+    q = glm::cross(s, edge1);
+    v = f * glm::dot(ray_dir, q);
+    if (v < 0.0 || u + v > 1.0)
+        return false;
+
+    float t = f * glm::dot(edge2, q);
+    if (t > EPSILON)
+    {
+        *intersect_point = ray_pos + ray_dir * t;
+        return true;
+    }
+
+    else
+        return false;
+}
+
+
+glm::vec3 ClosestPointOnLineSegment( glm::vec3 point, glm::vec3 A, glm::vec3 B )
+{
+    glm::vec3 AB = B - A;
+    float t = glm::dot(point - A, AB) / glm::dot(AB, AB);
+    return A + glm::min(glm::max(t, 0.0f), 1.0f) * AB;
+}
+
+
+
+bool
+idk::geometry::capsuleTriangleIntersection( const glm::vec3 &capsule_pos, float bot, float top, float rad,
+                                            const Triangle &tri, glm::vec3 &res )
+{
+    glm::vec3 center = capsule_pos - (bot) * glm::vec3(0.0f, 1.0f, 0.0f);
+
+    glm::vec3 tri_center = (tri.v0 + tri.v1 + tri.v2) / 3.0f;
+    glm::vec3 v0 = tri.v0 + rad*glm::normalize(v0 - tri_center);
+    glm::vec3 v1 = tri.v1 + rad*glm::normalize(v1 - tri_center);
+    glm::vec3 v2 = tri.v2 + rad*glm::normalize(v2 - tri_center);
+
+
+    glm::vec3 N = glm::cross(v1 - v0, v2 - v0);
+              N = glm::normalize(N);
+
+    if (glm::dot(N, glm::normalize(center - v0)) < 0.0)
+    {
+        N *= -1.0f;
+    }
+
+    float plane_dist = geometry::distPlanePoint(v0, N, center);
+
+    if (plane_dist < 0.0f)
+    {
+        return false;
+    }
+
+    if (plane_dist > rad)
+    {
+        return false;
+    }
+
+    res = (rad - plane_dist) * N;
+
+    glm::vec3 intersection;
+    bool intersects = ray_intersects_triangle(center, -res, v0, v1, v2, &intersection);
+
+    if (intersects == false)
+    {
+        return false;
+    }
+
+    return true;
+}
 
 
 

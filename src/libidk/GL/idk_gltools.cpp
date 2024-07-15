@@ -12,9 +12,8 @@
 namespace fs = std::filesystem;
 
 
-
 GLuint
-idk::gltools::loadTexture2D( size_t w, size_t h, void *data, const glTextureConfig &config )
+idk::gltools::loadTexture2D( uint32_t w, uint32_t h, void *data, const glTextureConfig &config )
 {
     GLuint texture_id;
     gl::createTextures(config.target, 1, &texture_id);
@@ -47,7 +46,7 @@ idk::gltools::loadTexture2D( size_t w, size_t h, void *data, const glTextureConf
 
 
 GLuint
-idk::gltools::loadTexture3D( size_t w, size_t h, size_t d, void *data, const glTextureConfig &config )
+idk::gltools::loadTexture3D( uint32_t w, uint32_t h, uint32_t d, void *data, const glTextureConfig &config )
 {
     GLuint texture_id;
     gl::createTextures(config.target, 1, &texture_id);
@@ -87,9 +86,104 @@ idk::gltools::loadTexture3D( size_t w, size_t h, size_t d, void *data, const glT
 
 
 
+GLuint
+idk::gltools::allocateTextureCube( uint32_t w, uint32_t h, const glTextureConfig &config )
+{
+    GLuint texture;
+    gl::createTextures(GL_TEXTURE_CUBE_MAP, 1, &texture);
+
+    GLsizei levels = 1 + floor(log2(idk::max(w, h)));
+            levels = config.genmipmap ? levels : 1;
+
+    gl::textureStorage2D(texture, levels, config.internalformat, w, h);
+
+    for (uint32_t i=0; i<6; i++)
+    {
+        gl::textureSubImage3D(
+            texture, 0,
+            0, 0, i,
+            w, h, 1,
+            config.format,
+            config.datatype,
+            nullptr
+        );
+    }
+
+    gl::textureParameteri(texture, GL_TEXTURE_MIN_FILTER, config.minfilter);
+    gl::textureParameteri(texture, GL_TEXTURE_MAG_FILTER, config.magfilter);
+    gl::textureParameteri(texture, GL_TEXTURE_WRAP_S, config.wrap_s);
+    gl::textureParameteri(texture, GL_TEXTURE_WRAP_T, config.wrap_t);
+
+    if (config.anisotropic)
+    {
+        float anisotropy;
+        gl::getFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisotropy);
+        gl::textureParameterf(texture, GL_TEXTURE_MAX_ANISOTROPY, anisotropy);
+    }
+
+    if (config.genmipmap)
+    {
+        gl::generateTextureMipmap(texture);
+    }
+
+    return texture;
+}
+
+
+
+GLuint
+idk::gltools::allocateTextureCubeArray( uint32_t w, uint32_t h, uint32_t layers,
+                                        const glTextureConfig &config )
+{
+    GLuint texture;
+    gl::createTextures(GL_TEXTURE_CUBE_MAP_ARRAY, 1, &texture);
+
+    GLsizei levels = 1 + floor(log2(idk::max(w, h)));
+            levels = config.genmipmap ? levels : 1;
+
+    gl::textureStorage3D(texture, levels, config.internalformat, w, h, 6*layers);
+
+    for (uint32_t layer=0; layer<layers; layer++)
+    {
+        for (uint32_t face=0; face<6; face++)
+        {
+            gl::textureSubImage3D(
+                texture,
+                0,
+                0, 0, 6*layer + face,
+                w, h, 1,
+                config.format,
+                config.datatype,
+                nullptr
+            );
+        }
+    }
+
+    gl::textureParameteri(texture, GL_TEXTURE_MIN_FILTER, config.minfilter);
+    gl::textureParameteri(texture, GL_TEXTURE_MAG_FILTER, config.magfilter);
+    gl::textureParameteri(texture, GL_TEXTURE_WRAP_S, config.wrap_s);
+    gl::textureParameteri(texture, GL_TEXTURE_WRAP_T, config.wrap_t);
+    gl::textureParameteri(texture, GL_TEXTURE_WRAP_R, config.wrap_r);
+
+    if (config.anisotropic)
+    {
+        float anisotropy;
+        gl::getFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisotropy);
+        gl::textureParameterf(texture, GL_TEXTURE_MAX_ANISOTROPY, anisotropy);
+    }
+
+    if (config.genmipmap)
+    {
+        gl::generateTextureMipmap(texture);
+    }
+
+    return texture;
+}
+
+
 
 static glm::vec4
-t_query( int u, int v, size_t w, size_t h, std::unique_ptr<uint8_t[]> &data )
+t_query( int u, int v, uint32_t w, uint32_t h, std::unique_ptr<uint8_t[]> &data )
 {
     u %= w;
     v &= h;
@@ -107,7 +201,7 @@ t_query( int u, int v, size_t w, size_t h, std::unique_ptr<uint8_t[]> &data )
 
 
 glm::vec4
-idk::gltools::textureQuery( float u, float v, size_t w, size_t h,
+idk::gltools::textureQuery( float u, float v, uint32_t w, uint32_t h,
                             std::unique_ptr<uint8_t[]> &data )
 {
     u = u * 0.5f + 0.5f;
@@ -149,7 +243,7 @@ idk::gltools::textureQuery( float u, float v, size_t w, size_t h,
 
 
 GLuint
-idk::gltools::loadCubemap2( size_t w, void *data, const idk::glTextureConfig &config )
+idk::gltools::loadCubemap2( uint32_t w, void *data, const idk::glTextureConfig &config )
 {
     GLuint texture_id;
 
@@ -387,6 +481,34 @@ idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &c
 
 
 
+
+void *
+idk::gltools::loadPixels( const std::string &filepath, uint32_t *w, uint32_t *h )
+{
+    if (fs::exists(filepath) == false)
+    {
+        LOG_ERROR() << "File does not exist: " << filepath;
+    }
+
+    SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
+    SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
+    SDL_Surface      *img    = SDL_ConvertSurface(tmp, target, 0);
+
+    *w = img->w;
+    *h = img->h;
+    size_t nbytes = img->w * img->h * sizeof(uint32_t);
+    void  *pixels = std::malloc(nbytes);
+
+    std::memcpy(pixels, img->pixels, nbytes);
+
+    SDL_FreeFormat(target);
+    SDL_FreeSurface(tmp);
+    SDL_FreeSurface(img);
+
+    return pixels;
+}
+
+
 // GLuint
 // idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &config,
 //                            std::shared_ptr<uint32_t> *wrapper )
@@ -439,7 +561,7 @@ idk::gltools::loadTextureWrapper( const std::string &filepath, const glTextureCo
 
 
 // idk::glTexture
-// idk::gltools::loadTexture2( size_t w, size_t h, void *data, const glTextureConfig &config )
+// idk::gltools::loadTexture2( uint32_t w, uint32_t h, void *data, const glTextureConfig &config )
 // {
 //     GLuint texture_id = gltools::loadTexture2D(w, h, (uint32_t *)(data), config);
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "idk_memory.hpp"
+#include <vector>
+
 #include <string>
 #include <cstdint>
 #include <cstddef>
@@ -9,11 +10,25 @@
 
 namespace idk
 {
-    using string  = std::string;
-    using tstring = std::basic_string<char, std::char_traits<char>, idk::frame_allocator<char>>;
-    using pstring = std::basic_string<char, std::char_traits<char>, idk::linear_allocator<char>>;
+    // using string  = std::string;
+    // using tstring = std::basic_string<char, std::char_traits<char>, idk::frame_allocator<char>>;
+    // using pstring = std::basic_string<char, std::char_traits<char>, idk::linear_allocator<char>>;
+
+    class string;
 };
 
+
+
+class idk::string
+{
+private:
+    std::vector<uint8_t> m_data;
+
+public:
+    string() {  };
+
+
+};
 
 
 
@@ -34,4 +49,3 @@ namespace idk
 //     str.resize(num_elements);
 //     stream.read(reinterpret_cast<char *>(str.data()), str.size()*sizeof(char));
 // }
-

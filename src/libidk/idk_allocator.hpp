@@ -43,7 +43,7 @@ template <typename T, typename A>
 class idk::Allocator
 {
 private:
-    idk::vector<int>        m_available_ids;
+    idk::vector<int>        m_freelist;
     idk::vector<int>        m_reverse;
     idk::vector<int>        m_forward;
     idk::vector<T>          m_data;
@@ -59,6 +59,9 @@ public:
                             Allocator( const Allocator & );
                             Allocator( Allocator && );
                            ~Allocator();
+
+
+
 
     int                     create  (          );
     int                     create  ( const T& );
@@ -125,7 +128,7 @@ idk::Allocator<T, A>::create()
 
     // Determine user-facing id
     // ------------------------------------------------------------------------
-    if (m_available_ids.empty())
+    if (m_freelist.empty())
     {
         id = m_forward.size();
         m_forward.push_back(data_idx);
@@ -133,8 +136,8 @@ idk::Allocator<T, A>::create()
 
     else
     {
-        id = m_available_ids.back();
-             m_available_ids.pop_back();
+        id = m_freelist.back();
+             m_freelist.pop_back();
     }
     // ------------------------------------------------------------------------
 
@@ -162,7 +165,7 @@ idk::Allocator<T, A>::create( const T &data )
 
     // Determine user-facing id
     // ------------------------------------------------------------------------
-    if (m_available_ids.empty())
+    if (m_freelist.empty())
     {
         id = m_forward.size();
         m_forward.push_back(data_idx);
@@ -170,8 +173,8 @@ idk::Allocator<T, A>::create( const T &data )
 
     else
     {
-        id = m_available_ids.back();
-             m_available_ids.pop_back();
+        id = m_freelist.back();
+             m_freelist.pop_back();
     }
     // ------------------------------------------------------------------------
 
@@ -198,7 +201,7 @@ idk::Allocator<T, A>::create( T &&data )
 
     // Determine user-facing id
     // ------------------------------------------------------------------------
-    if (m_available_ids.empty())
+    if (m_freelist.empty())
     {
         id = m_forward.size();
         m_forward.push_back(data_idx);
@@ -206,8 +209,8 @@ idk::Allocator<T, A>::create( T &&data )
 
     else
     {
-        id = m_available_ids.back();
-             m_available_ids.pop_back();
+        id = m_freelist.back();
+             m_freelist.pop_back();
     }
     // ------------------------------------------------------------------------
 
@@ -269,7 +272,7 @@ idk::Allocator<T, A>::destroy( int id )
     m_forward[back_idx] = data_idx;
     m_forward[id] = -1;
 
-    m_available_ids.push_back(id);
+    m_freelist.push_back(id);
 }
 
 
@@ -277,14 +280,9 @@ template <typename T, typename A>
 void
 idk::Allocator<T, A>::clear()
 {
-    m_data.clear();
-    m_forward.clear();
-
-    while (m_available_ids.empty() == false)
-    {
-        m_available_ids.pop_back();
-    }
-
+    m_data     = std::vector<T>();
+    m_forward  = std::vector<int>();
+    m_freelist = std::vector<int>();
 }
 
 
@@ -294,25 +292,12 @@ template <typename T, typename A>
 bool
 idk::Allocator<T, A>::contains( int id )
 {
-    // if (id < 0)
-    // {
-    //     return false;
-    // }
-
-    // if (id >= m_forward.size())
-    // {
-    //     return false;
-    // }
-
-    for (int i=0; i<m_forward.size(); i++)
+    if (id < 0 || id >= m_forward.size())
     {
-        if (i == id && m_forward[i] != -1)
-        {
-            return true;
-        }
+        return false;
     }
 
-    return false;
+    return m_forward[id] != -1;
 }
 
 
@@ -329,7 +314,7 @@ idk::Allocator<T, A>::serialize( std::ofstream &stream ) const
     n += idk::streamwrite<idk::vector<T>>(stream, m_data);
     n += idk::streamwrite<idk::vector<int>>(stream, m_forward);
     n += idk::streamwrite<idk::vector<int>>(stream, m_reverse);
-    n += idk::streamwrite<idk::vector<int>>(stream, m_available_ids);
+    n += idk::streamwrite<idk::vector<int>>(stream, m_freelist);
     return n;
 }
 
@@ -338,11 +323,13 @@ template <typename T, typename A>
 size_t
 idk::Allocator<T, A>::deserialize( std::ifstream &stream )
 {
+    this->clear();
+
     size_t n = 0;
     n += idk::streamread(stream, m_data);
     n += idk::streamread(stream, m_forward);
     n += idk::streamread(stream, m_reverse);
-    n += idk::streamread(stream, m_available_ids);
+    n += idk::streamread(stream, m_freelist);
     return n;
 }
 

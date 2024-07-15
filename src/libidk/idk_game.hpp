@@ -18,7 +18,7 @@ public:
     const std::string &getName() { return m_name; };
 
     virtual void registerModules ( idk::EngineAPI& ) = 0;
-    virtual void setup           ( idk::EngineAPI& ) = 0;
+    virtual void setup           ( const std::vector<std::string>&, idk::EngineAPI& ) = 0;
     virtual void mainloop        ( idk::EngineAPI& ) = 0;
     virtual void shutdown        (                 ) = 0;
 

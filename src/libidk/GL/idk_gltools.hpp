@@ -6,12 +6,18 @@
 #include "idk_glBindings.hpp"
 #include <memory>
 
+#include <cstddef>
+#include <cstdint>
+
 
 namespace idk::gltools
 {
-    GLuint  loadTexture2D( size_t w, size_t h, void *data, const glTextureConfig &config );
+    GLuint  loadTexture2D( uint32_t w, uint32_t h, void *data, const glTextureConfig &config );
+    GLuint  loadTexture3D( uint32_t w, uint32_t h, uint32_t d, void *data, const glTextureConfig &config );
+    GLuint  allocateTextureCube( uint32_t w, uint32_t h, const glTextureConfig &config );
+    GLuint  allocateTextureCubeArray( uint32_t w, uint32_t h, uint32_t d, const glTextureConfig &config );
 
-    GLuint  loadTexture3D( size_t w, size_t h, size_t d, void *data, const glTextureConfig &config );
+    void *loadPixels( const std::string&, uint32_t *w, uint32_t *h );
 
     GLuint loadTexture( const std::string &, const glTextureConfig &config,
                         idk::TextureWrapper *wrapper = nullptr );
@@ -22,7 +28,7 @@ namespace idk::gltools
     idk::TextureRef loadTextureWrapper( const std::string&, const glTextureConfig &config );
 
 
-    glm::vec4 textureQuery( float u, float v, size_t w, size_t h,
+    glm::vec4 textureQuery( float u, float v, uint32_t w, uint32_t h,
                             std::unique_ptr<uint8_t[]> &data );
 
 
@@ -37,7 +43,7 @@ namespace idk::gltools
                             GLint                    level );
 
 
-    GLuint  loadCubemap2( size_t w, void *data, const idk::glTextureConfig & );
+    GLuint  loadCubemap2( uint32_t w, void *data, const idk::glTextureConfig & );
 
 };
 

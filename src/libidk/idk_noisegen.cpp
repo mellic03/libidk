@@ -1,6 +1,5 @@
 #include <ctime>
 #include <vector>
-#include <memory>
 #include <random>
 
 #include "idk_noisegen.hpp"
@@ -18,6 +17,22 @@ idk::noisegen2D::u8_whitenoise( size_t w, size_t h )
 
     return data;
 }
+
+
+
+std::unique_ptr<uint8_t[]>
+idk::noisegen2D::white_u8( size_t w, size_t h, size_t stride )
+{
+    auto data = std::unique_ptr<uint8_t[]>(new uint8_t[stride*w*h]);
+
+    for (size_t i=0; i<stride*w*h; i++)
+    {
+        data[i] = rand() % 255;
+    }
+
+    return data;
+}
+
 
 
 

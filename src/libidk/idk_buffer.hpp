@@ -1,57 +1,41 @@
 #pragma once
 
-#include "idk_ibuffer.hpp"
-#include <vector>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+
 
 namespace idk
 {
-    template <typename T>
-    class Buffer;
+    class byte_buffer;
 };
 
 
-template <typename T>
-class idk::Buffer: public idk::iBuffer
+
+class idk::byte_buffer
 {
+private:
+    // std::shared_ptr<void> m_data;
+    void  *m_data = nullptr;
+    size_t m_size = 0;
+    size_t m_cap  = 0;
+
+    void _init( size_t cap_nbytes = 32 );
+    void _deinit();
+
 public:
-    std::vector<T> m_data;
 
-    virtual void   *data     (          ) final;
-    virtual size_t  size     (          ) final { return m_data.size(); };
-    virtual size_t  typesize (          ) final { return sizeof(T);     };
-    virtual size_t  nbytes   (          ) final;
-    virtual void    resize   ( size_t s ) final;
+    byte_buffer();
+    ~byte_buffer();
 
-    void    push_back( const T &data ) { m_data.push_back(data); };
+    byte_buffer( size_t reserve_nbytes );
+    byte_buffer( const byte_buffer& );
+    byte_buffer( byte_buffer&& );
 
-    T &     operator[] ( int i ) { return m_data[i]; };
+    /**
+     * @return Size of buffer after copy.
+    */
+    size_t append( const void *src, size_t nbytes );
 
-    typename std::vector<T>::iterator begin() { return m_data.begin(); };
-    typename std::vector<T>::iterator end()   { return m_data.end();   };
+    const void *data() const { return m_data; };
 };
-
-
-
-template <typename T>
-void *
-idk::Buffer<T>::data()
-{
-    return reinterpret_cast<void *>(&m_data[0]);
-}
-
-
-template <typename T>
-size_t
-idk::Buffer<T>::nbytes()
-{
-    return sizeof(T) * m_data.size();
-}
-
-
-template <typename T>
-void
-idk::Buffer<T>::resize( size_t s )
-{
-    m_data.resize(s);
-}
-

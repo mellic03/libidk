@@ -50,6 +50,18 @@ namespace idk
             Y               = SDL_SCANCODE_Y,
             Z               = SDL_SCANCODE_Z,
 
+            N1               = SDL_SCANCODE_1,
+            N2               = SDL_SCANCODE_2,
+            N3               = SDL_SCANCODE_3,
+            N4               = SDL_SCANCODE_4,
+            N5               = SDL_SCANCODE_5,
+            N6               = SDL_SCANCODE_6,
+            N7               = SDL_SCANCODE_7,
+            N8               = SDL_SCANCODE_8,
+            N9               = SDL_SCANCODE_9,
+            N0               = SDL_SCANCODE_0,
+
+
             F1              = SDL_SCANCODE_F1,
             F2              = SDL_SCANCODE_F2,
             F3              = SDL_SCANCODE_F3,
@@ -67,6 +79,10 @@ namespace idk
             LSHIFT          = SDL_SCANCODE_LSHIFT,
             LALT            = SDL_SCANCODE_LALT,
             ESCAPE          = SDL_SCANCODE_ESCAPE,
+            TAB             = SDL_SCANCODE_TAB,
+
+            PERIOD          = SDL_SCANCODE_PERIOD,
+            BACKSPACE       = SDL_SCANCODE_BACKSPACE,
 
             NUM_KEYCODES    = SDL_NUM_SCANCODES
         };

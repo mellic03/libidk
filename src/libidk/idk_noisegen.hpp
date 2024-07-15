@@ -2,8 +2,7 @@
 
 #include <cstdint>
 #include <cstddef>
-
-#include "forward_declarations.hpp"
+#include <memory>
 
 namespace idk::noisegen3D
 {
@@ -16,4 +15,6 @@ namespace idk::noisegen3D
 namespace idk::noisegen2D
 {
     std::unique_ptr<uint8_t[]> u8_whitenoise( size_t w, size_t h );
+    std::unique_ptr<uint8_t[]> white_u8( size_t w, size_t h, size_t stride );
+
 };

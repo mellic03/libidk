@@ -5,6 +5,30 @@
 
 namespace idk::geometry
 {
+    struct AABB
+    {
+        glm::vec3 center;
+        glm::vec3 extents;
+    };
+
+    struct Triangle
+    {
+        glm::vec3 v0, v1, v2;
+    };
+
+
+    bool AABB_AABB_Intersects( const AABB &A, const AABB &B );
+
+    bool pointInTriangle( const glm::vec3 &point, const Triangle &tri );
+
+    bool rayAABBIntersection( const glm::vec3 &origin, const glm::vec3 &dir,
+                              const glm::vec3 &rect, const glm::vec3 &bounds,
+                              glm::vec3 *res = nullptr, glm::vec3 *N = nullptr );
+
+    bool raySphereIntersects( const glm::vec3 &ray_origin, const glm::vec3 &ray_dir,
+                              const glm::vec3 &sphere_origin, float sphere_radius,
+                              glm::vec3 *hit = nullptr, glm::vec3 *N = nullptr );
+
 
     float distPlanePoint( const glm::vec3 &plane, const glm::vec3 &N, const glm::vec3 &point );
 
@@ -34,6 +58,10 @@ namespace idk::geometry
 
     bool capsuleRectIntersection( const glm::vec3 &c_pos, float c_bot, float c_top, float c_rad,
                                   const glm::mat4 &rect, glm::vec3 &res );
+
+
+    bool capsuleTriangleIntersection( const glm::vec3 &c_pos, float c_bot, float c_top, float c_rad,
+                                      const Triangle &tri, glm::vec3 &res );
 
 
     struct CameraFrustum
