@@ -93,27 +93,27 @@ idk::glFramebuffer::colorAttachment( int idx, const idk::glTextureConfig &config
 
 
 void
-idk::glFramebuffer::depthAttachment( const idk::DepthAttachmentConfig &config )
+idk::glFramebuffer::depthAttachment( int idx, const idk::DepthAttachmentConfig &config )
 {
-    gl::deleteTextures(1, &depth_attachment);
-    gl::createTextures(GL_TEXTURE_2D, 1, &depth_attachment);
+    gl::deleteTextures(1, &attachments[idx]);
+    gl::createTextures(GL_TEXTURE_2D, 1, &attachments[idx]);
 
     gl::textureStorage2D(
-        depth_attachment,
+        attachments[idx],
         1,
         config.internalformat,
         m_size.x, m_size.y
     );
 
-    gl::textureParameteri(depth_attachment, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    gl::textureParameteri(depth_attachment, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    gl::textureParameterf(depth_attachment, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    gl::textureParameterf(depth_attachment, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    gl::textureParameteri(attachments[idx], GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    gl::textureParameteri(attachments[idx], GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    gl::textureParameterf(attachments[idx], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    gl::textureParameterf(attachments[idx], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
     // gl::textureParameteri(depth_attachment, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     // gl::textureParameteri(depth_attachment, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 
-    gl::namedFramebufferTexture(m_FBO, GL_DEPTH_ATTACHMENT, depth_attachment, 0);
+    gl::namedFramebufferTexture(m_FBO, GL_DEPTH_ATTACHMENT, attachments[idx], 0);
 }
 
 

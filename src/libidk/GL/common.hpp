@@ -7,7 +7,7 @@
 #include <GL/glu.h>
 #include <assert.h>
 
-#include "idk_glm.hpp"
+#include "../idk_glm.hpp"
 
 #include <set>
 #include <map>

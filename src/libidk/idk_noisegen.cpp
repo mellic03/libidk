@@ -3,6 +3,7 @@
 #include <random>
 
 #include "idk_noisegen.hpp"
+#include "idk_random.hpp"
 
 
 std::unique_ptr<uint8_t[]>
@@ -19,7 +20,6 @@ idk::noisegen2D::u8_whitenoise( size_t w, size_t h )
 }
 
 
-
 std::unique_ptr<uint8_t[]>
 idk::noisegen2D::white_u8( size_t w, size_t h, size_t stride )
 {
@@ -28,6 +28,20 @@ idk::noisegen2D::white_u8( size_t w, size_t h, size_t stride )
     for (size_t i=0; i<stride*w*h; i++)
     {
         data[i] = rand() % 255;
+    }
+
+    return data;
+}
+
+
+std::unique_ptr<float[]>
+idk::noisegen2D::white_f32( size_t w, size_t h, size_t stride )
+{
+    auto data = std::unique_ptr<float[]>(new float[stride*w*h]);
+
+    for (size_t i=0; i<stride*w*h; i++)
+    {
+        data[i] = idk::randf(0.0f, 1.0f);
     }
 
     return data;

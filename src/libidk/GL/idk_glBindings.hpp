@@ -212,6 +212,7 @@ namespace idk::gl
     void viewport( GLint x, GLint y, GLsizei w, GLsizei h );
     void cullFace( GLenum mode );
     void blendFunc( GLenum sfactor, GLenum dfactor );
+    void blendFunci( GLuint buf, GLenum sfactor, GLenum dfactor );
 
 };
 

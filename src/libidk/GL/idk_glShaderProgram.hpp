@@ -25,6 +25,8 @@ public:
 private:
     inline static GLuint current_bound_id = 0;
 
+    std::vector<std::string>    m_stage_paths;
+
     std::string                 m_version;
     std::string                 m_vert_src;
     std::string                 m_geom_src;
@@ -53,7 +55,6 @@ private:
 
     template <typename ...Args>
     void          _attach_shader( idk::glShaderStage first, Args ...rest );
-
 
     void          reset();
 
@@ -90,6 +91,8 @@ public:
     bool        setDefinition( std::string name, std::string value );
     auto &      getDefinitions() { return m_definitions; };
 
+    void        recompile();
+
     GLuint      compile();
     void        bind();
     static void unbind();
@@ -117,6 +120,7 @@ public:
     void        set_mat4            ( const std::string &, size_t n, glm::mat4 * );
     void        set_mat4Array       ( const std::string &, glm::mat4 *, size_t );
     void        set_sampler2D       ( const std::string &, GLuint    );
+    void        set_sampler2D       ( const std::string &, GLuint, GLuint );
     void        set_sampler2DArray  ( const std::string &, GLuint    );
     void        set_sampler3D       ( const std::string &, GLuint    );
     void        set_samplerCube     ( const std::string &, GLuint    );
@@ -131,6 +135,8 @@ template <typename ...Args>
 void
 idk::glShaderProgram::_attach_shader( idk::glShaderStage first, Args ...rest )
 {
+    m_stage_paths.push_back(first.m_path);
+
     gl::attachShader(m_program_id, first.m_shader_id);
     _attach_shader(rest...);
 }

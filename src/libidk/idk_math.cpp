@@ -1,5 +1,14 @@
 #include "idk_math.hpp"
 
+
+float
+idk::mixRadians( float x, float y, float a )
+{
+    return x + a * (glm::mod(y-x + PI, TAU) - PI);
+}
+
+
+
 int
 idk::roundup( int n, int multipleof )
 {

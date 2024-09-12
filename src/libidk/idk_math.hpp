@@ -6,8 +6,30 @@
 #include <string>
 
 
+// float putInRange( float x )
+// {
+//     x = glm::mod(x + 3.14159f, 2.0f*3.14159f) - 3.14159f;
+//     return x;
+// }
+
+
+// float lerpAngle( float u, float v, float p )
+// {
+//     return 
+// }
+
+
+
 namespace idk
 {
+    static constexpr float TAU = 6.2831855f;
+    static constexpr float PI  = 3.1415926f;
+    static constexpr float HPI = 1.5707964f;
+
+
+    float mixRadians( float x, float y, float a );
+
+
     template <typename T> T         min( T, T );
     template <typename T> T         max( T, T );
     template <typename T> T         clamp( T, T, T );

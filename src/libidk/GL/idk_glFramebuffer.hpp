@@ -33,10 +33,12 @@ protected:
     void   _reset( int w, int h, size_t num_attachments );
 
 public:
-    GLuint              m_FBO;
-    std::vector<GLuint> attachments;
-    GLuint              cubemap_attachment;
-    GLuint              depth_attachment;
+    GLuint                m_FBO;
+    std::vector<GLuint>   attachments;
+    std::vector<GLuint64> handles;
+    std::vector<GLuint>   depth_attachments;
+    GLuint                cubemap_attachment;
+    GLuint                depth_attachment;
 
     void    reset( int w, int h, size_t num_attachments );
 
@@ -48,7 +50,7 @@ public:
 
     void    colorAttachment( int idx, const idk::glTextureConfig &config );
 
-    void    depthAttachment( const idk::DepthAttachmentConfig &config );
+    void    depthAttachment( int idx, const idk::DepthAttachmentConfig &config );
     void    depthArrayAttachment( uint32_t layers, const idk::DepthAttachmentConfig &config );
 
     void    generateMipmap( int idx );

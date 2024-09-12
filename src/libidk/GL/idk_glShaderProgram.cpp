@@ -243,6 +243,7 @@ idk::glShaderProgram::compile_vgf( const std::string &defines )
 void
 idk::glShaderProgram::_attach_shader( idk::glShaderStage first )
 {
+    m_stage_paths.push_back(first.m_path);
     gl::attachShader(m_program_id, first.m_shader_id);
 }
 
@@ -354,6 +355,35 @@ idk::glShaderProgram::setDefinition( std::string name, std::string value )
 
     return true;
 }
+
+
+
+void
+idk::glShaderProgram::recompile()
+{
+    gl::deleteProgram(m_program_id);
+    m_program_id = gl::createProgram();
+
+    std::vector<idk::glShaderStage> stages;
+
+    std::cout << "\n";
+
+    for (std::string path: m_stage_paths)
+    {
+        stages.push_back(idk::glShaderStage(path.c_str()));
+    }
+
+    for (auto &stage: stages)
+    {
+        std::cout << "stage: \"" << stage.m_path << "\"\n";
+        gl::attachShader(m_program_id, stage.m_shader_id);
+    }
+
+    _link_validate();
+
+    std::cout << "\n";
+}
+
 
 
 GLuint
@@ -573,6 +603,18 @@ idk::glShaderProgram::set_sampler2D( const std::string &name, GLuint texture_id 
 
     gl::bindTextureUnit(m_texture_unit - GL_TEXTURE0, texture_id);
     gl::uniform1i(loc, m_texture_unit - GL_TEXTURE0);
+
+    m_texture_unit += 1;
+}
+
+
+void
+idk::glShaderProgram::set_sampler2D( const std::string &name, GLuint index, GLuint texture_id )
+{
+    GLint loc = IDK_GL_SHADER_GET_UNIFORM_LOC(name);
+
+    gl::bindTextureUnit(index, texture_id);
+    gl::uniform1i(loc, index);
 
     m_texture_unit += 1;
 }

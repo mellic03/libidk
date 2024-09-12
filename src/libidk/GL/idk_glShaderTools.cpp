@@ -46,14 +46,16 @@ idk_shadertools_include( const std::string &current_path, const std::string &inc
     pos     = relpath.find("\"");
     relpath = relpath.substr(0, pos);
 
+    fs::path include_path = fs::absolute(fs::path(current_path).parent_path() / fs::path(relpath));
 
-    fs::path include_path = fs::path(current_path).parent_path() / fs::path(relpath);
+    // std::cout << "current path: " << fs::absolute(fs::path(current_path)) << "\n";
+    // std::cout << "include path: " << include_path << "\n\n";
+
 
     if (included_files.contains(include_path))
     {
-        std::cout << "She works!!!\n";
-        exit(1);
-        return "";
+        // std::cout << "include path already cached: " << include_path << "\n\n";
+        return "\n";
     }
 
     included_files.emplace(include_path);
@@ -68,9 +70,18 @@ idk_shadertools_include( const std::string &current_path, const std::string &inc
     {
         src += "/* " + std::to_string(line_number) + "\t*/\t";
 
-        if (line.find("include") != std::string::npos)
+        if (line[0] == '/' && line[1] == '/')
         {
-            std::cout << "Moving to: " << include_path << "\n";
+            continue;
+        }
+
+        if (line.find("GL_GOOGLE_include_directive") != std::string::npos)
+        {
+            continue;
+        }
+
+        if (line.find("#include") != std::string::npos)
+        {
             src += idk_shadertools_include(include_path, line, line_number) + "\n";
         }
 
@@ -103,7 +114,17 @@ idk_shadertools_parse( const char *filepath )
     {
         src += "/* " + std::to_string(line_number) + "\t*/\t";
 
-        if (line.find("include") != std::string::npos)
+        if (line[0] == '/' && line[1] == '/')
+        {
+            continue;
+        }
+
+        if (line.find("GL_GOOGLE_include_directive") != std::string::npos)
+        {
+            continue;
+        }
+
+        if (line.find("#include") != std::string::npos)
         {
             src += idk_shadertools_include(filepath, line, line_number) + "\n";
         }

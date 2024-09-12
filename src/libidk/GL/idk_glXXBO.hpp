@@ -26,6 +26,18 @@ public:
 
     GLuint ID() { return m_buffer; };
 
+    glBufferObject()
+    {
+        
+    }
+
+    glBufferObject( GLuint index, size_t nbytes, GLenum usage )
+    {
+        init(index);
+        bufferData(nbytes, nullptr, usage);
+    }
+
+
     void    init();
     void    init( GLuint index );
 

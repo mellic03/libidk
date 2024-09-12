@@ -20,6 +20,24 @@ idk::texturegen::genRGBA( size_t w, size_t h, T r, T g, T b, T a )
     return data;
 }
 
+
+template <typename T>
+std::unique_ptr<T[]>
+idk::texturegen::genRGB( size_t w, size_t h, T r, T g, T b )
+{
+    auto data = std::unique_ptr<T[]>(new T[3*w*h]);
+
+    for (size_t i=0; i<w*h; i++)
+    {
+        data[3*i+0] = r;
+        data[3*i+1] = g;
+        data[3*i+2] = b;
+    }
+
+    return data;
+}
+
+
 template <typename T>
 std::unique_ptr<T[]>
 idk::texturegen::genRA( size_t w, size_t h, T r, T a )

@@ -87,6 +87,76 @@ idk::gltools::loadTexture3D( uint32_t w, uint32_t h, uint32_t d, void *data, con
 
 
 GLuint
+idk::gltools::allocateTexture2DArray( uint32_t w, uint32_t h, uint32_t layers, void *data,
+                                      const glTextureConfig &config )
+{
+    GLuint texture_id;
+    gl::createTextures(GL_TEXTURE_2D_ARRAY, 1, &texture_id);
+
+    GLsizei levels = 1 + floor(log2(idk::max(w, h)));
+            levels = config.genmipmap ? levels : 1;
+
+    gl::textureStorage3D(texture_id, levels, config.internalformat, w, h, layers);
+    // gl::textureSubImage2D(texture_id, 0, 0, 0, w, h, config.format, config.datatype, data);
+
+    gl::textureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, config.minfilter);
+    gl::textureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, config.magfilter);
+    gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_S, config.wrap_s);
+    gl::textureParameteri(texture_id, GL_TEXTURE_WRAP_T, config.wrap_t);
+
+    if (config.anisotropic)
+    {
+        float anisotropy;
+        gl::getFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisotropy);
+        gl::textureParameterf(texture_id, GL_TEXTURE_MAX_ANISOTROPY, anisotropy);
+    }
+
+    if (config.genmipmap)
+    {
+        gl::generateTextureMipmap(texture_id);
+    }
+
+    return texture_id;
+}
+
+
+GLuint
+idk::gltools::loadTexture2DArray( uint32_t w, uint32_t h, const std::vector<std::string> &textures,
+                                  const glTextureConfig &config )
+{
+    GLuint texture = allocateTexture2DArray(w, h, textures.size(), nullptr, config);
+
+    for (int i=0; i<textures.size(); i++)
+    {
+        void *pixels = loadPixels(textures[i], nullptr, nullptr, true);
+
+        gl::textureSubImage3D(
+            texture,
+            0,
+            0, 0, i,
+            w, h, 1,
+            config.format,
+            config.datatype,
+            pixels
+        );
+
+        std::free(pixels);
+    }
+
+
+    if (config.genmipmap)
+    {
+        gl::generateTextureMipmap(texture);
+    }
+
+    return texture;
+}
+
+
+
+
+
+GLuint
 idk::gltools::allocateTextureCube( uint32_t w, uint32_t h, const glTextureConfig &config )
 {
     GLuint texture;
@@ -458,7 +528,8 @@ idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &c
 {
     if (fs::exists(filepath) == false)
     {
-        LOG_ERROR() << "File does not exist: " << filepath;
+        std::string msg = "File does not exist: \"" + filepath + "\"\n";
+        IDK_ASSERT(msg.c_str(), false);
     }
 
     SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
@@ -483,20 +554,35 @@ idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &c
 
 
 void *
-idk::gltools::loadPixels( const std::string &filepath, uint32_t *w, uint32_t *h )
+idk::gltools::loadPixels( const std::string &filepath, uint32_t *w, uint32_t *h, bool alpha )
 {
     if (fs::exists(filepath) == false)
     {
         LOG_ERROR() << "File does not exist: " << filepath;
     }
 
-    SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
-    SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
-    SDL_Surface      *img    = SDL_ConvertSurface(tmp, target, 0);
+    SDL_Surface      *tmp = IMG_Load(filepath.c_str());
+    SDL_PixelFormat  *target;
 
-    *w = img->w;
-    *h = img->h;
-    size_t nbytes = img->w * img->h * sizeof(uint32_t);
+    if (alpha)
+    {
+        target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
+    }
+
+    else
+    {
+        target = SDL_AllocFormat(SDL_PIXELFORMAT_RGB24);
+    }
+
+    SDL_Surface *img = SDL_ConvertSurface(tmp, target, 0);
+
+    if (w && h)
+    {
+        *w = img->w;
+        *h = img->h;
+    }
+
+    size_t nbytes = img->w * img->h * (alpha ? 4 : 3);
     void  *pixels = std::malloc(nbytes);
 
     std::memcpy(pixels, img->pixels, nbytes);

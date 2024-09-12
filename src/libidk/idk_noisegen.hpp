@@ -17,4 +17,6 @@ namespace idk::noisegen2D
     std::unique_ptr<uint8_t[]> u8_whitenoise( size_t w, size_t h );
     std::unique_ptr<uint8_t[]> white_u8( size_t w, size_t h, size_t stride );
 
+    std::unique_ptr<float[]>   white_f32( size_t w, size_t h, size_t stride );
+
 };

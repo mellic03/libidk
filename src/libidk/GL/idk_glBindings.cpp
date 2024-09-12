@@ -772,3 +772,10 @@ idk::gl::blendFunc( GLenum sfactor, GLenum dfactor )
 {
     IDK_GLCALL( glBlendFunc(sfactor, dfactor); )
 }
+
+
+void
+idk::gl::blendFunci( GLuint buf, GLenum sfactor, GLenum dfactor )
+{
+    IDK_GLCALL( glBlendFunci(buf, sfactor, dfactor); )
+}

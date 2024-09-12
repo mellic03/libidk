@@ -20,7 +20,7 @@ SDL2_WindowSystem::SDL2_WindowSystem( const char *windowname, int w, int h,
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
 
-    Uint32 sdl_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
+    Uint32 sdl_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     if (flags & idk::InitFlag::INIT_HEADLESS) sdl_flags |= SDL_WINDOW_HIDDEN;
 
     m_window = SDL_CreateWindow(

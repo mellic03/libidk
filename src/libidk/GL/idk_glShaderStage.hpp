@@ -3,6 +3,8 @@
 #include "common.hpp"
 #include "idk_glBindings.hpp"
 
+#include <string>
+
 
 namespace idk
 {
@@ -21,6 +23,7 @@ private:
 public:
     GLenum m_type = GL_VERTEX_SHADER;
     GLuint m_shader_id;
+    std::string m_path;
 
     glShaderStage( const char *filepath );
     glShaderStage( GLenum type, const char *filepath );
