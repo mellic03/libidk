@@ -304,8 +304,6 @@ idk::Allocator<T, A>::contains( int id )
 
 
 
-
-
 template <typename T, typename A>
 size_t
 idk::Allocator<T, A>::serialize( std::ofstream &stream ) const

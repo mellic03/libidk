@@ -143,7 +143,6 @@ idk::gltools::loadTexture2DArray( uint32_t w, uint32_t h, const std::vector<std:
         std::free(pixels);
     }
 
-
     if (config.genmipmap)
     {
         gl::generateTextureMipmap(texture);

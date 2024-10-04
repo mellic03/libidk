@@ -77,7 +77,7 @@ public:
             GenericLoader( const std::string &filepath )
             : DynamicLoader(filepath) {  };
 
-    T *     getInstance() { return reinterpret_cast<T *>(getData()); };
+    T *     getInstance() { return static_cast<T *>(getData()); };
 };
 
 

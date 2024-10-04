@@ -132,6 +132,7 @@ public:
                                 const std::string &func, int line )
     {
         m_history.push_back(idk::LogStream(m_flags, type, file, func, line));
+        // std::cout << m_history.back().str() << "\n";
         return m_history.back();
     };
 

@@ -5,15 +5,39 @@
 #include "../idk_assert.hpp"
 
 
+
+// uint32_t
+// idk::FramebufferAttachment::reset( glFramebuffer &fb )
+// {
+//     auto size = fb.size();
+
+//     gl::deleteTextures(1, &texture);
+//     texture = gltools::loadTexture2D(size.x, size.y, nullptr, config);
+
+//     gl::clearTexImage(texture, 0, config.format, config.datatype, nullptr);
+
+//     return texture;
+// }
+
+
+
+
 void
 idk::glFramebuffer::_reset( int w, int h, size_t num_attachments )
 {
-    m_size = glm::ivec2(w, h);
+    IDK_ASSERT(
+        "Cannot allocate zero textures to a framebuffer!",
+        num_attachments > 0
+    );
 
-    gl::deleteTextures(attachments.size(), &attachments[0]);
+    m_size = glm::ivec2(w, h);
 
     m_gl_attachments.resize(0);
     attachments.resize(num_attachments);
+    configs.resize(num_attachments);
+    // m_ptr_attachments.resize(num_attachments, nullptr);
+
+    gl::deleteTextures(attachments.size(), &attachments[0]);
 
     if (m_first == false)
     {
@@ -33,12 +57,57 @@ idk::glFramebuffer::reset( int w, int h, size_t num_attachments )
 }
 
 
+// void
+// idk::glFramebuffer::resize( int w, int h )
+// {
+//     for (int idx=0; idx<m_ptr_attachments.size(); idx++)
+//     {
+//         auto *A = m_ptr_attachments[idx];
+
+//         if (A != nullptr)
+//         {
+//             init_attachment(idx, A->reset(*this));
+//         }
+//     }
+// }
+
+
+// void
+// idk::glFramebuffer::addAttachment( int idx, idk::FramebufferAttachment *A )
+// {
+//     uint32_t texture = A->reset(*this);
+//     m_ptr_attachments[idx] = A;
+//     init_attachment(idx, texture);
+// }
+
+
+
+// void
+// idk::glFramebuffer::init_attachment( int idx, uint32_t texture )
+// {
+//     this->attachments[idx] = texture;
+//     m_gl_attachments[idx]  = GL_COLOR_ATTACHMENT0 + idx;
+
+//     gl::namedFramebufferTexture(m_FBO, m_gl_attachments.back(), attachments[idx], 0);
+//     gl::namedFramebufferDrawBuffers(m_FBO, m_gl_attachments.size(), m_gl_attachments.data());
+
+//     uint32_t status;
+//     IDK_GLCALL( status = glCheckNamedFramebufferStatus(m_FBO, GL_FRAMEBUFFER); )
+//     IDK_ASSERT("Incomplete framebuffer", status == GL_FRAMEBUFFER_COMPLETE);
+    
+// }
+
+
+
+
+
 void
 idk::glFramebuffer::cubeColorAttachment( int idx, const idk::glTextureConfig &config )
 {
     gl::deleteTextures(1, &attachments[idx]);
 
     attachments[idx] = gltools::allocateTextureCube(m_size.x, m_size.y, config);
+    configs[idx]     = config;
     m_gl_attachments.push_back(GL_COLOR_ATTACHMENT0 + idx);
 
     gl::namedFramebufferTexture(m_FBO, m_gl_attachments.back(), attachments[idx], 0);
@@ -58,6 +127,7 @@ idk::glFramebuffer::cubeArrayColorAttachment( int idx, uint32_t layers, const id
     gl::deleteTextures(1, &attachments[idx]);
 
     attachments[idx] = gltools::allocateTextureCubeArray(m_size.x, m_size.y, layers, config);
+    configs[idx]     = config;
     m_gl_attachments.push_back(GL_COLOR_ATTACHMENT0 + idx);
 
     gl::namedFramebufferTexture(m_FBO, m_gl_attachments.back(), attachments[idx], 0);
@@ -80,6 +150,7 @@ idk::glFramebuffer::colorAttachment( int idx, const idk::glTextureConfig &config
     gl::deleteTextures(1, &attachments[idx]);
 
     attachments[idx] = gltools::loadTexture2D(m_size.x, m_size.y, nullptr, config);
+    configs[idx]     = config;
     m_gl_attachments.push_back(GL_COLOR_ATTACHMENT0 + idx);
 
     gl::namedFramebufferTexture(m_FBO, m_gl_attachments.back(), attachments[idx], 0);
@@ -93,10 +164,11 @@ idk::glFramebuffer::colorAttachment( int idx, const idk::glTextureConfig &config
 
 
 void
-idk::glFramebuffer::depthAttachment( int idx, const idk::DepthAttachmentConfig &config )
+idk::glFramebuffer::depthAttachment( int idx, const idk::glTextureConfig &config )
 {
     gl::deleteTextures(1, &attachments[idx]);
     gl::createTextures(GL_TEXTURE_2D, 1, &attachments[idx]);
+    configs[idx] = config;
 
     gl::textureStorage2D(
         attachments[idx],
@@ -119,7 +191,7 @@ idk::glFramebuffer::depthAttachment( int idx, const idk::DepthAttachmentConfig &
 
 
 void
-idk::glFramebuffer::cubeArrayDepthAttachment( uint32_t layers, const idk::DepthAttachmentConfig &config )
+idk::glFramebuffer::cubeArrayDepthAttachment( uint32_t layers, const idk::glTextureConfig &config )
 {
     gl::deleteTextures(1, &depth_attachment);
     gl::createTextures(GL_TEXTURE_CUBE_MAP_ARRAY, 1, &depth_attachment);
@@ -154,7 +226,7 @@ idk::glFramebuffer::cubeArrayDepthAttachment( uint32_t layers, const idk::DepthA
     gl::textureParameterf(depth_attachment, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     gl::textureParameterf(depth_attachment, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
 
-    gl::textureParameteri(depth_attachment, GL_TEXTURE_COMPARE_FUNC, config.compare_func);
+    gl::textureParameteri(depth_attachment, GL_TEXTURE_COMPARE_FUNC, config.comp_fn);
 
     gl::namedFramebufferTexture(m_FBO, GL_DEPTH_ATTACHMENT, depth_attachment, 0);
 
@@ -166,7 +238,7 @@ idk::glFramebuffer::cubeArrayDepthAttachment( uint32_t layers, const idk::DepthA
 
 
 void
-idk::glFramebuffer::cubeDepthAttachment( const idk::DepthAttachmentConfig &config )
+idk::glFramebuffer::cubeDepthAttachment( const idk::glTextureConfig &config )
 {
     gl::deleteTextures(1, &depth_attachment);
     gl::createTextures(GL_TEXTURE_CUBE_MAP, 1, &depth_attachment);
@@ -208,7 +280,7 @@ idk::glFramebuffer::cubeDepthAttachment( const idk::DepthAttachmentConfig &confi
 
 
 void
-idk::glFramebuffer::depthArrayAttachment( uint32_t layers, const idk::DepthAttachmentConfig &config )
+idk::glFramebuffer::depthArrayAttachment( uint32_t layers, const idk::glTextureConfig &config )
 {
     gl::deleteTextures(1, &depth_attachment);
     gl::createTextures(GL_TEXTURE_2D_ARRAY, 1, &depth_attachment);
@@ -239,8 +311,11 @@ idk::glFramebuffer::depthArrayAttachment( uint32_t layers, const idk::DepthAttac
     gl::textureParameterf(depth_attachment, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     gl::textureParameterf(depth_attachment, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-    // gl::textureParameteri(depth_attachment, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-    // gl::textureParameteri(depth_attachment, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    IDK_GLCALL( glTextureParameterfv(depth_attachment, GL_TEXTURE_BORDER_COLOR, color); )
+
+    gl::textureParameteri(depth_attachment, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    gl::textureParameteri(depth_attachment, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 
     gl::namedFramebufferTexture(m_FBO, GL_DEPTH_ATTACHMENT, depth_attachment, 0);
 
@@ -253,6 +328,11 @@ idk::glFramebuffer::depthArrayAttachment( uint32_t layers, const idk::DepthAttac
 void
 idk::glFramebuffer::generateMipmap( int idx )
 {
+    IDK_ASSERT(
+        "Called generateMipmap on non mip mapped texture",
+        configs[idx].genmipmap == true
+    );
+
     gl::generateTextureMipmap(attachments[idx]);
 }
 

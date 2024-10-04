@@ -18,6 +18,8 @@ namespace idk
         static glm::mat4 toGLM_noscale ( const Transform&, float pitch, float roll, float yaw );
 
         static Transform fromGLM ( const glm::mat4&, float s = 1.0f );
+
+        static Transform mix( const Transform &A, const Transform &B, float alpha );
     };
 
 

@@ -366,7 +366,7 @@ idk::glShaderProgram::recompile()
 
     std::vector<idk::glShaderStage> stages;
 
-    std::cout << "\n";
+    // std::cout << "\n";
 
     for (std::string path: m_stage_paths)
     {
@@ -375,13 +375,13 @@ idk::glShaderProgram::recompile()
 
     for (auto &stage: stages)
     {
-        std::cout << "stage: \"" << stage.m_path << "\"\n";
+        // std::cout << "stage: \"" << stage.m_path << "\"\n";
         gl::attachShader(m_program_id, stage.m_shader_id);
     }
 
     _link_validate();
 
-    std::cout << "\n";
+    // std::cout << "\n";
 }
 
 

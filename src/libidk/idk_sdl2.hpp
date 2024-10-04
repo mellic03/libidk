@@ -49,6 +49,10 @@ namespace idk
             X               = SDL_SCANCODE_X,
             Y               = SDL_SCANCODE_Y,
             Z               = SDL_SCANCODE_Z,
+            LEFT            = SDL_SCANCODE_LEFT,
+            RIGHT           = SDL_SCANCODE_RIGHT,
+            UP              = SDL_SCANCODE_UP,
+            DOWN            = SDL_SCANCODE_DOWN,
 
             N1               = SDL_SCANCODE_1,
             N2               = SDL_SCANCODE_2,

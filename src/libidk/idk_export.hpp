@@ -23,9 +23,9 @@ extern "C" \
     } \
 \
     IDK_VISIBLE \
-    void deleteInstance( void *instance ) \
+    void deleteInstance( idk::Module *instance ) \
     { \
-        module_type *mod = reinterpret_cast<module_type *>(instance); \
+        module_type *mod = dynamic_cast<module_type *>(instance); \
         mod->deinit(); \
         delete mod; \
     } \
@@ -48,9 +48,9 @@ extern "C" \
     } \
 \
     IDK_VISIBLE \
-    void deleteInstance( void *instance ) \
+    void deleteInstance( idk::Game *instance ) \
     { \
-        game_type *game = reinterpret_cast<game_type *>(instance); \
+        game_type *game = dynamic_cast<game_type *>(instance); \
         game->shutdown(); \
         delete game; \
     } \

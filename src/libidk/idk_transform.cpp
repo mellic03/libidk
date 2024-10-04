@@ -90,6 +90,20 @@ idk::Transform::fromGLM( const glm::mat4 &T, float s )
 }
 
 
+idk::Transform
+idk::Transform::mix( const Transform &A, const Transform &B, float alpha )
+{
+    Transform AB = {
+        .position = glm::mix(A.position, B.position, alpha),
+        .rotation = glm::mix(A.rotation, B.rotation, alpha),
+        .scale    = glm::mix(A.scale,    B.scale,    alpha)
+    };
+
+    return AB;
+}
+
+
+
 
 idk::Transform
 idk::operator + ( const idk::Transform &T, const glm::vec3 &v )

@@ -37,6 +37,7 @@ namespace idk::geometry
     */
     float distPlaneSphere( const glm::vec3 &plane, const glm::vec3 &N, const glm::vec3 &sphere, float r );
 
+    bool pointInRect( const glm::vec2 &p, const glm::vec2 &tl, const glm::vec2 &extents );
     bool pointInRect( float px, float py, float x, float y, float w, float h );
     bool pointInRectCentered( float px, float py, float x, float y, float w, float h );
 

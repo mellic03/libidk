@@ -165,6 +165,13 @@ idk::geometry::distPlaneSphere( const glm::vec3 &plane, const glm::vec3 &N, cons
 
 
 bool
+idk::geometry::pointInRect( const glm::vec2 &p, const glm::vec2 &tl, const glm::vec2 &sp )
+{
+    return (tl.x <= p.x && p.x <= tl.x+sp.x) && (tl.y <= p.y && p.y <= tl.y+sp.y);
+}
+
+
+bool
 idk::geometry::pointInRect( float px, float py, float x, float y, float w, float h )
 {
     return (x <= px && px <= x+w) && (y <= py && py <= y+h);

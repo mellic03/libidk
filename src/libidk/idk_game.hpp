@@ -3,19 +3,17 @@
 #include "idk_export.hpp"
 #include <string>
 
-
-namespace idk { class Game; class GameHandle; };
-namespace idk { class EngineAPI; };
+namespace idk
+{ 
+    class EngineAPI;
+    class Game;
+}
 
 
 class IDK_VISIBLE idk::Game
 {
-private:
-    std::string m_name;
-
 public:
-    Game( const std::string &name ): m_name(name) {  };
-    const std::string &getName() { return m_name; };
+    virtual std::string getName() = 0;
 
     virtual void registerModules ( idk::EngineAPI& ) = 0;
     virtual void setup           ( const std::vector<std::string>&, idk::EngineAPI& ) = 0;
