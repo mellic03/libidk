@@ -42,17 +42,20 @@ public:
     using value_type = wrapper;
     using class_type = idk::WAllocator<T, A>;
 
-                            WAllocator() {  };
-                            WAllocator( const WAllocator & );
-                            WAllocator( WAllocator && );
-                           ~WAllocator();
+                WAllocator() {  };
+                WAllocator( const WAllocator & );
+                WAllocator( WAllocator && );
+               ~WAllocator();
 
-    int                     create  (          );
-    int                     create  ( const T& );
-    int                     create  ( T&&      );
-    T&                      get     ( int id   );
-    void                    destroy ( int id   );
-    void                    clear   (          );
+    int         create  (          );
+    int         create  ( const T& );
+    int         create  ( T&&      );
+    T&          get     ( int id   );
+    void        destroy ( int id   );
+    void        clear   (          );
+
+    void *      data    ()       { return m_data.data(); };
+    size_t      size    () const { return m_data.size(); };
 
 
     typename idk::vector<wrapper>::iterator begin() { return m_data.begin(); };

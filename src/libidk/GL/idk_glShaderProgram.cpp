@@ -110,11 +110,11 @@ idk::glShaderProgram::parse_shader_source( std::string root, std::stringstream s
             m_uniforms.emplace(tokens[2]);
         }
 
-        else if (tokens.size() > 0 && tokens[0] == "#define")
-        {
-            m_definitions[tokens[1]].value = line.substr(tokens[0].length() + tokens[1].length() + 1);
-            continue;
-        }
+        // else if (tokens.size() > 0 && tokens[0] == "#define")
+        // {
+        //     m_definitions[tokens[1]].value = line.substr(tokens[0].length() + tokens[1].length() + 1);
+        //     continue;
+        // }
 
 
         if (_line_has_include(line))
@@ -259,7 +259,7 @@ idk::glShaderProgram::_link_validate()
 void
 idk::glShaderProgram::reset()
 {
-    m_definitions.clear();
+    m_defines.clear();
     m_locations.clear();
     m_uniforms.clear();
 
@@ -346,12 +346,12 @@ idk::glShaderProgram::setDefinition( std::string name, std::string value )
 {
     // IDK_ASSERT("Definition does not exist", m_program_id != 0);
 
-    if (m_definitions[name].value == "NONE")
-    {
-        return false;
-    }
+    // if (m_defines[name] == "")
+    // {
+    //     return false;
+    // }
 
-    m_definitions[name].value = value;
+    // m_defines[name] = value;
 
     return true;
 }
@@ -370,7 +370,7 @@ idk::glShaderProgram::recompile()
 
     for (std::string path: m_stage_paths)
     {
-        stages.push_back(idk::glShaderStage(path.c_str()));
+        stages.push_back(glShaderStage(path.c_str()));
     }
 
     for (auto &stage: stages)
@@ -391,10 +391,10 @@ idk::glShaderProgram::compile()
 {
     std::string defines = "";
 
-    for (auto &[name, value]: m_definitions)
-    {
-        defines += "#define " + name + " " + value.value + "\n";
-    }
+    // for (auto &[name, value]: m_definitions)
+    // {
+    //     defines += "#define " + name + " " + value.value + "\n";
+    // }
 
     gl::deleteProgram(m_program_id);
     m_program_id = compile_vf(defines);

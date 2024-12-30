@@ -4,7 +4,6 @@
 #include "idk_glBindings.hpp"
 #include "idk_glShaderStage.hpp"
 
-
 #include <string>
 
 namespace idk
@@ -20,7 +19,6 @@ public:
     static GLuint compileShader( GLenum type, const char *filepath );
 
     struct Loc { GLint value = -1; };
-    struct Def { std::string value = "NONE"; };
 
 private:
     inline static GLuint current_bound_id = 0;
@@ -38,9 +36,10 @@ private:
 
     std::set<std::string>       m_uniforms;
     std::map<std::string, Loc>  m_locations;
-    std::map<std::string, Def>  m_definitions;
+    std::set<std::string>       m_defines;
     GLuint                      m_texture_unit = GL_TEXTURE0;
     GLuint                      m_program_id   = 0;
+
 
     std::string parse_shader_include ( const std::string &, const std::string & );
     std::string parse_shader_source  ( std::string root, std::stringstream source );
@@ -89,7 +88,7 @@ public:
 
 
     bool        setDefinition( std::string name, std::string value );
-    auto &      getDefinitions() { return m_definitions; };
+    auto &      getDefinitions() { return m_defines; };
 
     void        recompile();
 

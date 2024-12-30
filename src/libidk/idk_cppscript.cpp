@@ -3,8 +3,21 @@
 #include <iostream>
 
 #include "idk_assert.hpp"
+#include "idk_serialize.hpp"
 #include "idk_cppscript.hpp"
 #include "idk_dynamiclib.hpp"
+#include "idk_threadpool.hpp"
+#include "idk_log.hpp"
+
+
+#include "idk_platform.hpp"
+
+#ifdef IDK_UNIX
+    #define DLIB_EXT ".so"
+#elif defined(IDK_WINDOWS)
+    #define DLIB_EXT ".dll"
+#endif
+
 
 
 namespace fs = std::filesystem;
@@ -31,113 +44,184 @@ idk_genCompileCommand( const std::string &compiler,
 
 
 void
-idk::RuntimeScript::_load( const std::string &filepath )
+idk::RuntimeScript::_load()
 {
-    m_filepath = filepath;
+    auto dir = RuntimeScript::m_script_dir;
+    auto ext = RuntimeScript::m_script_ext;
+    auto *data = m_data.get();
 
-    fs::path path(filepath);
-    m_name = path.stem();
+    if (RuntimeScript::m_script_ext == ".cpp")
+    {
+        std::string cmd = idk_genCompileCommand(
+            "g++",
+            "c++20",
+            data->filepath,
+            data->libpath,
+            "./include/",
+            "./lib/"
+        );
 
-    m_libpath = "IDKGE/temp/" + path.relative_path().stem().string() + ".so";
+        std::cout << "Compiling script: \"" << cmd << "\" ..." << std::flush;
+        int res = std::system(cmd.c_str());
+        std::cout << "done!\n";
 
-    std::string cmd = idk_genCompileCommand(
-        "g++",
-        "c++20",
-        m_filepath,
-        m_libpath,
-        "../include/",
-        "../lib/debug/"
-    );
+        IDK_ASSERT("Error compiling script", (res == 0));
+    }
 
-    std::cout << "Compiling script: \"" << cmd << "\"\n";
-    int result = std::system(cmd.c_str());
-    IDK_ASSERT("Error compiling script", result == 0);
+    else if (RuntimeScript::m_script_ext == DLIB_EXT)
+    {
+        if (fs::exists(data->libpath))
+        {
+            fs::remove(data->libpath);
+        }
 
-    m_lib   = idk::dynamiclib::loadObject(m_libpath.c_str());
-    m_entry = idk::dynamiclib::loadFunction(m_lib, "idk_ScriptMain");
-    m_ready = true;
+        fs::copy_file(data->filepath, data->libpath);
+    }
+
+    data->lib   = idk::dynamiclib::loadObject(data->libpath.c_str());
+    data->entry = idk::dynamiclib::loadFunction(data->lib, "script");
+
+    data->ready.store(true);
 }
 
 
 void
 idk::RuntimeScript::_unload()
 {
-    idk::dynamiclib::unloadObject(m_lib);
-    // fs::remove(m_libpath);
-    m_ready = false;
+    auto &data = getData();
+
+    idk::dynamiclib::unloadObject(data.lib);
+    data.ready.store(false);
 }
 
 
 
-idk::RuntimeScript::RuntimeScript( const std::string &filepath )
+idk::RuntimeScript::RuntimeScript( const std::string &filename, bool concurrent )
 {
-    this->_load(filepath);
-}
+    m_data = std::make_shared<RuntimeScript::Data>();
 
+    auto dir = RuntimeScript::m_script_dir;
+    auto ext = RuntimeScript::m_script_ext;
+    auto &data = getData();
 
-idk::RuntimeScript::RuntimeScript( const RuntimeScript &s )
-:   m_filepath  (s.m_filepath),
-    m_libpath   (s.m_libpath),
-    m_lib       (nullptr),
-    m_entry     (nullptr),
-    m_ready     (s.m_ready)
-{
-    this->_load(m_filepath);
-}
+    data.filename = filename;
+    data.filepath = ( fs::path(dir) / fs::path(filename + ext) ).string();
+    data.libpath  = ( fs::path("IDKGE/temp/") / fs::path(filename + DLIB_EXT) ).string();
 
+    if (concurrent)
+    {
+        _reload();
+    }
 
-idk::RuntimeScript::RuntimeScript( RuntimeScript &&s )
-:   m_filepath  (s.m_filepath),
-    m_libpath   (s.m_libpath),
-    m_lib       (nullptr),
-    m_entry     (nullptr),
-    m_ready     (s.m_ready)
-{
-    s.m_lib   = nullptr;
-    s.m_entry = nullptr;
-    s.m_ready = false;
+    else
+    {
+        _load();
+        data.ready.store(true);
+    }
 }
 
 
 idk::RuntimeScript::~RuntimeScript()
 {
     if (this->is_ready())
-        this->_unload();
-}
-
-
-idk::RuntimeScript
-idk::RuntimeScript::operator = ( const idk::RuntimeScript &s )
-{
-    if (this != &s)
     {
-        m_filepath = s.m_filepath;
-        m_libpath  = s.m_libpath;
-
-        if (this->is_ready())
-            this->_unload();
-
-        this->_load(s.m_filepath);
+        this->_unload();
     }
-
-    return *this;
 }
 
+
+void
+idk::RuntimeScript::setScriptDirectory( const std::string &dir )
+{
+    m_script_dir = fs::path(dir).string();
+}
+
+
+void
+idk::RuntimeScript::setScriptExtension( const std::string &ext )
+{
+    m_script_ext = ext;
+}
 
 
 int
-idk::RuntimeScript::execute( idk::EngineAPI &api, int obj_id, int other_id )
+idk::RuntimeScript::execute( idk::EngineAPI &api, void *data )
 {
-    return idk::dynamiclib::call<int, idk::EngineAPI &, int, int>(m_entry, api, obj_id, other_id);
+    if (is_ready() == false)
+    {
+        return 0;
+    }
+
+    return idk::dynamiclib::call<int, idk::EngineAPI&, void*>(
+        m_data.get()->entry, api, data
+    );
+}
+
+
+void
+idk::RuntimeScript::_reload()
+{
+    auto *ready = &(this->getData().ready);
+    
+    ready->store(false);
+
+    idk::ThreadPool::createTask(
+        [this, ready]()
+        {
+            this->_load();
+            ready->store(true);
+        }
+    );
 }
 
 
 void
 idk::RuntimeScript::reload()
 {
-    if (this->is_ready())
-        this->_unload();
+    if (is_ready() == false)
+    {
+        return;
+    }
 
-    this->_load(m_filepath);
+    _unload();
+    _reload();
 }
 
+
+void
+idk::RuntimeScript::saveLib( const std::string &dst )
+{
+    auto &data = getData();
+
+    if (fs::exists(dst))
+    {
+        fs::remove(dst);
+        LOG_INFO() << "Deleted file which already existed: \"" << dst << "\"";
+    }
+
+    fs::copy_file(data.libpath, dst);
+    LOG_INFO() << "Copied file \"" << data.libpath << "\" to \"" << dst << "\"";
+}
+
+
+size_t
+idk::RuntimeScript::serialize( std::ofstream &stream ) const
+{
+    auto &data = getData();
+
+    size_t n = 0;
+    n += idk::streamwrite(stream, data.filepath);
+    return n;
+}
+
+
+size_t
+idk::RuntimeScript::deserialize( std::ifstream &stream )
+{
+    auto &data = getData();
+
+    size_t n = 0;
+    n += idk::streamread(stream, data.filepath);
+
+    return n;
+}

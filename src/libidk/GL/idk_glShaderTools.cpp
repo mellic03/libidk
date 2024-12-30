@@ -98,7 +98,7 @@ idk_shadertools_include( const std::string &current_path, const std::string &inc
 
 
 static std::string
-idk_shadertools_parse( const char *filepath )
+idk_shadertools_parse( const char *filepath, const std::vector<std::string> &defines = {} )
 {
     included_files.clear();
 
@@ -109,6 +109,7 @@ idk_shadertools_parse( const char *filepath )
     std::string line;
 
     size_t line_number = 0;
+    bool   version_found = false;
 
     while (std::getline(stream, line))
     {
@@ -132,6 +133,16 @@ idk_shadertools_parse( const char *filepath )
         else
         {
             src += line + "\n";
+
+            // Insert defines after version
+            if (!version_found && line.find("#version") != std::string::npos)
+            {
+                version_found = true;
+                for (auto &def: defines)
+                {
+                    src += "#define " + def + "\n";
+                }
+            }
         }
 
         line_number += 1;
@@ -142,11 +153,12 @@ idk_shadertools_parse( const char *filepath )
 
 
 GLuint
-idk::shadertools::compileShader( GLenum type, const char *filepath )
+idk::shadertools::compileShader( GLenum type, const char *filepath,
+                                 const std::vector<std::string> &defines )
 {
     IDK_ASSERT("File does not exist", std::filesystem::exists(std::string(filepath)));
 
-    std::string str = idk_shadertools_parse(filepath);
+    std::string str = idk_shadertools_parse(filepath, defines);
     // std::string str = buffer.str();
     const char *source = str.c_str();
 

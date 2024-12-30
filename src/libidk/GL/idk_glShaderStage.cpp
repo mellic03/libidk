@@ -8,6 +8,19 @@
 
 idk::glShaderStage::glShaderStage( const char *fp )
 {
+    init(fp, {});
+}
+
+
+idk::glShaderStage::glShaderStage( const char *fp, const std::vector<std::string> &defines )
+{
+    init(fp, defines);
+}
+
+
+void
+idk::glShaderStage::init( const char *fp, const std::vector<std::string> &defines )
+{
     m_refcount += 1;
 
     std::string filepath = std::string(fp);
@@ -37,7 +50,7 @@ idk::glShaderStage::glShaderStage( const char *fp )
 
 
     m_path = std::string(filepath);
-    m_shader_id = idk::shadertools::compileShader(m_type, filepath.c_str());
+    m_shader_id = idk::shadertools::compileShader(m_type, filepath.c_str(), defines);
 }
 
 

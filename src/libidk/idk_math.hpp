@@ -30,6 +30,15 @@ namespace idk
     float mixRadians( float x, float y, float a );
 
 
+
+
+
+    /**
+     * Framerate independent lerp.
+     */
+    template <typename T> T         flerp( T x, T y, T dt, T a );
+
+
     template <typename T> T         min( T, T );
     template <typename T> T         max( T, T );
     template <typename T> T         clamp( T, T, T );
@@ -44,6 +53,15 @@ namespace idk
 
     glm::vec3 calculate_barycentric( float x, float y, glm::vec2 v1, glm::vec2 v2, glm::vec2 v3 );
 };
+
+
+template <typename T>
+T
+idk::flerp( T x, T y, T dt, T a )
+{
+    return glm::mix(x, y, 1.0f - expf32(-dt * a));
+}
+
 
 
 template <typename T>

@@ -37,14 +37,19 @@ target_link_libraries(
 )
 
 
-
-file(
-    GLOB PUBLIC_HEADER
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/*.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/*.inl
+FILE(
+    COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/libidk
+    DESTINATION ${IDK_OUTPUT_DIRECTORY}/include/.
 )
 
-install(
-    FILES ${PUBLIC_HEADER}
-    DESTINATION ${CMAKE_SOURCE_DIR}/build/include/libidk/
-)
+
+# file(
+#     GLOB PUBLIC_HEADER
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/*.hpp
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/libidk/*.inl
+# )
+
+# install(
+#     FILES ${PUBLIC_HEADER}
+#     DESTINATION ${IDK_OUTPUT_DIRECTORY}/
+# )

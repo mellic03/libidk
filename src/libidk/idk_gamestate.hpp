@@ -16,11 +16,13 @@ namespace idk
 
 class idk::GameState
 {
-public:
-    const std::string m_name;
+private:
+    friend class GameStateGroup;
+    std::string     m_name;
     GameStateGroup *m_group;
 
-    GameState( const std::string&, idk::GameStateGroup* );
+public:
+    GameState();
 
     void transition( const std::string &to );
 
@@ -31,16 +33,18 @@ public:
 };
 
 
+
 class idk::GameStateGroup
 {
 private:
+    void state_assert( const std::string &name );
+
+protected:
     std::map<std::string, GameState*> m_states;
     std::set<std::string>             m_active;
 
-    void state_assert( const std::string &name );
-
 public:
-    void addState( idk::GameState* );
+    void addState( idk::GameState*, const std::string &name, bool active=false );
     void makeActive( const std::string &name );
     void makeInactive( const std::string &name );
     void transition( const std::string &from, const std::string &to );

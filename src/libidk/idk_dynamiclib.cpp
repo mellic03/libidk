@@ -147,6 +147,11 @@ idk::DynamicLoader::~DynamicLoader()
 void
 idk::DynamicLoader::_load()
 {
+    if (fs::exists("IDKGE/temp/") == false)
+    {
+        fs::create_directory("IDKGE/temp/");
+    }
+
     if (fs::exists(m_temppath))
     {
         fs::remove(m_temppath);

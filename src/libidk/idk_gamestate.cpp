@@ -3,9 +3,9 @@
 
 
 
-idk::GameState::GameState( const std::string &n, idk::GameStateGroup *g )
-:   m_name(n),
-    m_group(g)
+idk::GameState::GameState( )
+:   m_name("none"),
+    m_group(nullptr)
 {
 
 }
@@ -33,9 +33,10 @@ idk::GameStateGroup::state_assert( const std::string &name )
 
 
 void
-idk::GameStateGroup::addState( idk::GameState *state )
+idk::GameStateGroup::addState( idk::GameState *state, const std::string &name, bool active )
 {
-    const auto &name = state->m_name;
+    state->m_name = name;
+
     std::string msg = "State \"" + name + "\" already exists";
 
     IDK_ASSERT(
@@ -44,6 +45,11 @@ idk::GameStateGroup::addState( idk::GameState *state )
     );
 
     m_states[name] = state;
+
+    if (active)
+    {
+        makeActive(name);
+    }
 }
 
 
