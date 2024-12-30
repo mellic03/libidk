@@ -13,6 +13,15 @@
 #include <memory>
 
 
+#define IDK_WALLOCATOR_ACCESS( name, type, instance ) \
+int         create##name  (                  ) { return instance.create();     }; \
+int         create##name  ( const type &data ) { return instance.create(data); }; \
+type&       get##name     ( int id           ) { return instance.get(id);      }; \
+void        destroy##name ( int id           ) { instance.destroy(id);         }; \
+idk::WAllocator<type> &get##name##WAllocator()   { return instance; };
+
+
+
 namespace idk
 {
     template <typename T, typename A = std::allocator<T>>
