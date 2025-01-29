@@ -8,6 +8,7 @@
 #include "idk_vector.hpp"
 
 
+#include <type_traits>
 #include <cstring>
 #include <algorithm>
 #include <memory>
@@ -38,7 +39,19 @@ private:
     {
         int id;
         T data;
-        wrapper( int i, const T &d ): id(i), data(d) {  };
+
+        wrapper( int i, const T &d ): id(i), data(d)
+        {
+        
+        }
+
+        ~wrapper()
+        {
+            if constexpr (std::is_pointer_v<T>)
+            {
+                delete data;
+            }
+        }
     };
 
     idk::vector<int>        m_freelist;
@@ -127,7 +140,15 @@ idk::WAllocator<T, A>::create()
     // ------------------------------------------------------------------------
 
     m_forward[id] = data_idx;
-    m_data.emplace_back(wrapper(id, T()));
+
+    if constexpr (std::is_pointer_v<T>)
+    {
+        m_data.emplace_back(wrapper(id, new T()));
+    }
+    else
+    {
+        m_data.emplace_back(wrapper(id, T()));
+    }
 
     return id;
 }
@@ -156,7 +177,15 @@ idk::WAllocator<T, A>::create( const T &data )
     // ------------------------------------------------------------------------
 
     m_forward[id] = data_idx;
-    m_data.emplace_back(wrapper(id, data));
+
+    if constexpr (std::is_pointer_v<T>)
+    {
+        m_data.emplace_back(wrapper(id, new T(data)));
+    }
+    else
+    {
+        m_data.emplace_back(wrapper(id, T(data)));
+    }
 
     return id;
 }

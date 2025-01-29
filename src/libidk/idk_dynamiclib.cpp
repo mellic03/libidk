@@ -103,7 +103,6 @@ idk::DynamicLoader::DynamicLoader( const std::string &filepath )
 }
 
 
-
 idk::DynamicLoader::DynamicLoader( idk::DynamicLoader &&rhs )
 {
     *this = std::move(rhs);
@@ -161,6 +160,7 @@ idk::DynamicLoader::_load()
 
     m_lib = idk::dynamiclib::loadObject(m_temppath.c_str());
     m_functionptr = idk::dynamiclib::loadFunction(m_lib, "getInstance");
+    m_deleteptr   = idk::dynamiclib::loadFunction(m_lib, "freeInstance");
     m_data = idk::dynamiclib::call<void *>(m_functionptr);
 
     m_loaded = true;
@@ -171,9 +171,7 @@ idk::DynamicLoader::_load()
 void
 idk::DynamicLoader::_unload()
 {
-    void *ptr = idk::dynamiclib::loadFunction(m_lib, "deleteInstance");
-    idk::dynamiclib::call<void, void *>(ptr, m_data);
-
+    idk::dynamiclib::call<void>(m_deleteptr);
     idk::dynamiclib::unloadObject(m_lib);
 
     if (fs::exists(m_temppath))
@@ -199,10 +197,18 @@ idk::DynamicLoader::reload()
 
 
 
-void *
+void*
 idk::DynamicLoader::getData()
 {
     return m_data;
 }
+
+
+void
+idk::DynamicLoader::freeData()
+{
+    idk::dynamiclib::call<void>(m_deleteptr);
+}
+
 
 

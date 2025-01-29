@@ -33,10 +33,16 @@ idk_genCompileCommand( const std::string &compiler,
 {
     std::string cmd =  compiler + " ";
                 cmd += "-std=" + cppstd + " ";
-                cmd += inpath + " ";
                 cmd += "-shared -fPIC ";
+                cmd += inpath + " ";
                 cmd += "-o " + outpath + " ";
                 cmd += "-I" + includepath + " -L" + libpath + " ";
+
+    #ifdef IDK_DEBUG
+        cmd += "-O0 -g ";
+    #else
+        cmd += "-Ofast ";
+    #endif
 
     return cmd;
 }
@@ -46,36 +52,35 @@ idk_genCompileCommand( const std::string &compiler,
 void
 idk::RuntimeScript::_load()
 {
-    auto dir = RuntimeScript::m_script_dir;
-    auto ext = RuntimeScript::m_script_ext;
     auto *data = m_data.get();
+    auto ext = data->ext;
 
-    if (RuntimeScript::m_script_ext == ".cpp")
+    const auto src_cache_dir = fs::path(m_script_cache_dir);
+    const auto cached_path = src_cache_dir / data->filepath;
+    const auto parent_path = fs::path(data->libpath).parent_path();
+
+    if (fs::exists(parent_path) == false)
+    {
+        fs::create_directories(parent_path);
+    }
+
+    if (ext == ".cpp")
     {
         std::string cmd = idk_genCompileCommand(
             "g++",
-            "c++20",
-            data->filepath,
+            "c++23",
+            cached_path,
             data->libpath,
-            "./include/",
-            "./lib/"
+            "./include/ " + RuntimeScript::m_args_include + " ",
+            "./ " + RuntimeScript::m_args_lib + " "
         );
 
         std::cout << "Compiling script: \"" << cmd << "\" ..." << std::flush;
         int res = std::system(cmd.c_str());
         std::cout << "done!\n";
 
-        IDK_ASSERT("Error compiling script", (res == 0));
-    }
-
-    else if (RuntimeScript::m_script_ext == DLIB_EXT)
-    {
-        if (fs::exists(data->libpath))
-        {
-            fs::remove(data->libpath);
-        }
-
-        fs::copy_file(data->filepath, data->libpath);
+        std::string msg = "Error compiling script: " + cmd + "\n";
+        IDK_ASSERT(msg.c_str(), (res == 0));
     }
 
     data->lib   = idk::dynamiclib::loadObject(data->libpath.c_str());
@@ -89,35 +94,78 @@ void
 idk::RuntimeScript::_unload()
 {
     auto &data = getData();
-
     idk::dynamiclib::unloadObject(data.lib);
     data.ready.store(false);
 }
 
 
-
 idk::RuntimeScript::RuntimeScript( const std::string &filename, bool concurrent )
 {
+    m_filename = filename;
+    _init(filename, concurrent);
+}
+
+
+void
+idk::RuntimeScript::_init( const std::string &filename, bool concurrent )
+{
+    const auto src_cache_dir = fs::path(m_script_cache_dir);
+    const auto bin_cache_dir = fs::path(m_dlib_cache_dir);
+
+    if (fs::exists(src_cache_dir) == false)
+    {
+        fs::create_directories(src_cache_dir);
+    }
+
+    if (fs::exists(bin_cache_dir) == false)
+    {
+        fs::create_directories(bin_cache_dir);
+    }
+
+
+
     m_data = std::make_shared<RuntimeScript::Data>();
 
-    auto dir = RuntimeScript::m_script_dir;
-    auto ext = RuntimeScript::m_script_ext;
+    // auto dir = RuntimeScript::m_script_dir;
+    // auto ext = RuntimeScript::m_script_ext;
     auto &data = getData();
 
     data.filename = filename;
-    data.filepath = ( fs::path(dir) / fs::path(filename + ext) ).string();
-    data.libpath  = ( fs::path("IDKGE/temp/") / fs::path(filename + DLIB_EXT) ).string();
+    data.filepath = ( fs::path(filename + ".cpp") ).string();
+    data.libpath  = ( bin_cache_dir / fs::path(filename + DLIB_EXT) ).string();
+    data.ext      = ".cpp";
 
-    if (concurrent)
+    if (cpp_cached(data.filepath) && cpp_recent(data.filepath) && dlib_cached(data.libpath))
     {
-        _reload();
+        data.filepath = ( bin_cache_dir / fs::path(filename + DLIB_EXT) ).string();
+        data.ext      = DLIB_EXT;
     }
 
     else
     {
-        _load();
-        data.ready.store(true);
+        make_cached(data.filepath);
     }
+
+    auto *ready = &(this->getData().ready);
+    ready->store(false);
+
+    if (concurrent)
+    {
+        idk::ThreadPool::createTask(
+            [this, ready]()
+            {
+                this->_load();
+                ready->store(true);
+            }
+        );
+    }
+
+    else
+    {
+        this->_load();
+        ready->store(true); 
+    }
+
 }
 
 
@@ -131,17 +179,96 @@ idk::RuntimeScript::~RuntimeScript()
 
 
 void
-idk::RuntimeScript::setScriptDirectory( const std::string &dir )
+idk::RuntimeScript::setCompilerInclude( const char *args )
 {
-    m_script_dir = fs::path(dir).string();
+    RuntimeScript::m_args_include = std::string(args);
+    // m_script_dir = fs::path(dir).string();
 }
 
 
 void
-idk::RuntimeScript::setScriptExtension( const std::string &ext )
+idk::RuntimeScript::setCompilerLib( const char *args )
 {
-    m_script_ext = ext;
+    RuntimeScript::m_args_lib = std::string(args);
+    // m_script_ext = ext;
 }
+
+
+bool
+idk::RuntimeScript::cpp_cached( const std::string &source_path )
+{
+    const auto src_cache_dir = fs::path(m_script_cache_dir);
+    const auto cached_path = src_cache_dir / source_path;
+    // std::cout << "[RuntimeScript::cpp_cached] cached_path: " << cached_path << "\n";
+    return fs::exists(cached_path);
+}
+
+
+bool
+idk::RuntimeScript::dlib_cached( const std::string &libpath )
+{
+    return fs::exists(libpath);
+}
+
+
+
+bool
+idk::RuntimeScript::cpp_recent( const std::filesystem::path &source_path )
+{
+    const auto src_cache_dir = fs::path(m_script_cache_dir);
+    const auto cached_path = src_cache_dir / source_path;
+    
+    auto t0 = fs::last_write_time(source_path);
+    auto t1 = fs::last_write_time(cached_path);
+
+    // std::cout << "\n[cpp_recent] source_path: \"" << source_path << "\"\n";
+    // std::cout << "\n[cpp_recent] cached_path: \"" << cached_path << "\"\n";
+    // std::cout << "[cpp_recent] t0: \"" << t0 << "\"\n";
+    // std::cout << "[cpp_recent] t1: \"" << t1 << "\"\n";
+
+    // if (t0 < t1)
+    // {
+    //     std::cout << "file in date!\n\n";
+    // }
+    // else
+    // {
+    //     std::cout << "file out of date!\n\n";
+    // }
+
+    return (t0 < t1);
+}
+
+
+void
+idk::RuntimeScript::make_cached( const std::filesystem::path &source_path )
+{
+    const auto src_cache_dir = fs::path(m_script_cache_dir);
+    const auto bin_cache_dir = fs::path(m_dlib_cache_dir);
+    const auto cached_path   = src_cache_dir / source_path;
+    const auto parent_path   = cached_path.parent_path();
+
+    if (fs::exists(cached_path))
+    {
+        fs::remove(cached_path);
+    }
+
+    // std::cout << "\n\n";
+    // idk_printvalue(src_cache_dir);
+    // idk_printvalue(bin_cache_dir);
+    // idk_printvalue(source_path);
+    // idk_printvalue(cached_path);
+    // idk_printvalue(parent_path);
+    // std::cout << "\n\n";
+
+    if (fs::exists(parent_path) == false)
+    {
+        fs::create_directories(parent_path);
+    }
+
+    fs::copy_file(source_path, cached_path);
+}
+
+
 
 
 int
@@ -159,23 +286,6 @@ idk::RuntimeScript::execute( idk::EngineAPI &api, void *data )
 
 
 void
-idk::RuntimeScript::_reload()
-{
-    auto *ready = &(this->getData().ready);
-    
-    ready->store(false);
-
-    idk::ThreadPool::createTask(
-        [this, ready]()
-        {
-            this->_load();
-            ready->store(true);
-        }
-    );
-}
-
-
-void
 idk::RuntimeScript::reload()
 {
     if (is_ready() == false)
@@ -184,7 +294,7 @@ idk::RuntimeScript::reload()
     }
 
     _unload();
-    _reload();
+    _init(m_filename, true);
 }
 
 
@@ -196,11 +306,11 @@ idk::RuntimeScript::saveLib( const std::string &dst )
     if (fs::exists(dst))
     {
         fs::remove(dst);
-        LOG_INFO() << "Deleted file which already existed: \"" << dst << "\"";
+        // LOG_INFO() << "Deleted file which already existed: \"" << dst << "\"";
     }
 
     fs::copy_file(data.libpath, dst);
-    LOG_INFO() << "Copied file \"" << data.libpath << "\" to \"" << dst << "\"";
+    // LOG_INFO() << "Copied file \"" << data.libpath << "\" to \"" << dst << "\"";
 }
 
 

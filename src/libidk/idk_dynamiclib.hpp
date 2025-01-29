@@ -44,6 +44,7 @@ private:
 
     void           *m_lib;
     void           *m_functionptr;
+    void           *m_deleteptr;
     void           *m_data;
 
     bool            m_loaded = false;
@@ -56,8 +57,8 @@ private:
 
 public:
                     DynamicLoader( const std::string &filepath );
-                    DynamicLoader( const DynamicLoader & ) = delete;
-                    DynamicLoader( DynamicLoader && );
+                    DynamicLoader( const DynamicLoader& ) = delete;
+                    DynamicLoader( DynamicLoader&& );
                    ~DynamicLoader();
 
     DynamicLoader & operator = ( DynamicLoader && );
@@ -65,7 +66,7 @@ public:
     bool            is_loaded() { return m_loaded; };
     void            reload();
     virtual void *  getData();
-
+    void            freeData();
 };
 
 
@@ -74,10 +75,11 @@ template <typename T>
 class idk::GenericLoader: public idk::DynamicLoader
 {
 public:
-            GenericLoader( const std::string &filepath )
-            : DynamicLoader(filepath) {  };
+    GenericLoader( const std::string &filepath )
+    : DynamicLoader(filepath) {  };
 
-    T *     getInstance() { return static_cast<T *>(getData()); };
+    T *getInstance() { return static_cast<T *>(getData()); };
+    void freeInstance() { freeData(); };
 };
 
 

@@ -8,19 +8,19 @@
 namespace idk
 {
     template <typename ktype, typename dtype>
-    class EventManager;
+    class EventEmitter;
 }
 
 
 template <typename ktype, typename dtype>
-class idk::EventManager
+class idk::EventEmitter
 {
 private:
     using fn_type = std::function<void(dtype)>;
     std::map<ktype, std::vector<fn_type>> m_events;
 
 public:
-    EventManager &on( const ktype &key, const fn_type &callback );
+    EventEmitter &on( const ktype &key, const fn_type &callback );
     void emit( const ktype &key, const dtype &data );
     void emit( const ktype &key );
 };
@@ -28,8 +28,8 @@ public:
 
 
 template <typename ktype, typename dtype>
-idk::EventManager<ktype, dtype>&
-idk::EventManager<ktype, dtype>::on( const ktype &key, const fn_type &callback )
+idk::EventEmitter<ktype, dtype>&
+idk::EventEmitter<ktype, dtype>::on( const ktype &key, const fn_type &callback )
 {
     m_events[key].push_back(callback);
     return *this;
@@ -38,7 +38,7 @@ idk::EventManager<ktype, dtype>::on( const ktype &key, const fn_type &callback )
 
 template <typename ktype, typename dtype>
 void
-idk::EventManager<ktype, dtype>::emit( const ktype &key, const dtype &data )
+idk::EventEmitter<ktype, dtype>::emit( const ktype &key, const dtype &data )
 {
     for (auto &callback: m_events[key])
     {
@@ -49,7 +49,7 @@ idk::EventManager<ktype, dtype>::emit( const ktype &key, const dtype &data )
 
 template <typename ktype, typename dtype>
 void
-idk::EventManager<ktype, dtype>::emit( const ktype &key )
+idk::EventEmitter<ktype, dtype>::emit( const ktype &key )
 {
     for (auto &callback: m_events[key])
     {

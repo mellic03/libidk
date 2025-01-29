@@ -7,6 +7,7 @@
 #include <string>
 #include <fstream>
 #include <memory>
+#include <filesystem>
 
 
 namespace idk
@@ -24,7 +25,7 @@ private:
     {
         std::atomic_bool ready;
         void *lib, *entry;
-        std::string filename, filepath, libpath;
+        std::string filename, filepath, libpath, ext;
     
         Data()
         {
@@ -32,21 +33,28 @@ private:
         }
     };
 
+    inline static std::string m_script_cache_dir = "./IDKGE/cache/scripts/src/";
+    inline static std::string m_dlib_cache_dir = "./IDKGE/cache/scripts/bin/";
+    inline static std::string m_args_include = "";
+    inline static std::string m_args_lib     = "";
 
-    inline static std::string m_script_dir = "./assets/scripts/";
-    inline static std::string m_script_ext = ".cpp";
 
+    // inline static std::string m_script_dir = "./assets/scripts/";
+    // inline static std::string m_script_ext = ".cpp";
+
+    std::string m_filename = "";
     std::shared_ptr<Data> m_data;
     std::mutex m_mutex;
 
     Data& getData() const { return *(m_data.get()); }
+
+    void  _init( const std::string &filename, bool concurrent );
     void  _load();
     void  _unload();
     void  _reload();
 
 
 public:
-
     int  id = -1;
 
     /**
@@ -58,6 +66,15 @@ public:
     // static void initThreadedLoader( idk::ThreadPool* );
     static void setScriptDirectory( const std::string &dir );
     static void setScriptExtension( const std::string &ext );
+
+    static void setCompilerInclude( const char* );
+    static void setCompilerLib( const char* );
+
+    static bool cpp_cached( const std::string &name );
+    static bool dlib_cached( const std::string &name );
+    static bool cpp_recent( const std::filesystem::path &src );
+    static void make_cached( const std::filesystem::path &src );
+
 
     bool        is_ready() { return m_data->ready.load(); };
 

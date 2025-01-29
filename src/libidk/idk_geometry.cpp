@@ -134,7 +134,6 @@ idk::geometry::raySphereIntersects( const glm::vec3 &ray_origin, const glm::vec3
     }
 
     return true;
-
 }
 
 

@@ -14,3 +14,10 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/norm.hpp>
 
+
+namespace glm
+{
+    glm::mat4 translate( const glm::vec3& );
+}
+
+

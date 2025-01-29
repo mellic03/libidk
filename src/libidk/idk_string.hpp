@@ -1,51 +1,31 @@
 #pragma once
 
-#include <vector>
-
-#include <string>
-#include <cstdint>
-#include <cstddef>
-#include <fstream>
-
+#include <ostream>
+#include "idk_vector2.hpp"
 
 namespace idk
 {
-    // using string  = std::string;
-    // using tstring = std::basic_string<char, std::char_traits<char>, idk::frame_allocator<char>>;
-    // using pstring = std::basic_string<char, std::char_traits<char>, idk::linear_allocator<char>>;
-
     class string;
 };
 
 
-
-class idk::string
+class idk::string: public idk::vector2<char>
 {
 private:
-    std::vector<uint8_t> m_data;
+    // idk::vector2<char> m_data;
 
 public:
-    string() {  };
-
+    string( const char* );
+    string &operator= ( const char* );
+    const char *c_str() { return (const char*)data(); }
+    const char *c_str() const { return (const char*)data(); }
 
 };
 
 
-
-// inline std::ofstream &operator << ( std::ofstream &stream, const idk::string &str )
-// {
-//     uint32_t num_elements = str.size();
-//     stream.write(reinterpret_cast<const char *>(&num_elements), sizeof(uint32_t));
-//     stream.write(reinterpret_cast<const char *>(str.data()), str.size()*sizeof(char));
-//     return stream;
-// }
+bool operator== ( const idk::string&, const char* );
+bool operator== ( const idk::string&, const idk::string& );
 
 
-// inline void operator >> ( std::ifstream &stream, idk::string &str )
-// {
-//     uint32_t num_elements;
-//     stream.read(reinterpret_cast<char *>(&num_elements), sizeof(uint32_t));
+std::ostream &operator << ( std::ostream &stream, const idk::string &str );
 
-//     str.resize(num_elements);
-//     stream.read(reinterpret_cast<char *>(str.data()), str.size()*sizeof(char));
-// }

@@ -36,7 +36,7 @@ namespace idk
     /**
      * Framerate independent lerp.
      */
-    template <typename T> T         flerp( T x, T y, T dt, T a );
+    template <typename T> T         flerp( T x, T y, float dt, float a );
 
 
     template <typename T> T         min( T, T );
@@ -57,9 +57,11 @@ namespace idk
 
 template <typename T>
 T
-idk::flerp( T x, T y, T dt, T a )
+idk::flerp( T x, T y, float dt, float a )
 {
-    return glm::mix(x, y, 1.0f - expf32(-dt * a));
+    float decay = 25.0f * (1.0f - a);
+    return y + (x-y) * glm::exp(-decay*dt);
+    // return glm::mix(x, y, 1.0f - glm::exp(-decay*dt));
 }
 
 

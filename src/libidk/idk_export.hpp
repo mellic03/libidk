@@ -14,20 +14,21 @@
 \
 extern "C" \
 { \
+    static module_type *mod = nullptr; \
+\
     IDK_VISIBLE \
     idk::Module *getInstance() \
     { \
-        static module_type *mod = nullptr; \
         if (mod == nullptr) mod = new module_type(); \
         return dynamic_cast<idk::Module *>(mod); \
     } \
 \
     IDK_VISIBLE \
-    void deleteInstance( idk::Module *instance ) \
+    void freeInstance() \
     { \
-        module_type *mod = dynamic_cast<module_type *>(instance); \
         mod->deinit(); \
         delete mod; \
+        mod = nullptr; \
     } \
 } \
 
@@ -39,20 +40,21 @@ extern "C" \
 \
 extern "C" \
 { \
+    static game_type *game = nullptr; \
+\
     IDK_VISIBLE \
     idk::Game *getInstance() \
     { \
-        static game_type *game = nullptr; \
         if (game == nullptr) game = new game_type(); \
         return dynamic_cast<idk::Game *>(game); \
     } \
 \
     IDK_VISIBLE \
-    void deleteInstance( idk::Game *instance ) \
+    void freeInstance() \
     { \
-        game_type *game = dynamic_cast<game_type *>(instance); \
         game->shutdown(); \
         delete game; \
+        game = nullptr; \
     } \
 } \
 

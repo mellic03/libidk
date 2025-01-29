@@ -1,6 +1,7 @@
 #pragma once
 
 #include "idk_export.hpp"
+#include <vector>
 #include <string>
 
 namespace idk
@@ -15,9 +16,7 @@ class IDK_VISIBLE idk::Game
 public:
     virtual std::string getName() = 0;
 
-    virtual void build           (                 ) {  };
-    virtual void registerModules ( idk::EngineAPI& ) = 0;
-    virtual void setup           ( const std::vector<std::string>&, idk::EngineAPI& ) = 0;
+    virtual void setup           ( idk::EngineAPI& ) = 0;
     virtual void mainloop        ( idk::EngineAPI& ) = 0;
     virtual void shutdown        (                 ) = 0;
 
