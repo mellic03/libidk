@@ -2,7 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <memory>
+#include <vector>
 
 
 namespace idk
@@ -11,31 +11,32 @@ namespace idk
 };
 
 
-
 class idk::byte_buffer
 {
 private:
-    // std::shared_ptr<void> m_data;
-    void  *m_data = nullptr;
-    size_t m_size = 0;
-    size_t m_cap  = 0;
-
-    void _init( size_t cap_nbytes = 32 );
-    void _deinit();
 
 public:
-
+    std::vector<uint32_t> m_data;
     byte_buffer();
+    byte_buffer( size_t reserve_nbytes );
     ~byte_buffer();
 
-    byte_buffer( size_t reserve_nbytes );
-    byte_buffer( const byte_buffer& );
-    byte_buffer( byte_buffer&& );
+    size_t write( const void *src, size_t nbytes );
+    size_t read( void *dst, size_t offset, size_t nbytes );
+    size_t writeFile( const char *path );
+    size_t readFile( const char *path );
 
-    /**
-     * @return Size of buffer after copy.
-    */
-    size_t append( const void *src, size_t nbytes );
+    template <typename T>
+    size_t writeT( const T &src )
+    {
+        return write(reinterpret_cast<const void*>(&src), sizeof(T));
+    }
 
-    const void *data() const { return m_data; };
+    template <typename T>
+    size_t readT( const T &src, size_t offset )
+    {
+        return read(reinterpret_cast<void*>(&src), offset, sizeof(T));
+    }
+
+
 };

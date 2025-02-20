@@ -2,7 +2,7 @@
 
 #include <cstddef>
 #include "idk_vertex.hpp"
-#include "idk_buffer.hpp"
+// #include "idk_buffer.hpp"
 
 #include "forward_declarations.hpp"
 

@@ -2,7 +2,7 @@
 #include "../idk_math.hpp"
 
 #include "../idk_assert.hpp"
-#include <libidk/idk_log.hpp>
+#include <libidk/idk_log2.hpp>
 
 #include <fstream>
 #include <sstream>
@@ -557,7 +557,10 @@ idk::gltools::loadPixels( const std::string &filepath, uint32_t *w, uint32_t *h,
 {
     if (fs::exists(filepath) == false)
     {
-        LOG_ERROR() << "File does not exist: " << filepath;
+        LOG_ERROR(
+            "idk::gltools::loadPixels",
+            std::format("File does not exist: \"{}\"", filepath)
+        );
     }
 
     SDL_Surface      *tmp = IMG_Load(filepath.c_str());
@@ -594,40 +597,16 @@ idk::gltools::loadPixels( const std::string &filepath, uint32_t *w, uint32_t *h,
 }
 
 
-// GLuint
-// idk::gltools::loadTexture( const std::string &filepath, const glTextureConfig &config,
-//                            std::shared_ptr<uint32_t> *wrapper )
-// {
-//     if (fs::exists(filepath) == false)
-//     {
-//         LOG_ERROR() << "File does not exist: " << filepath;
-//     }
-
-//     SDL_Surface      *tmp    = IMG_Load(filepath.c_str());
-//     SDL_PixelFormat  *target = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
-//     SDL_Surface      *img    = SDL_ConvertSurface(tmp, target, 0);
-
-//     GLuint texture_id = gltools::loadTexture2D(img->w, img->h, (uint32_t *)(img->pixels), config);
-
-//     if (wrapper)
-//     {
-//         *wrapper = idk::TextureRef(texture_id, img->w, img->h);
-//     }
-
-//     SDL_FreeFormat(target);
-//     SDL_FreeSurface(tmp);
-//     SDL_FreeSurface(img);
-
-//     return texture_id;
-// }
-
 
 idk::TextureRef
 idk::gltools::loadTextureWrapper( const std::string &filepath, const glTextureConfig &config )
 {
     if (fs::exists(filepath) == false)
     {
-        LOG_ERROR() << "File does not exist: " << filepath;
+        LOG_ERROR(
+            "idk::gltools::loadTextureWrapper",
+            std::format("File does not exist: \"{}\"", filepath)
+        );
     }
 
     SDL_Surface      *tmp    = IMG_Load(filepath.c_str());

@@ -8,12 +8,6 @@ idk::Window::Window( const char *name, int w, int h, bool resizable, bool hidden
 :   width(w),
     height(h)
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        std::cout << "Error creating window\n";
-        exit(1);
-    }
-
     Uint32 sdl_flags = SDL_WINDOW_OPENGL;
 
     if (resizable) sdl_flags |= SDL_WINDOW_RESIZABLE;

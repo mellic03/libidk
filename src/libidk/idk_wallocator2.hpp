@@ -1,7 +1,7 @@
 #pragma once
 
 #include "idk_assert.hpp"
-#include "idk_log.hpp"
+#include "idk_log2.hpp"
 #include "idk_memory.hpp"
 #include "idk_io.hpp"
 #include "idk_serialize.hpp"
@@ -36,10 +36,10 @@ private:
         // ~wrapper() { delete data; }
     };
 
-    idk::vector<int>        m_freelist;
-    idk::vector<int>        m_reverse;
-    idk::vector<int>        m_forward;
-    idk::vector<wrapper>    m_data;
+    std::vector<int>        m_freelist;
+    std::vector<int>        m_reverse;
+    std::vector<int>        m_forward;
+    std::vector<wrapper>    m_data;
 
 
 public:
@@ -58,11 +58,11 @@ public:
     void *      data    ()       { return m_data.data(); };
     size_t      size    () const { return m_data.size(); };
 
-    typename idk::vector<wrapper>::iterator begin() { return m_data.begin(); };
-    typename idk::vector<wrapper>::iterator end()   { return m_data.end();   };
+    typename std::vector<wrapper>::iterator begin() { return m_data.begin(); };
+    typename std::vector<wrapper>::iterator end()   { return m_data.end();   };
 
-    typename idk::vector<wrapper>::const_iterator begin() const { return m_data.begin(); };
-    typename idk::vector<wrapper>::const_iterator end()   const { return m_data.end();   };
+    typename std::vector<wrapper>::const_iterator begin() const { return m_data.begin(); };
+    typename std::vector<wrapper>::const_iterator end()   const { return m_data.end();   };
 };
 
 
@@ -140,7 +140,10 @@ idk::WAllocator2<T, A>::destroy( int id )
 
     if (data_idx == -1)
     {
-        LOG_WARN() << "[WAllocator2<T, A>] Object " << id << " already deleted";
+        LOG_WARN(
+            "idk::WAllocator2",
+            std::format("Attempted to delete object {} which is already deleted", id)
+        );
         return;
     }
     // IDK_ASSERT("Attempted access of deleted object", data_idx != -1);

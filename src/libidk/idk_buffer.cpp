@@ -1,82 +1,78 @@
 #include "idk_buffer.hpp"
-
-#include <cstdlib>
-#include <cstring>
-
-
-
-void
-idk::byte_buffer::_init( size_t cap_nbytes )
-{
-    m_size = 0;
-    m_cap  = cap_nbytes;
-    m_data = std::malloc(m_cap);
-
-}
-
-
-void
-idk::byte_buffer::_deinit()
-{
-    std::free(m_data);
-}
+#include <fstream>
 
 
 
 idk::byte_buffer::byte_buffer()
 {
-    _init();
+
 }
 
 
 idk::byte_buffer::~byte_buffer()
 {
-    _deinit();
 
 }
 
 
-idk::byte_buffer::byte_buffer( size_t reserve_nbytes )
+size_t
+idk::byte_buffer::write( const void *ptr, size_t nbytes )
 {
-    _init(reserve_nbytes);
-}
+    const uint32_t *src = reinterpret_cast<const uint32_t*>(ptr);
+    const size_t nwords = nbytes/4;
 
+    for (size_t i=0; i<nwords; i++)
+    {
+        m_data.push_back(src[i]);
+    }
 
-idk::byte_buffer::byte_buffer( const byte_buffer &other )
-{
-    m_data = other.m_data;
-    m_size = other.m_size;
-    m_cap  = other.m_cap;
-
-    std::memcpy(m_data, other.m_data, other.m_size);
-}
-
-
-idk::byte_buffer::byte_buffer( byte_buffer &&other )
-{
-    m_data = other.m_data;
-    m_size = other.m_size;
-    m_cap  = other.m_cap;
-
-    other.m_data = nullptr;
-    other.m_size = 0;
-    other.m_cap  = 0;
+    return nbytes;
 }
 
 
 
 size_t
-idk::byte_buffer::append( const void *src, size_t nbytes )
+idk::byte_buffer::read( void *ptr, size_t offset, size_t nbytes )
 {
-    if (m_size + nbytes >= m_cap)
+    uint32_t *dst = reinterpret_cast<uint32_t*>(ptr);
+    const size_t nwords = nbytes/4;
+
+    for (size_t i=0; i<nwords; i++)
     {
-        m_cap *= 2;
-        m_data = std::realloc(m_data, m_cap);
+        dst[i] = m_data[offset+i];
     }
 
-    std::memcpy(m_data, src, nbytes);
-    m_size += nbytes;
-
     return nbytes;
+}
+
+
+
+size_t
+idk::byte_buffer::writeFile( const char *path )
+{
+    std::ofstream stream(path, std::ios::binary);
+
+    uint32_t nwords = m_data.size();
+    stream.write(reinterpret_cast<const char*>(&nwords), sizeof(uint32_t));
+    stream.write(reinterpret_cast<const char*>(m_data.data()), m_data.size());
+    stream.close();
+
+    return nwords;
+}
+
+
+size_t
+idk::byte_buffer::readFile( const char *path )
+{
+    std::ifstream stream(path, std::ios::binary);
+
+    uint32_t nwords;
+    stream.read(reinterpret_cast<char*>(&nwords), sizeof(uint32_t));
+    m_data.resize(nwords);
+
+    stream.read(reinterpret_cast<char*>(m_data.data()), 4*nwords);
+    stream.close();
+
+    return nwords;
 }
 

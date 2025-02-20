@@ -1,7 +1,7 @@
 #pragma once
 
+#include "idk_log2.hpp"
 #include "idk_assert.hpp"
-#include "idk_log.hpp"
 #include "idk_memory.hpp"
 #include "idk_io.hpp"
 #include "idk_serialize.hpp"
@@ -72,9 +72,10 @@ public:
 
     bool                    contains( int id   );
 
-    std::vector<T> &        vector   ()       { return m_data;           };
-    T *                     data     ()       { return m_data.data();    };
-    size_t                  size     () const { return m_data.size();    };
+    std::vector<T> &        vector   (       )       { return m_data;        };
+    T *                     data     (       )       { return m_data.data(); };
+    size_t                  size     (       ) const { return m_data.size(); };
+    void                    reserve  ( int n )       { m_data.reserve(n);    };
 
     T &                     operator [] ( int i ) { return m_data.get(i); };
 
@@ -247,7 +248,10 @@ idk::Allocator<T, A>::destroy( int id )
 
     if (data_idx == -1)
     {
-        LOG_WARN() << "[Allocator<T, A>] Object " << id << " already deleted";
+        LOG_WARN(
+            "idk::WAllocator2",
+            std::format("Attempted to delete object {} which is already deleted", id)
+        );
         return;
     }
     // IDK_ASSERT("Attempted access of deleted object", data_idx != -1);

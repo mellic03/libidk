@@ -2,7 +2,7 @@
 
 #include "../idk_assert.hpp"
 #include "../idk_math.hpp"
-#include "../idk_log.hpp"
+#include "../idk_log2.hpp"
 
 
 
@@ -39,7 +39,10 @@ static void deleter( uint32_t *p )
 {
     if (p)
     {
-        LOG_INFO() << "Deleting texture " << *p;
+        LOG_INFO(
+            "idk::TextureRef::deleter",
+            std::format("Deleting texture {}", *p)
+        );
         idk::gl::deleteTextures(1, p);
         delete p;
     }
@@ -50,14 +53,14 @@ static void deleter( uint32_t *p )
 idk::TextureRef::TextureRef()
 :   m_texture(nullptr, deleter)
 {
-    LOG_INFO() << "idk::TextureRef::TextureRef()";
+    LOG_INFO("idk::TextureRef::TextureRef( void )");
 }
 
 
 idk::TextureRef::TextureRef( uint32_t texture, size_t w, size_t h )
 :   m_texture(new uint32_t(texture), deleter)
 {
-    LOG_INFO() << "idk::TextureRef::TextureRef( uint32_t, size_t, size_t )";
+    LOG_INFO("idk::TextureRef::TextureRef( uint32_t, size_t, size_t )");
     width     = w;
     height    = h;
 }

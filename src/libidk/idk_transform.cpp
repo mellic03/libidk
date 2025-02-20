@@ -36,7 +36,7 @@ idk::Transform::toGLM( const Transform &t, float pitch, float roll, float yaw )
 {
     static const glm::mat4 I = glm::mat4(1.0f);
 
-    glm::mat4 Rroll  = glm::mat4_cast(glm::angleAxis(roll,  glm::vec3(0.0f, 0.0f, -1.0f)));
+    glm::mat4 Rroll  = glm::mat4_cast(glm::angleAxis(roll,  glm::vec3(0.0f, 0.0f, 1.0f)));
     glm::mat4 Rpitch = glm::mat4_cast(glm::angleAxis(pitch, glm::vec3(1.0f, 0.0f, 0.0f)));
     glm::mat4 Ryaw   = glm::mat4_cast(glm::angleAxis(yaw,   glm::vec3(0.0f, 1.0f, 0.0f)));
 
@@ -53,7 +53,7 @@ idk::Transform::toGLM_noscale( const Transform &t, float pitch, float roll, floa
 {
     static const glm::mat4 I = glm::mat4(1.0f);
 
-    glm::mat4 Rroll  = glm::mat4_cast(glm::angleAxis(roll,  glm::vec3(0.0f, 0.0f, -1.0f)));
+    glm::mat4 Rroll  = glm::mat4_cast(glm::angleAxis(roll,  glm::vec3(0.0f, 0.0f, 1.0f)));
     glm::mat4 Rpitch = glm::mat4_cast(glm::angleAxis(pitch, glm::vec3(1.0f, 0.0f, 0.0f)));
     glm::mat4 Ryaw   = glm::mat4_cast(glm::angleAxis(yaw,   glm::vec3(0.0f, 1.0f, 0.0f)));
 

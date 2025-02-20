@@ -1,7 +1,7 @@
 #pragma once
 
 #include "idk_assert.hpp"
-#include "idk_log.hpp"
+#include "idk_log2.hpp"
 #include "idk_memory.hpp"
 #include "idk_io.hpp"
 #include "idk_serialize.hpp"
@@ -241,7 +241,11 @@ idk::WAllocator<T, A>::destroy( int id )
 
     if (data_idx == -1)
     {
-        LOG_WARN() << "[WAllocator<T, A>] Object " << id << " already deleted";
+        LOG_WARN(
+            "idk::WAllocator",
+            std::format("Attempted to delete object {} which is already deleted", id)
+        );
+
         return;
     }
     // IDK_ASSERT("Attempted access of deleted object", data_idx != -1);
