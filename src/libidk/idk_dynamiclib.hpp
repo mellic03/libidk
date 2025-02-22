@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 
 namespace idk::dynamiclib
@@ -51,19 +52,20 @@ private:
     bool            m_moved  = false;
 
     void            _load();
-    void            _unload();
     bool            is_moved() { return m_moved; };
 
 
 public:
                     DynamicLoader( const std::string &filepath );
-                    DynamicLoader( const DynamicLoader& ) = delete;
-                    DynamicLoader( DynamicLoader&& );
-                   ~DynamicLoader();
+                //     DynamicLoader( const DynamicLoader& ) = delete;
+                //     DynamicLoader( DynamicLoader&& );
+                //    ~DynamicLoader();
 
-    DynamicLoader & operator = ( DynamicLoader && );
+    // const DynamicLoader &operator = ( DynamicLoader & );
+    // DynamicLoader  &operator = ( DynamicLoader && );
 
     bool            is_loaded() { return m_loaded; };
+    void            unload();
     void            reload();
     virtual void *  getData();
     void            freeData();
@@ -75,6 +77,10 @@ template <typename T>
 class idk::GenericLoader: public idk::DynamicLoader
 {
 public:
+    bool should_unload = false;
+    bool should_reload = false;
+    std::function<void()> onReload = [](){};
+
     GenericLoader( const std::string &filepath )
     : DynamicLoader(filepath) {  };
 

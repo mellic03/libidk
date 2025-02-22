@@ -24,7 +24,7 @@ extern "C" \
     } \
 \
     IDK_VISIBLE \
-    void freeInstance() \
+    void freeInstance( module_type *other ) \
     { \
         mod->deinit(); \
         delete mod; \
@@ -50,7 +50,7 @@ extern "C" \
     } \
 \
     IDK_VISIBLE \
-    void freeInstance() \
+    void freeInstance( game_type *other ) \
     { \
         game->shutdown(); \
         delete game; \

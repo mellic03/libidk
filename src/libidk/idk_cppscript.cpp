@@ -306,11 +306,11 @@ idk::RuntimeScript::saveLib( const std::string &dst )
     if (fs::exists(dst))
     {
         fs::remove(dst);
-        // LOG_INFO() << "Deleted file which already existed: \"" << dst << "\"";
+        // LOG_INFO("") << "Deleted file which already existed: \"" << dst << "\"";
     }
 
     fs::copy_file(data.libpath, dst);
-    // LOG_INFO() << "Copied file \"" << data.libpath << "\" to \"" << dst << "\"";
+    // LOG_INFO("") << "Copied file \"" << data.libpath << "\" to \"" << dst << "\"";
 }
 
 

@@ -30,8 +30,7 @@ public:
     constexpr const std::string &       name()   const { return m_name;   };
 
     virtual void                        init( idk::EngineAPI& ) = 0;
-    virtual void                        registerECS( idk::EngineAPI&, idk::ECS& ) = 0;
-    virtual void                        deinit() {  };
+    virtual void                        deinit() = 0;
 
     virtual void                        stage_A( idk::EngineAPI& ) = 0;
     virtual void                        stage_B( idk::EngineAPI& ) = 0;

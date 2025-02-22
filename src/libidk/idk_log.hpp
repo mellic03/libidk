@@ -1,165 +1,88 @@
-// #pragma once
+#pragma once
 
-// #include <deque>
-// #include <string>
-// #include <sstream>
-// #include <iostream>
-// #include <fstream>
-
-// #include <filesystem>
-// #include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <vector>
+#include <string>
+#include <format>
 
 
-// #define IDK_LOGGING
+#define LOG_ADVGING
 
 
-// namespace idk
-// {
-//     class Logger;
-//     class Loggable;
-//     class LogStream;
+namespace idk
+{
+    class Logger;
 
-//     enum class LogType: uint32_t
-//     {
-//         DEBUG,
-//         INFO,
-//         WARN,
-//         ERROR
-//     };
+    struct log_flag {
+        enum internal_type: uint32_t {
+            PRINT_LAZY = 1 << 1,
+            DETAIL = 1 << 2,
+            INFO   = 1 << 3,
+            DEBUG  = 1 << 4,
+            WARN   = 1 << 5,
+            ERROR  = 1 << 6,
+            FATAL  = 1 << 7,
 
-// };
-
-
-// class idk::LogStream
-// {
-// private:
-//     uint32_t m_flags;
-//     std::stringstream m_ss;
-
-//     std::string       m_type;
-//     std::string       m_file;
-//     std::string       m_func;
-//     int               m_line;
+            RENDER = 1 << 8,
+            AUDIO  = 1 << 9,
+            IO     = 1 << 10,
+            API    = 1 << 11,
 
 
-// public:
-
-//     LogStream( uint32_t flags, idk::LogType type, const std::string &file,
-//                const std::string &func, int line );
-
-//     template <typename T>
-//     LogStream &operator << ( const T &data )
-//     {
-//         m_ss << data;
-//         return *this;
-//     }
-
-//     std::string str() const
-//     {
-//         return m_ss.str();
-//     }
-
-// };
+            DEFAULT = PRINT_LAZY|INFO|WARN|ERROR|FATAL
+        };
+    };
+};
 
 
 
-// class idk::Logger
-// {
-// public:
-//     enum Idx
-//     {
-//         IDX_FILENAME = 0,
-//         IDX_FILEPATH,
-//         IDX_LINE,
-//         IDX_VAR_NAME,
-//         IDX_VAR_VALUE,
-//         IDX_NUM_IDX
-//     };
+class idk::Logger
+{
+public:
 
-//     enum Flag
-//     {
-//         LOG_FILENAME   = 1 << IDX_FILENAME,
-//         LOG_FILEPATH   = 1 << IDX_FILEPATH,
-//         LOG_LINE       = 1 << IDX_LINE,
-//         LOG_VAR_NAME   = 1 << IDX_VAR_NAME,
-//         LOG_VAR_VALUE  = 1 << IDX_VAR_VALUE
-//     };
+private:
+    struct Token
+    {
+        const char *color;
+        std::string time, ltype, title, msg;
+    };
 
+    inline static std::vector<Token> m_backbuffer;
+    inline static std::vector<Token> m_frontbuffer;
+    inline static std::string m_filepath = "";
+    
+public:
+    inline static uint32_t flags = log_flag::DEFAULT;
 
-// private:
-//     struct LogToken
-//     {
-//         std::chrono::high_resolution_clock::time_point timestamp;
-//         LogType     type;
-//         std::string data[IDX_NUM_IDX];
-//     };
+    static void init();
+    static void update();
+    static void log( uint32_t type, const std::string &title, const std::string &msg );
+    static void log( uint32_t type, const std::string &title );
+    static void log( const std::string &title, const std::string &msg );
+    static void log( const std::string &title );
+    static void print();
+    static void writeFile();
 
-//     inline static uint32_t               m_flags;
-//     inline static std::vector<LogStream> m_history;
-//     inline static size_t                 m_temp_idx = 0;
+};
 
 
-// public:
-
-//     static void init( uint32_t flags = 0 )
-//     {
-//         m_flags = flags;
-//     };
-
-
-//     static idk::LogStream &log( idk::LogType type, const std::string &file,
-//                                 const std::string &func, int line )
-//     {
-//         m_history.push_back(idk::LogStream(m_flags, type, file, func, line));
-//         // std::cout << m_history.back().str() << "\n";
-//         return m_history.back();
-//     };
-
-//     static void print()
-//     {
-//         if (m_temp_idx == m_history.size())
-//         {
-//             return;
-//         }
-
-//         for (size_t i=m_temp_idx; i<m_history.size(); i++)
-//         {
-//             std::cout << m_history[i].str() << "\n";
-//         }
-
-//         m_temp_idx = m_history.size();
-//     }
-
-//     static void write()
-//     {
-//         std::stringstream ss;
-//         ss << std::chrono::high_resolution_clock::now();
-//         std::string filepath = "log/" + ss.str() + ".txt";
-
-//         std::ofstream stream(filepath);
-
-//         for (idk::LogStream &l: m_history)
-//         {
-//             stream << l.str() << "\n";
-//         }
-
-//         stream.close();
-//     }
-
-// };
-
-
-// #ifdef IDK_LOGGING
-//     #define LOG_INFO()  idk::Logger::log(idk::LogType::INFO,  __FILE__, __PRETTY_FUNCTION__, __LINE__)
-//     #define LOG_DEBUG() idk::Logger::log(idk::LogType::DEBUG, __FILE__, __PRETTY_FUNCTION__, __LINE__)
-//     #define LOG_WARN()  idk::Logger::log(idk::LogType::WARN,  __FILE__, __PRETTY_FUNCTION__, __LINE__)
-//     #define LOG_ERROR() idk::Logger::log(idk::LogType::ERROR, __FILE__, __PRETTY_FUNCTION__, __LINE__)
-
-// #else
-//     #define LOG_INFO(lbl)
-//     #define LOG_DEBUG(lbl)
-//     #define LOG_WARN(lbl)
-//     #define LOG_ERROR(lbl)
-// #endif
+#ifdef LOG_ADVGING
+    #define LOG_ADV(log__flags, ...) idk::Logger::log(log__flags, __PRETTY_FUNCTION__, std::format(__VA_ARGS__, ""))
+    #define LOG_DETAIL(...) idk::Logger::log(idk::log_flag::DETAIL,  __PRETTY_FUNCTION__, std::format(__VA_ARGS__))
+    #define LOG_INFO(...) idk::Logger::log(idk::log_flag::INFO,  __PRETTY_FUNCTION__, std::format(__VA_ARGS__))
+    #define LOG_DEBUG(...) idk::Logger::log(idk::log_flag::DEBUG,  __PRETTY_FUNCTION__, std::format(__VA_ARGS__))
+    #define LOG_WARN(...) idk::Logger::log(idk::log_flag::WARN,  __PRETTY_FUNCTION__, std::format(__VA_ARGS__))
+    #define LOG_ERROR(...) idk::Logger::log(idk::log_flag::ERROR,  __PRETTY_FUNCTION__, std::format(__VA_ARGS__))
+    #define LOG_FATAL(...) idk::Logger::log(idk::log_flag::FATAL,  __PRETTY_FUNCTION__, std::format(__VA_ARGS__))
+#else
+    #define LOG_ADV(log__flags, ...)
+    #define LOG_DETAIL(...)
+    #define LOG_INFO(...)
+    #define LOG_DEBUG(...)
+    #define LOG_WARN(...)
+    #define LOG_ERROR(...)
+    #define LOG_FATAL(...)
+#endif
 
 

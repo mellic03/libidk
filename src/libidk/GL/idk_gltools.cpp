@@ -2,7 +2,7 @@
 #include "../idk_math.hpp"
 
 #include "../idk_assert.hpp"
-#include <libidk/idk_log2.hpp>
+#include <libidk/idk_log.hpp>
 
 #include <fstream>
 #include <sstream>
@@ -557,10 +557,8 @@ idk::gltools::loadPixels( const std::string &filepath, uint32_t *w, uint32_t *h,
 {
     if (fs::exists(filepath) == false)
     {
-        LOG_ERROR(
-            "idk::gltools::loadPixels",
-            std::format("File does not exist: \"{}\"", filepath)
-        );
+        LOG_ERROR("File does not exist: \"{}\"", filepath);
+        return nullptr;
     }
 
     SDL_Surface      *tmp = IMG_Load(filepath.c_str());
@@ -603,10 +601,7 @@ idk::gltools::loadTextureWrapper( const std::string &filepath, const glTextureCo
 {
     if (fs::exists(filepath) == false)
     {
-        LOG_ERROR(
-            "idk::gltools::loadTextureWrapper",
-            std::format("File does not exist: \"{}\"", filepath)
-        );
+        LOG_ERROR("File does not exist: \"{}\"", filepath);
     }
 
     SDL_Surface      *tmp    = IMG_Load(filepath.c_str());

@@ -1,36 +1,150 @@
-// #include "idk_log.hpp"
+#include "idk_ansi.hpp"
+#include "idk_assert.hpp"
+#include "idk_log.hpp"
+
+#include <sstream>
+#include <fstream>
+#include <iostream>
+#include <print>
+#include <chrono>
 
 
-// static constexpr auto RESET  = "\033[0m";
-// static constexpr auto BLACK  = "\033[30m";
-// static constexpr auto RED    = "\033[91m";
-// static constexpr auto GREEN  = "\033[92m";
-// static constexpr auto YELLOW = "\033[93m";
-// static constexpr auto BLUE   = "\033[94m";
+
+void
+idk::Logger::init()
+{
+    std::string time = std::format("{:%Y-%m-%d %H:%M:%OS}", std::chrono::high_resolution_clock::now());
+    m_filepath = std::format("./log/{}.txt", time);
+
+    std::ofstream stream(m_filepath);
+
+    if (stream.good())
+    {
+        std::print("[{}] [info]  [idk:::Logger::int] Opened file \"{}\"", time, m_filepath);
+    }
+
+    LOG_INFO("");
+
+    stream << "Initialized at " << time << "\n";
+    stream.close();
+}
 
 
-// idk::LogStream::LogStream( uint32_t flags, idk::LogType type, const std::string &file,
-//                            const std::string &func, int line )
-// :   m_flags (flags),
-//     m_file  (std::filesystem::path(file).filename().string()),
-//     m_func  (func),
-//     m_line  (line)
-// {
-//     auto color = RESET;
+void
+idk::Logger::update()
+{
+    static uint32_t count = 0;
+    Logger::print();
 
-//     switch (type)
-//     {
-//         default:
-//         case idk::LogType::INFO:  m_type = "[info]  "; color = GREEN;  break;
-//         case idk::LogType::DEBUG: m_type = "[debug] "; color = BLUE;   break;
-//         case idk::LogType::WARN:  m_type = "[warn]  "; color = YELLOW; break;
-//         case idk::LogType::ERROR: m_type = "[error] "; color = RED;    break;
-//     }
+    if (count >= 1024 && m_backbuffer.size() > 0)
+    {
+        Logger::writeFile();
+        m_backbuffer.clear();
+        count = 0;
+    }
+    count += 1;
+}
 
-//     m_ss << "[" << std::chrono::high_resolution_clock::now() << "] "
-//          << color << m_type << RESET;
 
-//     //  << m_file << " "
-//     //  << m_func << " "
-//     //  << m_line << " ";
-// }
+void
+idk::Logger::log( uint32_t tp, const std::string &title, const std::string &msg )
+{
+    auto color = ANSI::RESET;
+    std::string type;
+
+    switch (tp)
+    {
+        default:
+        case log_flag::DETAIL: type = "[verbose] "; color = ANSI::Reg::GRN;  break;
+        case log_flag::INFO:   type = "[info]    "; color = ANSI::Reg::GRN;  break;
+        case log_flag::DEBUG:  type = "[debug]   "; color = ANSI::Reg::BLU;  break;
+        case log_flag::WARN:   type = "[warn]    "; color = ANSI::Bd::YEL;   break;
+        case log_flag::ERROR:  type = "[error]   "; color = ANSI::BdHi::RED; break;
+        case log_flag::FATAL:  type = "[fatal]   "; color = ANSI::BdHi::RED; break;
+    }
+
+    if ((tp & Logger::flags) != tp)
+    {
+        return;
+    }
+
+    Token token = {
+        color,
+        std::format("[{:%Y/%m/%d-%Hh%Mm%OSs}] ", std::chrono::high_resolution_clock::now()),
+        type,
+        "[" + title + "] ",
+        msg
+    };
+
+    m_frontbuffer.push_back(token);
+
+    if (tp & log_flag::FATAL)
+    {
+        Logger::print();
+        Logger::writeFile();
+        IDK_ASSERT("Fatal error", false);
+    }
+
+    // if ((Logger::flags & log_flag::PRINT_LAZY) == false)
+    // {
+    //     Logger::print();
+    //     std::cout << std::flush;
+    // }
+}
+
+void
+idk::Logger::log( uint32_t type, const std::string &title )
+{
+    log(type, title, "");
+}
+
+void
+idk::Logger::log( const std::string &title, const std::string &msg )
+{
+    log(Logger::flags, title, msg);
+}
+
+void
+idk::Logger::log( const std::string &title )
+{
+    log(Logger::flags, title, "");
+}
+
+
+
+void
+idk::Logger::print()
+{
+    static std::string output;
+
+    for (Token &t: m_frontbuffer)
+    {
+        output = t.time
+               + t.color + t.ltype + ANSI::RESET
+               + t.title
+               + t.msg
+               + "\n";
+
+        std::cout << output;
+        m_backbuffer.push_back(t);
+    }
+
+    m_frontbuffer.clear();
+}
+
+
+void
+idk::Logger::writeFile()
+{
+    static std::string output;
+    std::ofstream stream(m_filepath, std::ios::app);
+
+    for (Token &t: m_backbuffer)
+    {
+        output = t.time + t.ltype + t.title + t.msg + "\n";
+        stream << output;
+    }
+
+    stream.close();
+}
+

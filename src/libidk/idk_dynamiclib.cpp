@@ -103,43 +103,44 @@ idk::DynamicLoader::DynamicLoader( const std::string &filepath )
 }
 
 
-idk::DynamicLoader::DynamicLoader( idk::DynamicLoader &&rhs )
-{
-    *this = std::move(rhs);
-}
+// idk::DynamicLoader::DynamicLoader( idk::DynamicLoader &&rhs )
+// {
+//     *this = std::move(rhs);
+// }
 
 
 
-idk::DynamicLoader &
-idk::DynamicLoader::operator = ( idk::DynamicLoader &&rhs )
-{
-    if (this == &rhs)
-    {
-        return *this;
-    }
+// idk::DynamicLoader&
+// idk::DynamicLoader::operator= ( idk::DynamicLoader &&rhs )
+// {
+//     if (this == &rhs)
+//     {
+//         return *this;
+//     }
 
-    m_realpath    = std::move(rhs.m_realpath);
-    m_temppath    = std::move(rhs.m_temppath);
-    m_lib         = std::move(rhs.m_lib);
-    m_functionptr = std::move(rhs.m_functionptr);
-    m_data        = std::move(rhs.m_data);
-    m_loaded      = std::move(rhs.m_loaded);
+//     m_realpath    = std::move(rhs.m_realpath);
+//     m_temppath    = std::move(rhs.m_temppath);
+//     m_lib         = std::move(rhs.m_lib);
+//     m_functionptr = std::move(rhs.m_functionptr);
+//     m_deleteptr   = std::move(rhs.m_deleteptr);
+//     m_data        = std::move(rhs.m_data);
+//     m_loaded      = std::move(rhs.m_loaded);
 
-    rhs.m_moved   = true;
-    this->m_moved = false;
+//     rhs.m_moved   = true;
+//     this->m_moved = false;
 
-    return *this;
-}
+//     return *this;
+// }
 
 
 
-idk::DynamicLoader::~DynamicLoader()
-{
-    if (is_moved() == false)
-    {
-        _unload();
-    }
-}
+// idk::DynamicLoader::~DynamicLoader()
+// {
+//     if (is_moved() == false)
+//     {
+//         unload();
+//     }
+// }
 
 
 
@@ -161,7 +162,7 @@ idk::DynamicLoader::_load()
     m_lib = idk::dynamiclib::loadObject(m_temppath.c_str());
     m_functionptr = idk::dynamiclib::loadFunction(m_lib, "getInstance");
     m_deleteptr   = idk::dynamiclib::loadFunction(m_lib, "freeInstance");
-    m_data = idk::dynamiclib::call<void *>(m_functionptr);
+    m_data = idk::dynamiclib::call<void*>(m_functionptr);
 
     m_loaded = true;
 }
@@ -169,7 +170,7 @@ idk::DynamicLoader::_load()
 
 
 void
-idk::DynamicLoader::_unload()
+idk::DynamicLoader::unload()
 {
     idk::dynamiclib::call<void>(m_deleteptr);
     idk::dynamiclib::unloadObject(m_lib);
@@ -189,7 +190,7 @@ idk::DynamicLoader::reload()
 {
     if (is_loaded())
     {
-        _unload();
+        unload();
     }
 
     _load();

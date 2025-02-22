@@ -1,8 +1,7 @@
 #pragma once
 
 #include "idk_assert.hpp"
-#include "idk_log2.hpp"
-#include "idk_memory.hpp"
+#include "idk_log.hpp"
 #include "idk_io.hpp"
 #include "idk_serialize.hpp"
 #include "idk_vector.hpp"
@@ -49,7 +48,7 @@ private:
         {
             if constexpr (std::is_pointer_v<T>)
             {
-                delete data;
+                // delete data;
             }
         }
     };
@@ -180,7 +179,7 @@ idk::WAllocator<T, A>::create( const T &data )
 
     if constexpr (std::is_pointer_v<T>)
     {
-        m_data.emplace_back(wrapper(id, new T(data)));
+        m_data.emplace_back(wrapper(id, data));
     }
     else
     {
@@ -241,15 +240,9 @@ idk::WAllocator<T, A>::destroy( int id )
 
     if (data_idx == -1)
     {
-        LOG_WARN(
-            "idk::WAllocator",
-            std::format("Attempted to delete object {} which is already deleted", id)
-        );
-
+        LOG_WARN("Attempted to delete object {} which is already deleted", id);
         return;
     }
-    // IDK_ASSERT("Attempted access of deleted object", data_idx != -1);
-
 
     // Find id of object which points to end of m_data
     int back_idx = -1;
@@ -263,6 +256,16 @@ idk::WAllocator<T, A>::destroy( int id )
     }
 
     IDK_ASSERT("Ruh roh", back_idx != -1);
+
+    if constexpr (std::is_pointer_v<T>)
+    {
+        delete m_data[back_idx].data;
+        m_data[back_idx].data = nullptr;
+    }
+    else
+    {
+
+    }
 
     std::swap(m_data[data_idx], m_data.back());
     m_data.pop_back();

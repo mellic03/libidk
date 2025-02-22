@@ -1,6 +1,5 @@
 #pragma once
 
-#include "idk_memory.hpp"
 #include "idk_pod.hpp"
 
 #include <vector>
@@ -12,11 +11,11 @@ namespace idk
     template <typename T, typename A = std::allocator<T>>
     using vector = std::vector<T, A>;
 
-    template <typename T>
-    using tvector = std::vector<T, idk::frame_allocator<T>>;
+    // template <typename T>
+    // using tvector = std::vector<T, idk::frame_allocator<T>>;
 
-    template <typename T>
-    using pvector = std::vector<T, idk::linear_allocator<T>>;
+    // template <typename T>
+    // using pvector = std::vector<T, idk::linear_allocator<T>>;
 
 };
 

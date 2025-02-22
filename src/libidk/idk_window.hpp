@@ -30,7 +30,7 @@ private:
 
 public:
     int major, minor;
-    SDL_GLContext sdl_ctx;
+    SDL_GLContext sdl_glctx;
 
     GLContext( idk::Window &win, int gl_major, int gl_minor );
     void reload();

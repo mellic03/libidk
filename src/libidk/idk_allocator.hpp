@@ -1,8 +1,7 @@
 #pragma once
 
-#include "idk_log2.hpp"
+#include "idk_log.hpp"
 #include "idk_assert.hpp"
-#include "idk_memory.hpp"
 #include "idk_io.hpp"
 #include "idk_serialize.hpp"
 #include "idk_vector.hpp"
@@ -29,11 +28,11 @@ namespace idk
     template <typename T, typename A = std::allocator<T>>
     class Allocator;
 
-    template <typename T>
-    using tAllocator = idk::Allocator<T, idk::frame_allocator<T>>;
+    // template <typename T>
+    // using tAllocator = idk::Allocator<T, idk::frame_allocator<T>>;
 
-    template <typename T>
-    using pAllocator = idk::Allocator<T, idk::linear_allocator<T>>;
+    // template <typename T>
+    // using pAllocator = idk::Allocator<T, idk::linear_allocator<T>>;
 
 };
 
@@ -248,10 +247,7 @@ idk::Allocator<T, A>::destroy( int id )
 
     if (data_idx == -1)
     {
-        LOG_WARN(
-            "idk::WAllocator2",
-            std::format("Attempted to delete object {} which is already deleted", id)
-        );
+        LOG_WARN("Attempted to delete object {} which is already deleted", id);
         return;
     }
     // IDK_ASSERT("Attempted access of deleted object", data_idx != -1);

@@ -1,81 +1,11 @@
 #pragma once
+#include <cstdint>
+#include <cstddef>
+#include "memory/tmp_vector.hpp"
 
-#include "memory/idk_memory.hpp"
-
-
-// #include <cstdint>
-// #include <cstddef>
-
-
-// namespace idk
-// {
-//     class linear_allocator;
-//     class frame_allocator;
-
-//     class block_allocator;
-//     class stdlib_allocator;
-
-//     class MemorySystem
-//     {
-//         void update();
-//     };
-
-// }
-
-
-
-// class idk::frame_allocator
-// {
-// private:
-//     static uint8_t *baseptr;
-//     static size_t   tail;
-//     static size_t   capacity;
-
-// public:
-//     void *allocate( size_t nbytes );
-//     void  deallocate( void * ) {  };
-
-//     static void  reset() { tail = 0; };
-
-// };
-
-
-
-// class idk::linear_allocator
-// {
-// private:
-//     static uint8_t *baseptr;
-//     static size_t   tail;
-//     static size_t   capacity;
-
-// public:
-//     void *allocate( size_t nbytes );
-//     void  deallocate( void * ) {  };
-
-// };
-
-
-
-// // class idk::block_allocator
-// // {
-// // private:
-// //     static uint8_t *baseptr;
-// //     static size_t   tail;
-// //     static size_t   capacity;
-
-// // public:
-// //     void *allocate( size_t nbytes );
-// //     void  deallocate( void * );
-
-// // };
-
-
-
-// class idk::stdlib_allocator
-// {
-// public:
-//     void *allocate( size_t nbytes );
-//     void  deallocate( void * );
-// };
-
-
+namespace idk
+{
+    static constexpr size_t KILO = 1024*1;
+    static constexpr size_t MEGA = 1024*KILO;
+    static constexpr size_t GIGA = 1024*MEGA;
+};

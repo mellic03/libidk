@@ -53,7 +53,7 @@ idk::GLContext::GLContext( idk::Window &win, int gl_major, int gl_minor )
 void
 idk::GLContext::_init( idk::Window &win, int gl_major, int gl_minor )
 {
-    sdl_ctx = SDL_GL_CreateContext(win.sdl_win);
+    sdl_glctx = SDL_GL_CreateContext(win.sdl_win);
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,  24);
@@ -62,7 +62,7 @@ idk::GLContext::_init( idk::Window &win, int gl_major, int gl_minor )
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, gl_major);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, gl_minor);
 
-    SDL_GL_MakeCurrent(win.sdl_win, sdl_ctx);
+    SDL_GL_MakeCurrent(win.sdl_win, sdl_glctx);
     SDL_GL_SetSwapInterval(0);
     SDL_SetRelativeMouseMode(SDL_FALSE);
 
@@ -83,7 +83,7 @@ idk::GLContext::_init( idk::Window &win, int gl_major, int gl_minor )
 void
 idk::GLContext::reload()
 {
-    SDL_GL_DeleteContext(sdl_ctx);
+    SDL_GL_DeleteContext(sdl_glctx);
     _init(m_win, major, minor);
 }
 
