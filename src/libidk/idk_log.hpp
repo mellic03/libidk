@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <format>
+#include "idk_assert.hpp"
 
 
 #define LOG_ADVGING
@@ -75,6 +76,9 @@ public:
     #define LOG_WARN(...) idk::Logger::log(idk::log_flag::WARN,  __PRETTY_FUNCTION__, std::format(__VA_ARGS__))
     #define LOG_ERROR(...) idk::Logger::log(idk::log_flag::ERROR,  __PRETTY_FUNCTION__, std::format(__VA_ARGS__))
     #define LOG_FATAL(...) idk::Logger::log(idk::log_flag::FATAL,  __PRETTY_FUNCTION__, std::format(__VA_ARGS__))
+    #define LOG_ASSERT(__ass__, ...) if (!(__ass__)) { idk::Logger::log(idk::log_flag::FATAL,  __PRETTY_FUNCTION__, std::format(__VA_ARGS__)); }\
+
+
 #else
     #define LOG_ADV(log__flags, ...)
     #define LOG_DETAIL(...)
@@ -83,6 +87,7 @@ public:
     #define LOG_WARN(...)
     #define LOG_ERROR(...)
     #define LOG_FATAL(...)
+    #define LOG_ASSERT(__ass__, ...)
 #endif
 
 

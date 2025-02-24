@@ -1,28 +1,13 @@
 #include "stack_allocator.hpp"
 #include "../idk_assert.hpp"
+#include "../idk_bitmanip.hpp"
 #include "../idk_log.hpp"
 
 
-idk::stack_allocator::stack_allocator( size_t capacity )
+idk::stack_allocator::stack_allocator( size_t nbytes, void *baseptr )
+:   linear_allocator(nbytes, baseptr)
 {
-    if (capacity == 0)
-    {
-        LOG_FATAL("Capacity cannot be zero bytes!");
-    }
-
-    LOG_INFO("Capacity: {} bytes", capacity);
-
-    m_capacity = capacity;
-    m_base     = new uint8_t[capacity];
-    m_tail     = m_base;
-    m_end      = m_base + capacity;
-}
-
-
-idk::stack_allocator::~stack_allocator()
-{
-    LOG_INFO("");
-    delete[] m_base;
+    m_tail = m_base + sizeof(node_type);
 }
 
 
@@ -30,7 +15,8 @@ void*
 idk::stack_allocator::alloc( size_t nbytes, size_t alignment )
 {
     uint8_t *tailptr = m_tail;
-    uint8_t *aligned = align_ptr(m_tail, alignment);
+    uint8_t *aligned = idk::ptr_align(m_tail+sizeof(node_type), alignment);
+    m_tail = aligned + nbytes;
 
     LOG_INFO(
         "nbytes={}, tail={}, aligned={}",
@@ -44,23 +30,31 @@ idk::stack_allocator::alloc( size_t nbytes, size_t alignment )
     }
 
     LOG_INFO("Allocated {} bytes", nbytes);
+    
+    m_top = reinterpret_cast<node_type*>(aligned - sizeof(node_type));
 
-    void *usrptr = static_cast<void*>(aligned);
-    m_tail = aligned + nbytes;
-    m_stack.push({tailptr, usrptr});
+    std::cout << "m_base: " << (void *)(m_base) << std::endl;
+    std::cout << "m_end: " << (void *)(m_end) << std::endl;
+    std::cout << "m_top: " << (void *)(m_top) << std::endl;
+    
+    m_top->tailptr = tailptr;
+    m_top->usrptr  = static_cast<void*>(aligned);
 
-    return usrptr; 
+    return m_top->usrptr;
 }
 
 
 void
-idk::stack_allocator::free( void *usrptr )
+idk::stack_allocator::free( void *ptr )
 {
-    IDK_ASSERT("Cannot free, stack is already empty", m_stack.empty() == false);
-    IDK_ASSERT("Memory must be freed in LIFO order", usrptr == m_stack.top().usr);
+    if (ptr != m_top->usrptr)
+    {
+        LOG_INFO("usrptr={} m_top->usrptr={}", ptr, m_top->usrptr);
+        LOG_FATAL("Memory must be freed in LIFO order");
+    }
 
-    m_tail = m_stack.top().tail;
-    m_stack.pop();
+    m_tail = static_cast<uint8_t*>(m_top->tailptr);
+    ptr = nullptr;
 }
 
 

@@ -82,7 +82,7 @@ idk::Logger::log( uint32_t tp, const std::string &title, const std::string &msg 
     {
         Logger::print();
         Logger::writeFile();
-        IDK_ASSERT("Fatal error", false);
+        IDK_ASSERT(msg.c_str(), false);
     }
 
     // if ((Logger::flags & log_flag::PRINT_LAZY) == false)

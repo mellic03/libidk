@@ -19,6 +19,5 @@ namespace idk::internal
 // #endif
 
 
-
 #define idk_printvalue(v) std::cout << #v << ": " << v << "\n"
 

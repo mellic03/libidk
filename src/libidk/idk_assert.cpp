@@ -14,10 +14,11 @@ idk::internal::assert_msg( const char *msg, const bool expression )
             << "Assertion failed: " << "\"" << msg << "\"\n"
             << __FILE__ << ":" << __LINE__ << "\n";
 
-        LOG_ERROR("{}", msg);
+        // LOG_FATAL("{}", msg);
 
         idk::Logger::print();
         idk::Logger::writeFile();
+        std::cout << std::endl;
 
         assert(false);
     }
