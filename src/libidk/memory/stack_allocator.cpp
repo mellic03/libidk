@@ -40,6 +40,14 @@ idk::stack_allocator::alloc( size_t nbytes, size_t alignment )
     m_top->tailptr = tailptr;
     m_top->usrptr  = static_cast<void*>(aligned);
 
+
+    LOG_ASSERT(
+        m_tail < m_end,
+        "Out of memory ({} / {} bytes)",
+        static_cast<size_t>(m_tail-m_base),
+        static_cast<size_t>(m_end-m_base)
+    );
+
     return m_top->usrptr;
 }
 

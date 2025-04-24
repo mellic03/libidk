@@ -30,6 +30,7 @@ namespace idk
             IO     = 1 << 10,
             API    = 1 << 11,
 
+            EVERYTHING = 1 << 12,
 
             DEFAULT = PRINT_LAZY|INFO|WARN|ERROR|FATAL
         };

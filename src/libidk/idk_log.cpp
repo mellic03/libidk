@@ -78,12 +78,19 @@ idk::Logger::log( uint32_t tp, const std::string &title, const std::string &msg 
 
     m_frontbuffer.push_back(token);
 
-    if (tp & log_flag::FATAL)
+    if (tp & log_flag::EVERYTHING)
+    {
+        Logger::print();
+        std::cout << std::flush;
+    }
+
+    else if (tp & log_flag::FATAL)
     {
         Logger::print();
         Logger::writeFile();
         IDK_ASSERT(msg.c_str(), false);
     }
+
 
     // if ((Logger::flags & log_flag::PRINT_LAZY) == false)
     // {

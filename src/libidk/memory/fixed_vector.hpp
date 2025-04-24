@@ -50,61 +50,44 @@ public:
     fixed_vector(const fixed_vector &) = delete; // Disable copy constructor
     fixed_vector &operator=(const fixed_vector &) = delete; // Disable assignment
 
-    void push( const T &data )
+
+    template <typename... Args>
+    void emplace_back( Args&&... args )
     {
-        // LOG_ASSERT(m_top < m_end, "Stack overflow");
-        *(m_top++) = data;
+        LOG_ASSERT(m_top < m_end, "Vector overflow");
+        std::construct_at(m_top, std::forward<Args>(args)...);
+        m_top++;
     }
 
-    void pop()
+    void push_back( const T &data )
     {
-        // LOG_ASSERT(m_top >= m_base, "Stack underflow");
+        LOG_ASSERT(m_top < m_end, "Vector overflow");
+        std::construct_at(m_top, data);
+        m_top++;
+    }
+
+    void push_back( T &&data )
+    {
+        emplace_back(std::move(data));
+    }
+
+    void pop_back()
+    {
         m_top--;
-            
-        if (!std::is_pointer_v<T>)
-        {
-            (*m_top).~T();
-        }
-    }
 
-    T &top()
-    {
-        // LOG_ASSERT(!empty(), "Stack is empty");
-        return *(m_top - 1);
-    }
-    
-    const T &top() const
-    {
-        // LOG_ASSERT(!empty(), "Stack is empty");
-        return *(m_top - 1);
+        std::destroy_at(m_top);
+
+        // if constexpr (!std::is_pointer_v<T>)
+        // {
+            // (*m_top).~T();
+        // }
     }
 
 
-    void push_back( const T &data ) { push(data); }
-    void pop_back()                 { pop();      }
-
-    void emplace_back( T &&data )
-    {
-        // std::cout << "---------------emplace_back(T&&)----------------\n"
-        //           << "base, cap, end:  " << uint64_t(m_base) << ", " << uint64_t(m_cap) << ", " << uint64_t(m_end)
-        //           << "\n----------------------------------------------\n"; 
-        *m_top = data;
-        m_top++;
-    }
-
-    void emplace_back()
-    {
-        // std::cout << "---------------emplace_back()-----------------\n"
-        //           << "base, cap, end:  " << uint64_t(m_base) << ", " << uint64_t(m_cap) << ", " << uint64_t(m_end)
-        //           << "\n----------------------------------------------\n";
-        std::construct_at(m_top);
-        m_top++;
-    }
-
-    T&       front()       { return m_base[0];   }
-    const T& front() const { return m_base[0];   }
-    T&       back()        { return this->top(); }
-    const T& back()  const { return this->top(); }
+    T&       front()       { return m_base[0];  }
+    const T& front() const { return m_base[0];  }
+    T&       back()        { return *(m_top-1); }
+    const T& back()  const { return *(m_top-1); }
 
     T*       data()        { return m_base; }
     const T* data()  const { return m_base; }
@@ -115,8 +98,8 @@ public:
 
     void resize( size_t s )
     {
-        while (size() > 0) { pop();     }
-        while (size() < s) { push(T()); }
+        while (size() > 0) { pop_back();     }
+        while (size() < s) { push_back(T()); }
     }
 
 

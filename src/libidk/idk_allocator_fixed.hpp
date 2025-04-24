@@ -1,11 +1,11 @@
 #pragma once
 
-#include "idk_assert.hpp"
 #include "idk_log.hpp"
 #include "idk_io.hpp"
 #include "idk_serialize.hpp"
 #include "idk_vector.hpp"
 
+#include "memory/fixed_array.hpp"
 #include "memory/fixed_vector.hpp"
 
 #include <type_traits>
@@ -20,41 +20,62 @@ namespace idk
 };
 
 
+#ifndef IDK_ALLOCATOR_ACCESS
+    #define IDK_ALLOCATOR_ACCESS( name, type, instance ) \
+    int   create##name() { return instance.create(); }; \
+    int   create##name( const type &data ) { return instance.create(data); }; \
+    type& get##name( int id ) { return instance.get(id); }; \
+    void  destroy##name ( int id ) { instance.destroy(id); }; \
+    idk::fixed_Allocator<type> &get##name##Allocator() { return instance; };
+#endif
+
+
+
+
 template <typename T>
 class idk::fixed_Allocator
 {
 private:
+    struct wrapper_type
+    {
+        int id;
+        T *data;
+    };
+
+    int m_maxid = -1;
+
     idk::fixed_vector<int> m_freelist;
-    idk::fixed_vector<int> m_reverse;
-    idk::fixed_vector<int> m_forward;
+    idk::fixed_array<int>  m_reverse;
+    idk::fixed_array<int>  m_forward;
     idk::fixed_vector<T>   m_data;
 
+    int _create();
 
 public:
     using value_type = T;
     using class_type = idk::fixed_Allocator<T>;
 
-                fixed_Allocator( size_t capacity, idk::base_allocator* );
-                // fixed_Allocator( const fixed_Allocator & );
-                // fixed_Allocator( fixed_Allocator && );
-               ~fixed_Allocator();
+    fixed_Allocator( size_t capacity, idk::base_allocator* );
+    ~fixed_Allocator();
 
-    int         create  (          );
-    int         create  ( const T& );
-    int         create  ( T&&      );
+    
+    int create  ( T&& );
+    int create  ( const T &data );
+    int create  ( );
+    
     T&          get     ( int id   );
     void        destroy ( int id   );
     void        clear   (          );
 
     void *      data    ()       { return m_data.data(); };
     size_t      size    () const { return m_data.size(); };
-
+    bool        contains( int id ) { return (0<=id && id<m_maxid) && (m_forward[id] != -1);}
 
     typename idk::fixed_vector<T>::iterator begin() { return m_data.begin(); };
     typename idk::fixed_vector<T>::iterator end()   { return m_data.end();   };
 
-    // typename idk::vector<wrapper>::const_iterator begin() const { return m_data.begin(); };
-    // typename idk::vector<wrapper>::const_iterator end()   const { return m_data.end();   };
+    // typename idk::fixed_vector<wrapper>::const_iterator begin() const { return m_data.begin(); };
+    // typename idk::fixed_vector<wrapper>::const_iterator end()   const { return m_data.end();   };
 
     size_t serialize( std::ofstream &stream ) const;
     size_t deserialize( std::ifstream &stream );
@@ -63,29 +84,14 @@ public:
 
 
 
-// template <typename T>
-// idk::fixed_Allocator<T>::fixed_Allocator( const idk::fixed_Allocator<T> &a )
-// :   m_data (std::move(a.m_data))
-// {
-
-// }
-
-
-// template <typename T>
-// idk::fixed_Allocator<T>::fixed_Allocator( idk::fixed_Allocator<T> &&a )
-// :   m_data (std::move(a.m_data))
-// {
-
-// }
-
 template <typename T>
 idk::fixed_Allocator<T>::fixed_Allocator( size_t capacity, idk::base_allocator *A )
 :   m_freelist(capacity, A),
-    m_reverse(capacity, A),
-    m_forward(capacity, A),
+    m_reverse(capacity, -1, A),
+    m_forward(capacity, -1, A),
     m_data(capacity, A)
 {
-    std::cout << "---------------fixed_Allocator-------------------\n";
+
 }
 
 
@@ -98,20 +104,18 @@ idk::fixed_Allocator<T>::~fixed_Allocator()
 
 
 
+
 template <typename T>
 int
-idk::fixed_Allocator<T>::create()
+idk::fixed_Allocator<T>::_create()
 {
-    int id  = -1;
-    int data_idx = m_data.size();
-    m_data.emplace_back();
+    int id, idx;
 
-    // Determine user-facing id
-    // ------------------------------------------------------------------------
     if (m_freelist.empty())
     {
-        id = m_forward.size();
-        m_forward.push_back(data_idx);
+        m_maxid += 1;
+        id = m_maxid;
+        // m_maxid += 1;
     }
 
     else
@@ -119,10 +123,21 @@ idk::fixed_Allocator<T>::create()
         id = m_freelist.back();
              m_freelist.pop_back();
     }
-    // ------------------------------------------------------------------------
 
-    m_forward[id] = data_idx;
+    idx = m_data.size();
+    m_forward[id]  = idx;
+    m_reverse[idx] = id;
 
+    return id;
+}
+
+
+template <typename T>
+int
+idk::fixed_Allocator<T>::create()
+{
+    int id = _create();
+    m_data.push_back(T());
     return id;
 }
 
@@ -131,27 +146,8 @@ template <typename T>
 int
 idk::fixed_Allocator<T>::create( const T &data )
 {
-    int id  = -1;
-    int data_idx = m_data.size();
-    m_data.emplace_back(data);
-
-    // Determine user-facing id
-    // ------------------------------------------------------------------------
-    if (m_freelist.empty())
-    {
-        id = m_forward.size();
-        m_forward.push_back(data_idx);
-    }
-
-    else
-    {
-        id = m_freelist.back();
-             m_freelist.pop_back();
-    }
-    // ------------------------------------------------------------------------
-
-    m_forward[id] = data_idx;
-
+    int id = _create();
+    m_data.push_back(data);
     return id;
 }
 
@@ -160,27 +156,8 @@ template <typename T>
 int
 idk::fixed_Allocator<T>::create( T &&data )
 {
-    int id = -1;
-    int data_idx = m_data.size();
-    m_data.emplace_back(data);
-
-    // Determine user-facing id
-    // ------------------------------------------------------------------------
-    if (m_freelist.empty())
-    {
-        id = m_forward.size();
-        m_forward.push_back(data_idx);
-    }
-
-    else
-    {
-        id = m_freelist.back();
-             m_freelist.pop_back();
-    }
-    // ------------------------------------------------------------------------
-
-    m_forward[id] = data_idx;
-
+    int id = _create();
+    m_data.push_back(data);
     return id;
 }
 
@@ -189,12 +166,19 @@ template <typename T>
 T&
 idk::fixed_Allocator<T>::get( int id )
 {
-    IDK_ASSERT("Attempted access of non-existant object", id < m_forward.size());
+    LOG_ASSERT(
+        0 <= id && id <= m_maxid,
+        "Attempted access of non-existant object {}. Reason: 0<={} && {}<={}", id, id, id, m_maxid
+    );
 
-    int data_idx = m_forward[id];
-    IDK_ASSERT("Attempted access of deleted object", data_idx != -1);
+    int idx = m_forward[id];
 
-    return m_data[data_idx];
+    LOG_ASSERT(
+        idx != -1,
+        "Attempted access of deleted object {}", id
+    );
+
+    return m_data[idx];
 }
 
 
@@ -202,32 +186,22 @@ template <typename T>
 void
 idk::fixed_Allocator<T>::destroy( int id )
 {
-    int data_idx = m_forward[id];
+    int idx = m_forward[id];
 
-    if (data_idx == -1)
-    {
-        LOG_WARN("Attempted to delete object {} which is already deleted", id);
-        return;
-    }
+    // Public id of element currently stored at data.back()
+    int back_id = m_reverse[m_data.size() - 1];
+    LOG_ASSERT(back_id != -1, "Programmer error exists if this assertion has failed");
 
-    // Find id of object which points to end of m_data
-    int back_idx = -1;
-
-    for (int i=0; i<m_forward.size(); i++)
-    {
-        if (m_forward[i] == m_data.size()-1)
-        {
-            back_idx = i;
-        }
-    }
-
-    IDK_ASSERT("Ruh roh", back_idx != -1);
-
-    std::swap(m_data[data_idx], m_data.back());
+    // Swap elements "id" and "back_id" and pop
+    std::swap(m_data[idx], m_data.back());
     m_data.pop_back();
 
-    m_forward[back_idx] = data_idx;
-    m_forward[id] = -1;
+    // The internal id of element "back_id" now needs to point to where element "id" used to be.
+    m_forward[back_id] = idx;
+
+    // Reset
+    m_reverse[idx] = -1;
+    m_forward[id]  = -1;
 
     m_freelist.push_back(id);
 }

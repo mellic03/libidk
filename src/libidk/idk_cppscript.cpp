@@ -149,9 +149,9 @@ idk::RuntimeScript::_init( const std::string &filename, bool concurrent )
     auto *ready = &(this->getData().ready);
     ready->store(false);
 
-    if (concurrent)
+    if (RuntimeScript::threadpool)
     {
-        idk::ThreadPool::createTask(
+        RuntimeScript::threadpool->createTask(
             [this, ready]()
             {
                 this->_load();

@@ -13,13 +13,14 @@
 
 
 
-
-#define IDK_ALLOCATOR_ACCESS( name, type, instance ) \
-int         create##name  (                  ) { return instance.create();     }; \
-int         create##name  ( const type &data ) { return instance.create(data); }; \
-type&       get##name     ( int id           ) { return instance.get(id);      }; \
-void        destroy##name ( int id           ) { instance.destroy(id);         }; \
-idk::Allocator<type> &get##name##Allocator()   { return instance; };
+// #ifndef IDK_ALLOCATOR_ACCESS
+//     #define IDK_ALLOCATOR_ACCESS( name, type, instance ) \
+//     int         create##name  (                  ) { return instance.create();     }; \
+//     int         create##name  ( const type &data ) { return instance.create(data); }; \
+//     type&       get##name     ( int id           ) { return instance.get(id);      }; \
+//     void        destroy##name ( int id           ) { instance.destroy(id);         }; \
+//     idk::Allocator<type> &get##name##Allocator()   { return instance; };
+// #endif
 
 
 

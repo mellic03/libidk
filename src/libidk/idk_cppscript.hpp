@@ -12,6 +12,7 @@
 
 namespace idk
 {
+    class Threadpool;
     class EngineAPI;
     class RuntimeScript;
 }
@@ -55,7 +56,8 @@ private:
 
 
 public:
-    int  id = -1;
+    int id = -1;
+    inline static idk::Threadpool *threadpool = nullptr;
 
     /**
      * @param filepath filepath relative to RuntimeScript::script_dir

@@ -38,6 +38,14 @@ idk::linear_allocator::alloc( size_t nbytes, size_t alignment )
     // return static_cast<void*>(top);
 
     m_tail = idk::ptr_align(m_tail, alignment) + nbytes;
+
+    LOG_ASSERT(
+        m_tail < m_end,
+        "Out of memory ({} / {} bytes)",
+        static_cast<size_t>(m_tail-m_base),
+        static_cast<size_t>(m_end-m_base)
+    );
+
     return static_cast<void*>(m_tail - nbytes);
 }
 
